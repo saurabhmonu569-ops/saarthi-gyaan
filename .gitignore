@@ -5,6 +5,18 @@ node_modules/
 dist/
 .vite/
 
+# Build-pipeline scratch data (2026-07-27, git setup): 36,800+ small
+# per-page/per-chunk intermediate files from the original book-processing
+# pipeline (OCR raw text + chunk splits). NOT read by the live app at
+# runtime (app fetches from public/knowledge/* only) — this is reproducible
+# scratch output, keeping it out of git so the repo stays fast to clone/push.
+data/chunks/
+data/raw/
+# Legacy pre-split knowledge files (~118MB) — superseded by public/knowledge/
+# (split-v1 format the live app actually reads). Confirmed unused at runtime.
+data/knowledge/knowledge.json
+data/knowledge/search_manifest.json
+
 # Environment (NEVER commit your API key!)
 .env
 .env.local
