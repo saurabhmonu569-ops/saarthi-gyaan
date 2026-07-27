@@ -294,31 +294,3 @@ function SearchResultCard({ result, query }) {
     </div>
   );
 }
-
-// SECTION 3 — AUDIO
-// ─────────────────────────────────────────────────────────────────────────────
-
-
-// ── AAJ KA AMRIT: roz har granth ka ek asli paath (Hindi + English) ─────────
-let _amritCache = undefined;
-async function loadAmrit() {
-  if (_amritCache !== undefined) return _amritCache;
-  try {
-    const r = await fetch("/knowledge/amrit.json");
-    _amritCache = r.ok ? (await r.json()) : null;
-  } catch { _amritCache = null; }
-  return _amritCache;
-}
-
-// MP3 manifest — kaunse paath ki natural-awaaz file bani hai (06_amrit_audio.py)
-let _amritAudioCache;
-async function loadAmritAudio() {
-  if (_amritAudioCache !== undefined) return _amritAudioCache;
-  try {
-    const r = await fetch("/audio/amrit/manifest.json");
-    _amritAudioCache = r.ok ? (await r.json()) : null;
-  } catch { _amritAudioCache = null; }
-  return _amritAudioCache;
-}
-const dayOfYear = () => Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
-
