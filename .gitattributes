@@ -1,0 +1,1 @@
+public/embed-model/paraphrase-multilingual-MiniLM-L12-v2/onnx/model_quantized.onnx filter=lfs diff=lfs merge=lfs -text

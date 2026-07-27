@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="hi" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Saarthi" />
+  <meta name="theme-color" content="#D4621A" />
+  <meta name="description" content="Saarthi — Ancient wisdom and thoughtful AI for life's real questions. Spiritual guidance, sacred books, and personal support." />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="manifest" href="/manifest.json" />
+  <!-- Typography: Tiro Devanagari Hindi = granth-jaisa serif (Devanagari+Latin),
+       Mukta = saaf UI font. Georgia mein Devanagari glyphs hi nahi the — isliye
+       Hindi ab tak system ke sookhe font mein girti thi. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Hindi:ital@0;1&family=Mukta:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <title>Saarthi — Ancient Wisdom, Modern Guidance</title>
+  <style>
+    * { box-sizing: border-box; }
+    html {
+      height: 100%;
+      height: -webkit-fill-available;
+      -webkit-text-size-adjust: 100%;
+    }
+    body {
+      height: 100%;
+      height: -webkit-fill-available;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+    #root {
+      height: 100vh;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.jsx"></script>
+</body>
+</html>

@@ -1,0 +1,37 @@
+{
+  "name": "saarthi-ai",
+  "version": "1.2.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@xenova/transformers": "^2.17.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.0",
+    "autoprefixer": "^10.4.19",
+    "jsdom": "^24.1.0",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^3.4.3",
+    "vite": "^5.2.11",
+    "vitest": "^2.0.5"
+  },
+  "description": "SAARTHI \u2014 Guide To Lost Divine Knowledge. A spiritual AI companion combining ancient wisdom with modern AI.",
+  "keywords": [
+    "spiritual",
+    "ai",
+    "bhagavad-gita",
+    "vedas",
+    "saarthi",
+    "hindi",
+    "meditation"
+  ],
+  "license": "MIT"
+}
