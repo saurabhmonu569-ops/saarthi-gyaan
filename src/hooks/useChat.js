@@ -443,6 +443,17 @@ export function useChat({
       // hain, par citation NAHI lagti. Kam bharosa theek hai; galat
       // bharosa nahi.
       const groundedChunks = (liveChunks || []).filter(c => c.grounded);
+
+      // DIAGNOSTIC (2026-08-03): footer laga ya nahi, aur NAHI toh KYUN —
+      // chaaron shart alag-alag dikhti hain. Audit ka sabak: chup-chaap
+      // fail hone mat do, warna mahino pata nahi chalta.
+      const _why = !responseText ? "koi jawab nahi"
+        : groundedChunks.length === 0 ? `grounded=0 (kul chunks ${(liveChunks || []).length})`
+        : responseText.includes("📚 Aadhaar") ? "model ne khud footer likh diya"
+        : noGroundingDisclaimed ? "model ne 'ullekh nahi mila' kaha"
+        : null;
+      console.log(`[Aadhaar] ${_why ? "footer NAHI laga — " + _why : `footer lagega — ${groundedChunks.length} grounded chunks`}`);
+
       if (responseText && groundedChunks.length > 0 && !responseText.includes("📚 Aadhaar") && !noGroundingDisclaimed) {
         // BUG FIX: pehle book+page se dedupe hota tha — "Agni Purana · Agni
         // Purana · Agni Purana" dikhta tha. Ab ek book EK baar, pages jud kar.

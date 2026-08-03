@@ -463,6 +463,14 @@ export function ChatView() {
         chunk: { ...r.chunk, text: r.chunk.text.slice(0, i < 3 ? 800 : 300) },
       }));
 
+      // DIAGNOSTIC (2026-08-03): retrieval ka poora hisaab ek line mein —
+      // kitne candidates aaye, kitne gate paar kiye, kaun se granth, aur
+      // grounded flag sach mein laga ya nahi.
+      console.log(`[Retrieval] candidates=${cleaned.length} → gate-paar=${kept.length} → bheje=${merged.length}`
+        + ` | grounded=${merged.filter(m => m.grounded).length}`
+        + ` | granth: ${[...new Set(merged.map(m => m.chunk.book))].join(", ") || "koi nahi"}`
+        + (scores ? ` | best-rerank=${Math.max(...scores).toFixed(3)}` : " | RERANK FAIL"));
+
       setSacredChunks(merged);
       return merged;
     } catch (e) {
