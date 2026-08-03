@@ -108,9 +108,39 @@ export const STRINGS = {
   amritLoading:      { hi: "🕉️ अमृत ला रहे हैं…", en: "🕉️ Bringing today's Amrit…" },
   amritViewSubtitle: { hi: "हर ग्रंथ से आज का एक पाठ — पढ़ें या सुनें, हिंदी या अंग्रेज़ी", en: "A daily reading from every scripture — read or listen, in Hindi or English" },
 
+  // ── DISCLAIMER (2026-08-03 mein dobara likha) ──────────────────────────
+  //
+  // Purane version mein do line aisi thi jo faayda nahi, NUKSAAN kar rahi thi:
+  //
+  //   1. "ग्रंथों पर हमारा कोई स्वामित्व-दावा नहीं है"
+  //      Copyright ka ulanghan swamitva ka DAAVA karne se nahi hota, bina
+  //      anumati COPY/VITARAN karne se hota hai. Yeh line kisi bhi tarah
+  //      anumati nahi deti — disclaimer ek bayaan hai, licence nahi.
+  //
+  //   2. "कोई भी शुल्क AI-खोज तकनीक के लिए है, ग्रंथ के लिए नहीं"
+  //      Yeh line ULTA saboot deti thi. Bharat mein fair dealing (Sec 52)
+  //      soochibaddh hai aur uski shart hai ki istemal "paise kamaane ke
+  //      liye na ho". Khud likh kar batana ki app commercial hai, apne hi
+  //      khilaf jaata hai. Aur adalat label nahi, ASLIYAT dekhti hai.
+  //
+  // Naye version mein woh do line hata kar teen cheezein jodi hain jo sach
+  // mein kaam karti hain:
+  //
+  //   a) SHREY (attribution) — Sec 52 ki fair-dealing shart hi yeh hai ki
+  //      source ka ullekh ho. Isliye publisher/anuvaadak ka naam CHHUPANA
+  //      nahi, DIKHANA hamare paksh mein jaata hai.
+  //   b) TAKEDOWN sampark — kanooni kavach nahi, par vyavhaar mein sabse
+  //      asardaar: zyaadatar mamle notice-and-takedown par hi khatam ho
+  //      jaate hain. Sadbhaav dikhta hai, jo damages kam karta hai.
+  //   c) "mool granth sabke hain, anuvaad unke" — idea/expression ka
+  //      farak, jo hamari asli sthiti hai.
+  //
+  // AI-galti aur "chikitsa/kanooni salah nahi" wali lines waise hi rakhi
+  // hain — woh ALAG khatre ke liye hain (galat salah ki zimmedari) aur
+  // wahan sach mein qeemti hain.
   disclaimerText: {
-    hi: "🙏 SAARTHI GYAAN एक शैक्षिक एवं आध्यात्मिक-अध्ययन प्लेटफ़ॉर्म है। AI के उत्तर गलत या अधूरे हो सकते हैं — महत्वपूर्ण बातों की पुष्टि मूल ग्रंथों से करें। यह चिकित्सा, कानूनी, वित्तीय या मनोवैज्ञानिक सलाह का विकल्प नहीं है। ग्रंथों पर हमारा कोई स्वामित्व-दावा नहीं है; कोई भी शुल्क AI-खोज तकनीक के लिए है, ग्रंथ के लिए नहीं। सभी धर्मों एवं परम्पराओं का पूर्ण सम्मान।",
-    en: "🙏 SAARTHI GYAAN is an educational and spiritual-study platform. AI responses may contain errors or be incomplete — please verify important matters from the original scriptures. This is not a substitute for medical, legal, financial, or psychological advice. We claim no ownership over the scriptures; any fee charged is for the AI search technology, not for the scripture itself. Full respect to all religions and traditions.",
+    hi: "🙏 SAARTHI GYAAN एक शैक्षिक एवं आध्यात्मिक-अध्ययन प्लेटफ़ॉर्म है। AI के उत्तर गलत या अधूरे हो सकते हैं — महत्वपूर्ण बातों की पुष्टि मूल ग्रंथों से अवश्य करें। यह चिकित्सा, कानूनी, वित्तीय या मनोवैज्ञानिक सलाह का विकल्प नहीं है; कृपया योग्य व्यक्ति से परामर्श लें। ग्रंथों का मूल ज्ञान मानवता की साझी धरोहर है; किंतु जिन संस्करणों, अनुवादों एवं टीकाओं का यहाँ उपयोग हुआ है, उनके अधिकार उनके रचयिताओं एवं प्रकाशकों के पास सुरक्षित हैं। यदि किसी अधिकार-धारक को कोई आपत्ति हो तो saurabhmonu569@gmail.com पर सूचित करें; सामग्री तुरंत हटा दी जाएगी। सभी धर्मों एवं परम्पराओं का पूर्ण सम्मान।",
+    en: "🙏 SAARTHI GYAAN is an educational and spiritual-study platform. AI responses may contain errors or be incomplete — please verify anything important against the original scriptures. It is not a substitute for medical, legal, financial, or psychological advice; please consult a qualified professional. The wisdom of these scriptures is humanity's shared inheritance; the particular editions, translations and commentaries used here, however, remain the rights of their authors and publishers. If you are a rights holder and object to any material, please write to saurabhmonu569@gmail.com and it will be removed promptly. Full respect to all religions and traditions.",
   },
 
   // ── Chat / Ask ──

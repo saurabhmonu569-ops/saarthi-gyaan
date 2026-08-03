@@ -8,7 +8,7 @@ import { useKnowledge } from "@/hooks/useKnowledge";
 import { useBookProgress } from "@/context/AppContext";
 import { polishSacredText, hasApiKey } from "@/services/gemini";
 import { BOOKS } from "@/data";
-import { useT } from "@/i18n";
+import { useT, useUiLang } from "@/i18n";
 import { C, F, serif, HAS_PDF } from "@/styles/theme";
 import { Prose } from "@/components/ui/Primitives";
 import { AudioEngine, HAS_EL } from "@/services/audioEngine";
@@ -211,6 +211,8 @@ function ChapterReader({ book, ch, onBack, markRead, isBookmarked, toggleBookmar
 
 function BookDetail({ book, onBack, getChapters, getChapterChunks, getBookChunks, knowledgeReady }) {
   const t = useT();
+  const { uiLang } = useUiLang();
+  const en = uiLang === "en";   // shrey-line (edition/संस्करण) ke liye
   const { markRead, toggleBookmark, isBookmarked, lastChapter } = useBookProgress();
   const [chapter, setChapter] = useState(null);
   const last = lastChapter(book.id);
@@ -289,6 +291,15 @@ function BookDetail({ book, onBack, getChapters, getChapterChunks, getBookChunks
               <h2 style={{ fontSize: F.lg + 1, fontWeight: 700, color: C.ink, margin: "0 0 4px" }}>{book.title}</h2>
               <p style={{ fontSize: F.sm, color: C.muted, margin: "0 0 8px" }}>{book.subtitle} · {book.totalChapters} chapters</p>
               <p style={{ fontSize: F.base, color: C.body, lineHeight: 1.65, margin: 0 }}>{book.description}</p>
+              {/* SHREY (2026-08-03) — is sanskaran ka prakashak/anuvaadak.
+                  Mool granth public domain hai, par yeh ANUVAAD/TEEKA unki
+                  apni rachna hai. Bharat ka fair dealing (Sec 52) source ke
+                  ullekh ki maang karta hai — isliye yeh dikhta hai. */}
+              {book.source && (
+                <p style={{ fontSize: F.xs, color: C.muted, lineHeight: 1.5, margin: "8px 0 0", fontStyle: "italic" }}>
+                  {en ? "Edition: " : "संस्करण: "}{en ? (book.sourceEn || book.source) : book.source}
+                </p>
+              )}
             </div>
           </div>
 
@@ -453,6 +464,11 @@ export function BooksView() {
         subtitle:     m.en    || eb.tradition,
         lang:         "Hindi / Sanskrit",
         description:  m.sub   || "",
+        // SHREY (2026-08-03): is sanskaran ka prakashak/anuvaadak. Bharat ke
+        // fair dealing (Copyright Act Sec 52) ki shart hi source ka ullekh
+        // hai — isliye yeh chhupane ki nahi, DIKHANE ki cheez hai.
+        source:       m.src   || "",
+        sourceEn:     m.srcEn || "",
         totalChapters: null,
       };
     });

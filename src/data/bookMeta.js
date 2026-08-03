@@ -6,31 +6,53 @@
  * between two view files. Pure move — no data changed.
  */
 
-// ── Curated metadata for the 13+ uploaded books — PROPER names, never OCR ────
+// ── SHREY / ATTRIBUTION (2026-08-03) ─────────────────────────────────────────
+// `src` field har kitab ke saath uske SANSKARAN ka shrey deta hai.
+//
+// KYUN: mool granth (Rigveda, Gita, Puran) hazaaron saal purane hain aur
+// public domain mein hain — par jo ANUVAAD, TEEKA aur SAMPADAN humne
+// istemal kiya hai, woh nayi rachnaayein hain aur unke apne adhikar hain.
+// Bharat ka fair dealing (Copyright Act, Sec 52) America ke "fair use"
+// jaisa lachila nahi hai — woh soochibaddh hai, aur uski ek saaf shart
+// yeh hai ki SOURCE KA ULLEKH ho.
+//
+// Isliye publisher ka naam CHHUPANA nahi, DIKHANA hamare paksh mein jaata
+// hai. (Ulta karna — copyright page hata dena — Sec 65B ke tehet alag
+// apradh hai aur "jaan-boojh kar kiya" ka saboot ban jaata hai.)
+//
+// Data src/../copyright_findings.md ki research se aaya hai. Jahan
+// publisher confirm nahi ho paya, wahan "अज्ञात" likha hai — jhootha
+// shrey dene se behtar hai sach mein na jaanna maan lena.
+//
+// ⚠️ Yeh KAANOONI SURAKSHA NAHI hai. Asli risk teen cheezon se ghatta hai:
+//    (1) poori PDF baantna band karna, (2) Gita Press se likhit anumati
+//    (11/24 kitaabein ek saath), (3) 3 high-risk kitaabein public-domain
+//    source se badalna. Yeh attribution unke SAATH chalta hai, unki jagah
+//    nahi.
 export const BOOK_META = {
-  bhagavad_gita_shankar: { icon:"🕉️", title:"श्रीमद्भगवद्गीता", en:"Shrimad Bhagavad Gita", sub:"शांकरभाष्य सहित — कर्म, भक्ति और ज्ञान का सार" },
-  valmiki_ramayana:      { icon:"🏹", title:"वाल्मीकि रामायण",   en:"Valmiki Ramayana",     sub:"मर्यादा पुरुषोत्तम श्रीराम की पावन गाथा" },
-  rigveda_1:             { icon:"📜", title:"ऋग्वेद",             en:"Rigveda",              sub:"विश्व का प्राचीनतम ग्रंथ — ऋचाओं का संग्रह" },
-  samaveda:              { icon:"🎵", title:"सामवेद",             en:"Samaveda",             sub:"संगीत और साम-गान का वेद" },
-  yajurveda:             { icon:"🔥", title:"यजुर्वेद",            en:"Yajurveda",            sub:"यज्ञ-विधि और मंत्रों का वेद" },
-  atharvaveda_1:         { icon:"🌿", title:"अथर्ववेद",           en:"Atharvaveda",          sub:"जीवन, औषधि और रक्षा-मंत्रों का वेद" },
-  shiva_purana_1:        { icon:"🔱", title:"शिव पुराण — खण्ड १",  en:"Shiva Purana Khand 1", sub:"भगवान शिव की महिमा और लीलाएँ" },
-  shiva_purana_2:        { icon:"🔱", title:"शिव पुराण — खण्ड २",  en:"Shiva Purana Khand 2", sub:"शिव-भक्ति, व्रत और कथाएँ" },
-  garuda_purana_1:       { icon:"🦅", title:"गरुड़ पुराण",         en:"Garuda Purana",        sub:"मृत्यु, परलोक और कर्मफल का ज्ञान" },
-  vishnu_purana_1:       { icon:"🪷", title:"विष्णु पुराण",        en:"Vishnu Purana",        sub:"सृष्टि, अवतार और भक्ति की कथाएँ" },
-  narasimha_purana:      { icon:"🦁", title:"नृसिंह पुराण",        en:"Narasimha Purana",     sub:"भक्त प्रह्लाद और नृसिंह अवतार" },
-  bhavishya_purana:      { icon:"🔮", title:"भविष्य पुराण",        en:"Bhavishya Purana",     sub:"भविष्य-कथन, व्रत और धर्म-आचार" },
-  agni_purana:           { icon:"🔥", title:"अग्नि पुराण",         en:"Agni Purana",          sub:"सर्व-विद्या का विश्वकोश पुराण" },
+  bhagavad_gita_shankar: { icon:"🕉️", title:"श्रीमद्भगवद्गीता", en:"Shrimad Bhagavad Gita", sub:"शांकरभाष्य सहित — कर्म, भक्ति और ज्ञान का सार", src:"गीता प्रेस, गोरखपुर", srcEn:"Gita Press, Gorakhpur" },
+  valmiki_ramayana:      { icon:"🏹", title:"वाल्मीकि रामायण",   en:"Valmiki Ramayana",     sub:"मर्यादा पुरुषोत्तम श्रीराम की पावन गाथा", src:"अनु. चतुर्वेदी द्वारका प्रसाद शर्मा · राम नारायण लाल, प्रयाग · प्रथम संस्करण 1927", srcEn:"Tr. Chaturvedi Dwarka Prasad Sharma · Ram Narayan Lal, Allahabad · 1st edn. 1927" },
+  rigveda_1:             { icon:"📜", title:"ऋग्वेद",             en:"Rigveda",              sub:"विश्व का प्राचीनतम ग्रंथ — ऋचाओं का संग्रह", src:"संस्कृत साहित्य प्रकाशन · 2015", srcEn:"Sanskrit Sahitya Prakashan · 2015" },
+  samaveda:              { icon:"🎵", title:"सामवेद",             en:"Samaveda",             sub:"संगीत और साम-गान का वेद", src:"प्रकाशक अज्ञात", srcEn:"Publisher unknown" },
+  yajurveda:             { icon:"🔥", title:"यजुर्वेद",            en:"Yajurveda",            sub:"यज्ञ-विधि और मंत्रों का वेद", src:"संभवतः मोतीलाल बनारसीदास · 1971 (अपुष्ट)", srcEn:"Possibly Motilal Banarsidass · 1971 (unconfirmed)" },
+  atharvaveda_1:         { icon:"🌿", title:"अथर्ववेद",           en:"Atharvaveda",          sub:"जीवन, औषधि और रक्षा-मंत्रों का वेद", src:"संस्कृत साहित्य प्रकाशन · 2015", srcEn:"Sanskrit Sahitya Prakashan · 2015" },
+  shiva_purana_1:        { icon:"🔱", title:"शिव पुराण — खण्ड १",  en:"Shiva Purana Khand 1", sub:"भगवान शिव की महिमा और लीलाएँ", src:"गीता प्रेस, गोरखपुर", srcEn:"Gita Press, Gorakhpur" },
+  shiva_purana_2:        { icon:"🔱", title:"शिव पुराण — खण्ड २",  en:"Shiva Purana Khand 2", sub:"शिव-भक्ति, व्रत और कथाएँ", src:"गीता प्रेस, गोरखपुर", srcEn:"Gita Press, Gorakhpur" },
+  garuda_purana_1:       { icon:"🦅", title:"गरुड़ पुराण",         en:"Garuda Purana",        sub:"मृत्यु, परलोक और कर्मफल का ज्ञान", src:"संक्षिप्त गरुड़पुराण · गीता प्रेस, गोरखपुर · 32वाँ पुनर्मुद्रण", srcEn:"Sankshipt Garuda Purana · Gita Press, Gorakhpur · 32nd reprint" },
+  vishnu_purana_1:       { icon:"🪷", title:"विष्णु पुराण",        en:"Vishnu Purana",        sub:"सृष्टि, अवतार और भक्ति की कथाएँ", src:"गीता प्रेस, गोरखपुर (संभावित)", srcEn:"Gita Press, Gorakhpur (probable)" },
+  narasimha_purana:      { icon:"🦁", title:"नृसिंह पुराण",        en:"Narasimha Purana",     sub:"भक्त प्रह्लाद और नृसिंह अवतार", src:"गीता प्रेस, गोरखपुर — 'कल्याण' विशेषांक", srcEn:"Gita Press, Gorakhpur — 'Kalyan' special" },
+  bhavishya_purana:      { icon:"🔮", title:"भविष्य पुराण",        en:"Bhavishya Purana",     sub:"भविष्य-कथन, व्रत और धर्म-आचार", src:"गीता प्रेस 'कल्याण' · जनवरी 1992", srcEn:"Gita Press 'Kalyan' · January 1992" },
+  agni_purana:           { icon:"🔥", title:"अग्नि पुराण",         en:"Agni Purana",          sub:"सर्व-विद्या का विश्वकोश पुराण", src:"गीता प्रेस, गोरखपुर · 16वाँ पुनर्मुद्रण", srcEn:"Gita Press, Gorakhpur · 16th reprint" },
   // ── Batch 2: 11 nayi books (07_add_books.py se) ──
-  ishadi_upanishad:      { icon:"🪷", title:"ईशादि उपनिषद्",       en:"Ishadi Upanishad",     sub:"ईश, केन, कठ आदि — आत्मज्ञान के मूल स्रोत" },
-  kathopanishad:         { icon:"🕯️", title:"कठोपनिषद्",           en:"Kathopanishad",        sub:"नचिकेता-यम संवाद — मृत्यु और अमरता का रहस्य" },
-  guru_granth_sahib:     { icon:"☬",  title:"गुरु ग्रंथ साहिब",     en:"Guru Granth Sahib",    sub:"गुरुवाणी — नाम, सेवा और सिमरन का प्रकाश" },
-  chanakya_neeti:        { icon:"🦉", title:"चाणक्य नीति",          en:"Chanakya Neeti",       sub:"जीवन, राजनीति और व्यवहार की अमर सूत्र-नीति" },
-  ekadashi_mahatmya:     { icon:"🌕", title:"एकादशी व्रत माहात्म्य", en:"Ekadashi Mahatmya",    sub:"सभी एकादशियों की कथा, विधि और फल" },
-  mantra_maha_sagar:     { icon:"📿", title:"मंत्र महासागर",        en:"Mantra Maha Sagar",    sub:"मंत्रों का महाकोश — साधना और सिद्धि" },
-  mantra_shakti:         { icon:"✨", title:"मंत्र शक्ति",          en:"Mantra Shakti",        sub:"मंत्र-विज्ञान और जप की शक्ति" },
-  nitya_devta_archana:   { icon:"🪔", title:"नित्य देवता अर्चना",   en:"Nitya Devta Archana",  sub:"दैनिक देव-पूजन की सरल विधि" },
-  nitya_karm_pooja:      { icon:"🛕", title:"नित्य कर्म पूजा प्रकाश", en:"Nitya Karm Pooja",     sub:"संध्या, पूजन और नित्य कर्मों का संग्रह" },
-  lal_kitab:             { icon:"📕", title:"लाल किताब (उपाय सहित)", en:"Lal Kitab",            sub:"ज्योतिष और सरल उपायों का प्रसिद्ध ग्रंथ" },
-  rashi_muhurt_vigyan:   { icon:"🪐", title:"सम्पूर्ण राशि और मुहूर्त विज्ञान", en:"Rashi & Muhurt Vigyan", sub:"राशियों, ग्रहों और शुभ मुहूर्त का विज्ञान" },
+  ishadi_upanishad:      { icon:"🪷", title:"ईशादि उपनिषद्",       en:"Ishadi Upanishad",     sub:"ईश, केन, कठ आदि — आत्मज्ञान के मूल स्रोत", src:"गीता प्रेस, गोरखपुर", srcEn:"Gita Press, Gorakhpur" },
+  kathopanishad:         { icon:"🕯️", title:"कठोपनिषद्",           en:"Kathopanishad",        sub:"नचिकेता-यम संवाद — मृत्यु और अमरता का रहस्य", src:"गीता प्रेस, गोरखपुर · 23वाँ संस्करण", srcEn:"Gita Press, Gorakhpur · 23rd edn." },
+  guru_granth_sahib:     { icon:"☬",  title:"गुरु ग्रंथ साहिब",     en:"Guru Granth Sahib",    sub:"गुरुवाणी — नाम, सेवा और सिमरन का प्रकाश", src:"हिंदी टीका: समन चेतनराय · मुद्रक: रोहित आर्ट प्रेस, दिल्ली", srcEn:"Hindi commentary: Saman Chetanray · Printer: Rohit Art Press, Delhi" },
+  chanakya_neeti:        { icon:"🦉", title:"चाणक्य नीति",          en:"Chanakya Neeti",       sub:"जीवन, राजनीति और व्यवहार की अमर सूत्र-नीति", src:"संकलन: विश्वामित्र शर्मा · प्रकाशक अज्ञात", srcEn:"Compiled by Vishvamitra Sharma · Publisher unknown" },
+  ekadashi_mahatmya:     { icon:"🌕", title:"एकादशी व्रत माहात्म्य", en:"Ekadashi Mahatmya",    sub:"सभी एकादशियों की कथा, विधि और फल", src:"गौड़ीय वेदांत प्रकाशन", srcEn:"Gaudiya Vedanta Publications" },
+  mantra_maha_sagar:     { icon:"📿", title:"मंत्र महासागर",        en:"Mantra Maha Sagar",    sub:"मंत्रों का महाकोश — साधना और सिद्धि", src:"चौखम्बा कृष्णदास अकादमी, वाराणसी · 2017", srcEn:"Chowkhamba Krishnadas Academy, Varanasi · 2017" },
+  mantra_shakti:         { icon:"✨", title:"मंत्र शक्ति",          en:"Mantra Shakti",        sub:"मंत्र-विज्ञान और जप की शक्ति", src:"गोयल एंड कंपनी, दरीबा, दिल्ली · लगभग 1974", srcEn:"Goyal & Company, Dariba, Delhi · c. 1974" },
+  nitya_devta_archana:   { icon:"🪔", title:"नित्य देवता अर्चना",   en:"Nitya Devta Archana",  sub:"दैनिक देव-पूजन की सरल विधि", src:"श्री चित्रापुर मठ", srcEn:"Shri Chitrapur Math" },
+  nitya_karm_pooja:      { icon:"🛕", title:"नित्य कर्म पूजा प्रकाश", en:"Nitya Karm Pooja",     sub:"संध्या, पूजन और नित्य कर्मों का संग्रह", src:"गीता प्रेस, गोरखपुर · 62वाँ पुनर्मुद्रण", srcEn:"Gita Press, Gorakhpur · 62nd reprint" },
+  lal_kitab:             { icon:"📕", title:"लाल किताब (उपाय सहित)", en:"Lal Kitab",            sub:"ज्योतिष और सरल उपायों का प्रसिद्ध ग्रंथ", src:"प्रकाशक अज्ञात", srcEn:"Publisher unknown" },
+  rashi_muhurt_vigyan:   { icon:"🪐", title:"सम्पूर्ण राशि और मुहूर्त विज्ञान", en:"Rashi & Muhurt Vigyan", sub:"राशियों, ग्रहों और शुभ मुहूर्त का विज्ञान", src:"आधुनिक संकलन · प्रकाशक अज्ञात", srcEn:"Modern compilation · Publisher unknown" },
 };
