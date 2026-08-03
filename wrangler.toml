@@ -1,0 +1,86 @@
+# SAARTHI Worker — deploy configuration
+# =====================================================================
+# KYUN (audit finding D3, 2026-08-01):
+# Ab tak yeh worker (1000+ lines) dashboard ke code-editor mein HAATH SE
+# paste karke deploy hota tha. Uske teen nateeje the:
+#
+#   1. Koi guarantee nahi ki repo ki file aur LIVE code ek jaise hain
+#   2. Koi rollback nahi — purana version wapas laane ka tareeka hi nahi
+#   3. Bindings aur cron sirf dashboard mein, kahin likhe hue nahi
+#
+# Aur yeh sirf theory nahi thi: is audit mein hi "pehle live code ka
+# backup lo" wala manual step do baar bhoolne se bacha.
+#
+# Ab config CODE mein hai. Deploy ek command hai, har deploy ek commit se
+# juda hota hai, aur rollback ek command hai.
+#
+# ── PEHLI BAAR SETUP (ek hi baar) ────────────────────────────────────
+#   npm install                      (wrangler devDependency mein hai)
+#   npx wrangler login               (browser khulega, Cloudflare login)
+#
+# ── ROZ KA ISTEMAL ───────────────────────────────────────────────────
+#   npm run worker:deploy            deploy karo
+#   npm run worker:tail              live logs dekho
+#   npx wrangler deployments list    history
+#   npx wrangler rollback            pichle version par wapas
+#
+# ── SECRETS (yahan NAHI aate — kabhi mat likhna) ─────────────────────
+# Yeh sirf dashboard/CLI se set hote hain aur file mein kabhi nahi jaate:
+#   GROQ_API_KEY  GROQ_API_KEY_2/3/4  GEMINI_API_KEY  OPENROUTER_API_KEY
+#   SESSION_SECRET  VAPID_PRIVATE_JWK
+# Naya secret set karna ho:  npx wrangler secret put NAAM
+#
+# ⚠️  Pehli baar `wrangler deploy` chalane se pehle: dashboard ke live code
+#     ka backup le lo (deploy/_live-backup.js). Agar dashboard mein koi
+#     aisa fix hai jo repo mein nahi aaya, deploy usse mita dega.
+
+name = "saarthi-ai"
+main = "deploy/cloudflare-worker.js"
+compatibility_date = "2026-07-01"
+workers_dev = true
+
+# ── DASHBOARD KE VARIABLES BACHAO ────────────────────────────────────
+# Default roop se `wrangler deploy` worker ke saare plaintext variables ko
+# is file ke hisaab se REPLACE kar deta hai — yaani jo yahan nahi likha,
+# woh LIVE se MIT jaata hai. Aapke ALLOWED_ORIGINS, GOOGLE_CLIENT_ID aur
+# VAPID_PUBLIC_KEY abhi dashboard mein set hain; unke bina /auth/verify
+# aur push notifications dono turant toot jaate.
+#
+# keep_vars = true isse rokta hai.
+#
+# ⚠️ YEH LINE YAHIN, SABSE UPAR RAHNI CHAHIYE. TOML mein top-level key
+#    kisi bhi [section] ke BAAD likhi jaye toh woh usi section ki key ban
+#    jaati hai. Pehle yeh galti se [triggers] ke neeche thi — tab yeh
+#    `triggers.keep_vars` ban rahi thi, poori tarah bekaar, aur pehle hi
+#    deploy par dashboard ke variables ud jaate.
+keep_vars = true
+
+# ── KV — push subscriptions + rate-limit counters ────────────────────
+# NOTE: is namespace mein DO tarah ki keys rehti hain:
+#   sub:*  → push subscriptions (scheduled() inhi ko bhejta hai)
+#   rl:*   → per-IP rate-limit counters, 60s TTL
+# Isiliye cron ka list() call `prefix: "sub:"` use karta hai — bina uske
+# rl: keys bhi "failed push" mein gin jaati thi (audit fix D1).
+[[kv_namespaces]]
+binding = "PUSH_SUBS"
+id = "dbc6d172f5f847fc9a626cc51ba5120a"
+
+# ── Workers AI — query embedding (bge-m3) + reranker ─────────────────
+[ai]
+binding = "AI"
+
+# ── Cron: 02:30, 08:30, 13:30 UTC = 08:00, 14:00, 19:00 IST ──────────
+# Ek hi cron dono kaam karta hai — health-check aur daily reminders.
+[triggers]
+crons = ["30 2,8,13 * * *"]
+
+# NOTE: keep_vars sabse upar hai (file ke shuru mein) — TOML ke niyam ke
+# hisaab se top-level key kisi bhi [section] se pehle honi chahiye.
+#
+# Dashboard ke variables (ALLOWED_ORIGINS, GOOGLE_CLIENT_ID,
+# VAPID_PUBLIC_KEY) ko aage chal kar code mein laana ho toh: pehle
+# dashboard se EXACT values copy karo, [vars] block banao, keep_vars
+# hata do, phir deploy — isi kram mein.
+
+[observability]
+enabled = true

@@ -7,7 +7,14 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "vitest run"
+    "test": "vitest run",
+    "worker:deploy": "wrangler deploy",
+    "worker:tail": "wrangler tail",
+    "worker:rollback": "wrangler rollback",
+    "embed:corpus": "node scripts/embed-corpus.mjs",
+    "embed:lexicon": "node scripts/build-lexicon.mjs",
+    "rag:calibrate": "node scripts/calibrate-threshold.mjs",
+    "rag:debug": "node scripts/debug-query.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",
@@ -20,7 +27,8 @@
     "postcss": "^8.4.38",
     "tailwindcss": "^3.4.3",
     "vite": "^5.2.11",
-    "vitest": "^2.0.5"
+    "vitest": "^2.0.5",
+    "wrangler": "^3.78.0"
   },
   "description": "SAARTHI \u2014 Guide To Lost Divine Knowledge. A spiritual AI companion combining ancient wisdom with modern AI.",
   "keywords": [

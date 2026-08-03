@@ -16,6 +16,13 @@ export default defineConfig({
   // component ko render/test nahi karte, isliye yeh fast aur stable hai.
   test: {
     environment: "jsdom",
+    // NODE 22 FIX (2026-08-03): sirf `environment: "jsdom"` kaafi NAHI hai.
+    // Node 22 ka apna experimental `localStorage` global jsdom wale ko
+    // globalThis par baithne nahi deta, aur woh khud `--localstorage-file`
+    // ke bina undefined rehta hai. quota.test.js ke saare 8 tests isi wajah
+    // se `beforeEach` mein mar rahe the — chup-chaap, Node upgrade ke baad
+    // se. Yeh setup file usse theek karti hai.
+    setupFiles: ["./vitest.setup.js"],
   },
   build: {
     outDir: "dist",

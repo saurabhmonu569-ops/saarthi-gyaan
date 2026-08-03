@@ -783,14 +783,27 @@ export default {
       // Key = endpoint ka hash bana sakte the, par endpoint khud hi kaafi
       // unique hai (har browser-install ka apna URL hota hai) — seedha use.
       const key = "sub:" + sub.endpoint.slice(-180);
+      // AUDIT FIX D2 (2026-08-03): pehle email/name seedha client ke bheje
+      // hue body se store hote the — jabki isi handler mein upar
+      // verifySessionToken() se nikla, crypto-verified `sessionEmail`
+      // pehle se maujood hai. Allowed origin se koi bhi request kisi bhi
+      // email ke naam par subscription bana sakti thi.
+      //
+      // Ab: verified session ho toh WAHI email maano. Na ho (bina sign-in
+      // ke bhi reminders chalne chahiye) tabhi client ka bheja hua lo, aur
+      // use "unverified" nishan ke saath rakho — taaki baad mein pata rahe
+      // ki kaunsi pehchan bharosemand hai.
+      const subEmail = sessionEmail || (b.email || "").trim().slice(0, 200);
       await env.PUSH_SUBS.put(key, JSON.stringify({
         subscription: sub,
-        email: (b.email || "").slice(0, 200),
+        email: subEmail,
+        emailVerified: Boolean(sessionEmail),
         name:  (b.name  || "").slice(0, 100),
         lang:  b.lang === "en" ? "en" : "hi",
         addedAt: Date.now(),
       }));
-      console.log(`[SAARTHI-PUSH] naya subscriber joda gaya (${b.email || "no-email"})`);
+      console.log(`[SAARTHI-PUSH] naya subscriber joda gaya (${subEmail || "no-email"}`
+        + `${sessionEmail ? ", verified" : ", unverified"})`);
       return jsonResponse({ ok: true }, 200, origin);
     }
     if (request.method === "POST" && url.pathname === "/push/unsubscribe") {

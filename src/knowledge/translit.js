@@ -185,12 +185,24 @@ function translitWord(w) {
 
 const DEVA_RE = /[ऀ-ॿ]/;
 
-/** Text mein Devanagari kitna hai (0..1). */
+/**
+ * Text mein Devanagari kitna hissa hai (0..1).
+ *
+ * BUG FIX (2026-08-03, test ne pakda): pehle numerator aur denominator do
+ * ALAG cheezein gin rahe the —
+ *     denominator: \p{L}      (sirf akshar)
+ *     numerator:   [ऀ-ॿ]      (akshar + matra + halant, sab)
+ * "नमस्ते" mein 6 Devanagari code points hain par \p{L} sirf 4 ginta hai
+ * (् aur े "mark" hain, "letter" nahi) — to ratio 6/4 = 1.5 aa jaata tha.
+ * Ratio 1 se upar ja hi nahi sakta.
+ *
+ * Ab dono taraf ek hi cheez ginte hain: akshar + matra (\p{L} + \p{M}).
+ */
 export function devanagariRatio(text) {
-  const letters = (text.match(/[\p{L}]/gu) || []).length;
-  if (!letters) return 0;
-  const deva = (text.match(/[ऀ-ॿ]/gu) || []).length;
-  return deva / letters;
+  const total = (text.match(/[\p{L}\p{M}]/gu) || []).length;
+  if (!total) return 0;
+  const deva = (text.match(/\p{Script=Devanagari}/gu) || []).length;
+  return deva / total;
 }
 
 /**
