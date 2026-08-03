@@ -10,7 +10,18 @@ import { useBookProgress } from "@/context/AppContext";
 import { BOOKS } from "@/data";
 import { useT } from "@/i18n";
 import { detectHintedBook } from "@/knowledge/bookHints";
-import { semanticSearch, preloadSemanticSearch } from "@/knowledge/semanticSearch";
+import { semanticSearch, preloadSemanticSearch, rerankPassages } from "@/knowledge/semanticSearch";
+import { normalizeQueryForSearch } from "@/knowledge/translit";
+
+// ── RELEVANCE GATE (item #17, 2026-08-03) ────────────────────────────────
+// 13 sawaalon par naapa gaya. Reranker ka score bimodal nikla:
+//     sahi sawaal   0.9009 – 0.9995
+//     kachre sawaal 0.0000 – 0.0131
+// Beech mein kuch nahi. 0.5 par dono taraf ~0.44 ka margin — itna chauda
+// ki koi ek sawaal ise hila nahi sakta.
+//
+// Ise badalna ho toh pehle naapo:  node scripts/test-reranker.mjs
+const MIN_RERANK_SCORE = 0.5;
 import { C, F } from "@/styles/theme";
 import { SaarthiOrb, StatusDot, Btn, ThinkingBubble, Prose, cleanOcrText } from "@/components/ui/Primitives";
 import { AudioEngine, HAS_EL } from "@/services/audioEngine";
@@ -233,12 +244,25 @@ export function ChatView() {
   const retrieveContext = useCallback(async (query) => {
     if (!knowledgeReady) return [];
     try {
+      // 0. QUERY NORMALIZATION (item #17, 2026-08-03)
+      // Poora corpus Devanagari mein hai. Roman/Hinglish sawaal
+      // ("gussa kaise shant karein") ko model na Hindi maanta hai na
+      // English — score girkar shor ke barabar aa jaata hai:
+      //     gussa kaise shant karein   0.4370
+      //     गुस्सा कैसे शांत करें         0.6595
+      // Lexicon-based translit (corpus ke 6,000 sabse aam shabd) se 96%
+      // faayda wapas aata hai. Keyword search ko bhi isse hi laabh hota
+      // hai — woh bhi Devanagari substring par chalti hai.
+      // Original query AI ke prompt ke liye waisa hi rehta hai; yeh sirf
+      // DHOONDHNE ke liye hai.
+      const { query: searchQ } = normalizeQueryForSearch(query);
+
       // 1. Cross-book: top 3 per book
-      const crossResults = crossBookSearch(query, null, 3);
+      const crossResults = crossBookSearch(searchQ, null, 3);
       const crossFlat = crossResults.flatMap(r => r.results);
 
       // 2. Keyword: direct inverted-index search, top 12
-      const kwResults = hybridSearch(query, null, {}, 12);
+      const kwResults = hybridSearch(searchQ, null, {}, 12);
 
       // 2.5 REAL semantic search (2026-07-26 fix — see src/knowledge/
       // semanticSearch.js for full context): keyword search sirf exact/
@@ -250,7 +274,7 @@ export function ChatView() {
       // kaam karte rehte hain, yeh sirf ADDITIONAL signal hai.
       let semResults = [];
       try {
-        const semHits = await semanticSearch(query, 12);
+        const semHits = await semanticSearch(searchQ, 12);
         semResults = semHits
           .map(h => {
             const chunk = getChunk(h.id);
@@ -286,7 +310,7 @@ export function ChatView() {
       if (hintedBook) {
         const already = [...byId.values()].filter(r => r.chunk.book === hintedBook).length;
         if (already < 3) {
-          const withinBook = hybridSearch(query, null, { book: hintedBook }, 6);
+          const withinBook = hybridSearch(searchQ, null, { book: hintedBook }, 6);
           for (const r of withinBook) {
             const existing = byId.get(r.chunk.id);
             if (!existing || r.score > existing.score) byId.set(r.chunk.id, r);
@@ -340,8 +364,31 @@ export function ChatView() {
       // shaamil mat karo — kam passages sahi, galat/anrelevant citation nahi.
       // (hintedBook wale case ko chhua nahi — uska apna guaranteed-grounding
       // logic hai, upar dekhen.)
-      const topScore = sorted.length ? sorted[0].score : 0;
-      const MIN_RELATIVE_SCORE = 0.35;
+      // AUDIT REWRITE (2026-08-03) — purana relevance-guard yahan tha:
+      //     const MIN_RELATIVE_SCORE = 0.35;
+      //     if (!hintedBook && diverse.length >= 3 && r.score < topScore * 0.35) continue;
+      //
+      // Usme DO buniyadi kharabiyan thi:
+      //
+      // (a) Threshold RELATIVE tha. Cutoff = topScore x 0.35. Agar sabse
+      //     accha match hi kachra ho (0.12), toh cutoff 0.042 ban jaata
+      //     aur sab paar kar jaate. Aisa guard vividhta control kar sakta
+      //     hai, PRASANGIKTA kabhi nahi — theek us waqt andha hota hai jab
+      //     poora result-set hi bekaar ho.
+      //
+      // (b) `diverse.length >= 3` — pehle 3 passages ko koi jaanch hi nahi.
+      //     ISI wajah se HAR jawab ke saath granth cite hote the, chahe
+      //     sawaal ka unse koi lena-dena ho ya na ho. "OCR me error ho to
+      //     AI kya kare" par bhi Valmiki Ramayana aa jaati thi.
+      //
+      // Ab: candidates bante hain (vividhta ke saath), phir CROSS-ENCODER
+      // RERANKER faisla karta hai ki koi passage sach mein jawab deta hai
+      // ya nahi. Naapa hua farak:
+      //     cosine     sahi-min 0.4941  kachra-max 0.4882  gap +0.0059
+      //     reranker   sahi-min 0.9009  kachra-max 0.0131  gap +0.8878
+      //
+      // Reranker score bimodal hai — ya 0.90+, ya lagbhag 0 — isliye 0.5
+      // par dono taraf 0.44 ka margin milta hai.
       const perBookCount = new Map();
       const diverse = [];
       for (const r of sorted) {
@@ -349,23 +396,56 @@ export function ChatView() {
         const c = perBookCount.get(b) || 0;
         const cap = hintedBook ? (b === hintedBook ? 6 : 1) : 2;
         if (c >= cap) continue;
-        if (!hintedBook && diverse.length >= 3 && r.score < topScore * MIN_RELATIVE_SCORE) continue;
         perBookCount.set(b, c + 1);
         diverse.push(r);
-        if (diverse.length >= 8) break;
+        if (diverse.length >= 10) break;   // reranker ko thode zyada de do
       }
-      const merged = diverse
-        .map((r, i) => ({
-          ...r,
-          // PRAMAAN-FIX: top-3 ansh MOTE (800) taaki AI seedha uddharan de sake,
-          // baaki 3 patle (300) — kul tokens lagbhag wahi (TPM surakshit)
-          chunk: { ...r.chunk, text: cleanOcrText(r.chunk.text || "").slice(0, i < 3 ? 800 : 300) },
-        }))
-        .filter(r => r.chunk.text.trim().length > 40); // drop passages that were pure junk
+
+      const cleaned = diverse
+        .map(r => ({ ...r, chunk: { ...r.chunk, text: cleanOcrText(r.chunk.text || "") } }))
+        .filter(r => r.chunk.text.trim().length > 40);   // pure OCR junk hatao
+
+      if (!cleaned.length) { setSacredChunks([]); return []; }
+
+      // ── RELEVANCE GATE ────────────────────────────────────────────────
+      const scores = await rerankPassages(searchQ, cleaned.map(r => r.chunk.text.slice(0, 1200)));
+
+      let kept;
+      if (scores) {
+        kept = cleaned
+          .map((r, i) => ({ ...r, rerank: scores[i] ?? 0 }))
+          .filter(r => r.rerank >= MIN_RERANK_SCORE)
+          .sort((a, b) => b.rerank - a.rerank);
+        if (!kept.length) {
+          // Yeh SAFALTA hai, vifalta nahi — user ka apna niyam:
+          // "agar 1% bhi jawab nahi mila toh saada jawab dena, source ke
+          //  bina bhi chalega". Khaali lautne se AI ko koi granth nahi
+          //  milta aur useChat.js koi Aadhaar footer nahi lagata.
+          console.log(`[Retrieval] koi prasangik ansh nahi mila (best rerank ${Math.max(...scores).toFixed(3)}) — bina granth ke jawab`);
+          setSacredChunks([]);
+          return [];
+        }
+      } else {
+        // Rerank fail (network/AI down) — passages istemal karo par
+        // grounded MAT maano, taaki citation na lage. Kam bharosa theek
+        // hai; galat bharosa nahi.
+        kept = cleaned.slice(0, 6).map(r => ({ ...r, rerank: null }));
+      }
+
+      // PRAMAAN-FIX: top-3 ansh MOTE (800) taaki AI seedha uddharan de sake,
+      // baaki patle (300) — kul tokens lagbhag wahi (TPM surakshit)
+      const merged = kept.slice(0, 8).map((r, i) => ({
+        ...r,
+        grounded: r.rerank != null && r.rerank >= MIN_RERANK_SCORE,
+        chunk: { ...r.chunk, text: r.chunk.text.slice(0, i < 3 ? 800 : 300) },
+      }));
 
       setSacredChunks(merged);
       return merged;
-    } catch { return []; }
+    } catch (e) {
+      console.warn("[Retrieval] failed:", e);
+      return [];
+    }
   }, [knowledgeReady, crossBookSearch, hybridSearch]);
 
   const { messages, isLoading, loadPhase, countdown, apiStatus, sendUserMessage, clearMessages, retryLast } = useChat({

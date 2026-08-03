@@ -502,15 +502,31 @@
       "title": "Chanakya Neeti",
       "tradition": "niti",
       "language": "hi",
-      "chunk_count": 563,
+      "chunk_count": 104,
       "chapters": [
-        1
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17
       ],
       "page_range": [
-        3,
-        281
+        0,
+        17
       ],
-      "chapter_count": 1
+      "chapter_count": 17
     },
     {
       "book_id": "ekadashi_mahatmya",
@@ -754,47 +770,33 @@
       "title": "Guru Granth Sahib (Hindi)",
       "tradition": "sikhism",
       "language": "hi+pa",
-      "chunk_count": 1627,
-      "chapters": [
-        1,
-        42,
-        43
-      ],
+      "chunk_count": 48,
+      "chapters": [],
       "page_range": [
-        3,
-        975
+        1,
+        48
       ],
-      "chapter_count": 3
+      "chapter_count": 0
     },
     {
       "book_id": "ishadi_upanishad",
       "title": "Ishadi Upanishad",
       "tradition": "upanishad",
       "language": "sa+hi",
-      "chunk_count": 826,
+      "chunk_count": 70,
       "chapters": [
         1,
         2,
         3,
         4,
         5,
-        6,
-        9,
-        10,
-        11,
-        13,
-        16,
-        17,
-        21,
-        31,
-        32,
-        33
+        6
       ],
       "page_range": [
-        3,
-        547
+        1,
+        70
       ],
-      "chapter_count": 16
+      "chapter_count": 6
     },
     {
       "book_id": "kathopanishad",
@@ -832,26 +834,24 @@
       "title": "Mantra Maha Sagar",
       "tradition": "mantra",
       "language": "sa+hi",
-      "chunk_count": 1127,
-      "chapters": [
-        443
-      ],
+      "chunk_count": 22,
+      "chapters": [],
       "page_range": [
-        4,
-        612
+        1,
+        22
       ],
-      "chapter_count": 1
+      "chapter_count": 0
     },
     {
       "book_id": "mantra_shakti",
       "title": "Mantra Shakti",
       "tradition": "mantra",
       "language": "sa+hi",
-      "chunk_count": 171,
+      "chunk_count": 24,
       "chapters": [],
       "page_range": [
-        4,
-        166
+        0,
+        154
       ],
       "chapter_count": 0
     },
@@ -907,11 +907,11 @@
       "title": "Nitya Devta Archana",
       "tradition": "pooja",
       "language": "sa+hi",
-      "chunk_count": 71,
+      "chunk_count": 30,
       "chapters": [],
       "page_range": [
-        3,
-        73
+        1,
+        30
       ],
       "chapter_count": 0
     },
@@ -920,16 +920,13 @@
       "title": "Nitya Karm Pooja Prakash",
       "tradition": "pooja",
       "language": "sa+hi",
-      "chunk_count": 423,
-      "chapters": [
-        4,
-        5
-      ],
+      "chunk_count": 34,
+      "chapters": [],
       "page_range": [
-        5,
-        396
+        1,
+        602
       ],
-      "chapter_count": 2
+      "chapter_count": 0
     },
     {
       "book_id": "rashi_muhurt_vigyan",

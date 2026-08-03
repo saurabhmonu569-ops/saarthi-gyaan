@@ -84,6 +84,47 @@ const GROQ_URL   = "https://api.groq.com/openai/v1/chat/completions";
 // Client-side tier.js ka mirror — Worker ko bhi pata hona chahiye ki
 // "owner" kaun hai taaki verified session ko rate-limit se exempt kar sake.
 const OWNER_EMAIL = "saurabhmonu569@gmail.com";
+
+// ── ITEM #16 — EMBEDDING MODEL (RAG ka dil) ──────────────────────────────
+// AUDIT (2026-08-01): public/embed-model/ ka model_quantized.onnx asal mein
+// model tha hi nahi — woh 134-byte ka Git LFS pointer tha. Isliye
+// semanticSearch() har baar chup-chaap [] laut raha tha aur poori app sirf
+// keyword (Devanagari substring) search par chal rahi thi. Yehi wajah thi ki
+// har jawab mein wahi 4-5 granth ghoomte the aur bilkul asambandhit sawaal
+// (jaise "OCR error") par bhi Ramayana cite ho jaati thi.
+//
+// Naya design: client ke paas ab KOI embedding model nahi hai (118 MB model +
+// 16 MB tokenizer + 10 MB wasm — teeno hata diye). Sawaal ka vector yahin
+// Workers AI se banta hai. Corpus ke vectors pehle jaise hi pre-computed
+// hain (ab int8 mein — 26.5 MB se 17.7 MB).
+//
+// Lagat: free tier 10,000 neurons/din. bge-m3 = 1075 neurons per 10 lakh
+// input tokens. Ek sawaal ~20 tokens → lagbhag 4,65,000 sawaal/din free.
+const EMBED_MODEL = "@cf/baai/bge-m3";   // 1024-dim, multilingual (Hindi strong)
+const EMBED_MAX_BATCH = 100;             // ek call mein max texts
+const EMBED_MAX_CHARS = 2000;            // per text — lamba ho toh kaat do
+
+// ── ITEM #17 — RERANKER (jhooti citations ka asli ilaaj) ─────────────────
+// NAAPA HUA (2026-08-03): "kya yeh sawaal granthon se jawab de sakta hai?"
+// — yeh sirf query dekh kar tay karne ki teen koshishein fail hui:
+//     raw Roman query          gap −0.05
+//     syllable transliteration gap −0.06   (kachra bhi upar chadh gaya)
+//     lexicon transliteration  gap +0.006  (bahut patla)
+//     LLM se Hindi mein badalna gap −0.009 (anuvaad mein galtiyan)
+//
+// Wajah: cosine BI-ENCODER hai — query aur passage alag-alag embed hote
+// hain, kabhi saath nahi padhe jaate. Woh "ye dono ek jaise dikhte hain?"
+// bata sakta hai, "kya yeh passage is sawaal ka jawab deta hai?" nahi.
+//
+// Cross-encoder reranker dono ko EK SAATH padhta hai. Naapne par:
+//     cosine     sahi-min 0.4941  kachra-max 0.4882  gap +0.0059
+//     reranker   sahi-min 0.9009  kachra-max 0.0131  gap +0.8878   ← 150x
+// Score bimodal hai — ya 0.90+, ya lagbhag 0. Beech mein kuch nahi.
+//
+// Lagat: ~1.1 neurons per sawaal (8 passages) → ~9,000 sawaal/din free.
+const RERANK_MODEL = "@cf/baai/bge-reranker-base";
+const RERANK_MAX_CONTEXTS = 20;
+const RERANK_MAX_CHARS = 1200;
 // FIX (2026-07-23): gemini-2.0-flash Google ne 1 June 2026 ko HARD SHUTDOWN kar
 // diya — is model ko call karne par ab seedha error aata hai. Yeh Engine 2 tha,
 // isliye pichle ~7 hafton se yeh chupke se fail ho raha tha aur har baar seedha
@@ -635,6 +676,101 @@ export default {
       return jsonResponse(q, q.allowed ? 200 : 429, origin);
     }
 
+    // ── EMBED (item #16) — sawaal ka vector banao ────────────────────────
+    // Body: { text: "sawaal" }  ya  { text: ["a","b",...] }  (max 100)
+    // Reply: { vectors: [[...1024 floats...]], dim: 1024, model: "..." }
+    //
+    // Client (semanticSearch.js) har sawaal se pehle isse ek baar bulata hai,
+    // phir us vector ko pehle se download kiye gaye corpus vectors ke saath
+    // cosine-compare karta hai. Corpus vectors client par hi rehte hain —
+    // sirf query ka embedding server par banta hai.
+    //
+    // Upar ka origin-allowlist + rate-limit isi handler mein already lag
+    // chuka hai, isliye yahan alag se auth ki zaroorat nahi.
+    if (request.method === "POST" && url.pathname === "/embed") {
+      if (!env.AI) {
+        console.log("[SAARTHI-EMBED] AI binding missing — Settings → Bindings → Workers AI (name: AI)");
+        return jsonResponse({ error: { message: "AI binding not configured" } }, 500, origin);
+      }
+      let b;
+      try { b = JSON.parse(await request.text()); } catch { return jsonResponse({ error: { message: "Bad JSON" } }, 400, origin); }
+      const raw = b?.text;
+      const texts = (Array.isArray(raw) ? raw : [raw])
+        .filter(t => typeof t === "string" && t.trim())
+        .map(t => t.trim().slice(0, EMBED_MAX_CHARS));
+      if (!texts.length) {
+        return jsonResponse({ error: { message: "text required" } }, 400, origin);
+      }
+      if (texts.length > EMBED_MAX_BATCH) {
+        return jsonResponse({ error: { message: `max ${EMBED_MAX_BATCH} texts per call` } }, 400, origin);
+      }
+      try {
+        const out = await env.AI.run(EMBED_MODEL, { text: texts });
+        // Workers AI ka reply shape model/version ke saath thoda badalta rehta
+        // hai — teeno aam roop handle kar lo, taaki upgrade par chup-chaap na
+        // toote (yehi galti pichli baar semantic search ke saath hui thi).
+        const vecs = out?.data || out?.result?.data || (Array.isArray(out) ? out : null);
+        if (!Array.isArray(vecs) || !vecs.length || !Array.isArray(vecs[0])) {
+          console.log("[SAARTHI-EMBED] unexpected shape: " + JSON.stringify(out).slice(0, 200));
+          return jsonResponse({ error: { message: "embedding failed" } }, 502, origin);
+        }
+        return jsonResponse({ vectors: vecs, dim: vecs[0].length, model: EMBED_MODEL }, 200, origin);
+      } catch (e) {
+        console.log("[SAARTHI-EMBED] FAIL — " + (e?.message || e));
+        return jsonResponse({ error: { message: "embedding failed" } }, 502, origin);
+      }
+    }
+
+    // ── RERANK (item #17) — "kya yeh passage sach mein jawab deta hai?" ──
+    // Body:  { query: "...", contexts: ["passage1", "passage2", ...] }
+    // Reply: { scores: [0.94, 0.01, ...] }  — input ke HI kram mein
+    //
+    // Kram bahut zaroori hai: Workers AI apna jawab index ke saath deta hai
+    // (kabhi score ke hisaab se sorted). Hum use wapas input-order mein
+    // rakh kar lautate hain, taaki client seedha apne chunks se joda kar
+    // sake — index ghalat hua toh galat passage cite ho jayega.
+    if (request.method === "POST" && url.pathname === "/rerank") {
+      if (!env.AI) return jsonResponse({ error: { message: "AI binding not configured" } }, 500, origin);
+      let b;
+      try { b = JSON.parse(await request.text()); } catch { return jsonResponse({ error: { message: "Bad JSON" } }, 400, origin); }
+
+      const query = typeof b?.query === "string" ? b.query.trim().slice(0, EMBED_MAX_CHARS) : "";
+      const ctxIn = Array.isArray(b?.contexts) ? b.contexts : [];
+      const contexts = ctxIn
+        .map(c => (typeof c === "string" ? c : c?.text) || "")
+        .map(t => t.trim().slice(0, RERANK_MAX_CHARS));
+
+      if (!query) return jsonResponse({ error: { message: "query required" } }, 400, origin);
+      if (!contexts.length) return jsonResponse({ scores: [] }, 200, origin);
+      if (contexts.length > RERANK_MAX_CONTEXTS) {
+        return jsonResponse({ error: { message: `max ${RERANK_MAX_CONTEXTS} contexts` } }, 400, origin);
+      }
+
+      try {
+        const out = await env.AI.run(RERANK_MODEL, {
+          query,
+          contexts: contexts.map(text => ({ text })),
+          top_k: contexts.length,
+        });
+        const list = out?.response || out?.result?.response || (Array.isArray(out) ? out : null);
+        if (!Array.isArray(list)) {
+          console.log("[SAARTHI-RERANK] unexpected shape: " + JSON.stringify(out).slice(0, 200));
+          return jsonResponse({ error: { message: "rerank failed" } }, 502, origin);
+        }
+        // input-order mein wapas rakho
+        const scores = new Array(contexts.length).fill(0);
+        for (const item of list) {
+          const i = item?.id ?? item?.index;
+          const s = item?.score ?? item?.relevance_score;
+          if (Number.isInteger(i) && i >= 0 && i < scores.length && typeof s === "number") scores[i] = s;
+        }
+        return jsonResponse({ scores, model: RERANK_MODEL }, 200, origin);
+      } catch (e) {
+        console.log("[SAARTHI-RERANK] FAIL — " + (e?.message || e));
+        return jsonResponse({ error: { message: "rerank failed" } }, 502, origin);
+      }
+    }
+
     // ── PUSH SUBSCRIBE/UNSUBSCRIBE (item #15) ────────────────────────────
     if (request.method === "POST" && url.pathname === "/push/subscribe") {
       if (!env.PUSH_SUBS) return jsonResponse({ error: { message: "Push storage not configured" } }, 500, origin);
@@ -845,7 +981,14 @@ export default {
     // mein todna hoga (scaling-note, jaisa PDF-size wala).
     const MAX_PER_RUN = 300;
     do {
-      const page = await env.PUSH_SUBS.list({ cursor, limit: 100 });
+      // AUDIT FIX (2026-08-01): pehle yahan prefix nahi tha — list() SAARI
+      // keys laut deta tha, aur PUSH_SUBS mein "rl:<ip>" rate-limit counters
+      // bhi rehte hain (60s TTL). Unki value "2" jaisi hoti hai, jise
+      // JSON.parse khushi se maan leta hai (rec = 2), phir
+      // sendWebPush(rec.subscription === undefined) andar se fail hota tha
+      // aur "failed" count mein jud jaata tha — jhoothe failure numbers aur
+      // bekaar subrequests. Ab sirf asli subscriptions.
+      const page = await env.PUSH_SUBS.list({ cursor, limit: 100, prefix: "sub:" });
       for (const k of page.keys) {
         if (sent + failed >= MAX_PER_RUN) break;
         const raw = await env.PUSH_SUBS.get(k.name);

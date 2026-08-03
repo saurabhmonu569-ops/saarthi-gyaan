@@ -21,6 +21,7 @@ data/knowledge/search_manifest.json
 .env
 .env.local
 .env.production
+vapid-keys.txt
 
 # OS files
 .DS_Store

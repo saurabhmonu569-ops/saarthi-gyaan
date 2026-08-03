@@ -382,6 +382,15 @@ export function useChat({
         .replace(/\n*📚\s*\*?Aadhaar[^\n]*/gi, "")
         // Model kabhi bina-📚 wala nakli "*Aadhaar: ..." footer bana deta hai — use bhi hatao
         .replace(/\n+[*_]{0,2}\s*Aadhaar\s*:[^\n]*/gi, "")
+        // AUDIT FIX (2026-08-01): upar wale dono sirf LATIN "Aadhaar" pakadte
+        // the. Model bahut baar DEVANAGARI mein likhta hai — "आधार:" (aur
+        // galat hijje "आदार:"). Woh bach jaati thi, isliye ek hi jawab mein
+        // DO alag-alag source-lists dikhti thi, jo aapas mein match bhi
+        // nahi karti thi. Asli mein dekha gaya:
+        //     आधार: गीता, उपनिषद, और अन्य आध्यात्मिक ग्रंथ।
+        //     📚 Aadhaar: Valmiki Ramayana · Yajurveda · Samaveda
+        // App ka apna footer hi ekmatra sach hai — model ka apna hataao.
+        .replace(/\n+[*_]{0,2}\s*(आधार|आदार|आधार-ग्रंथ|स्रोत)\s*[:：][^\n]*/g, "")
         // GURU-GARIMA FILTER: 8b model prompt ke bawajood "Arre bhai/yaar" bol
         // deta hai — code se hatao, model koi bhi ho. (Guru aisa nahi bolta.)
         .replace(/\b[Aa]rre\s+(bhai|yaar|dost)\b[,!]?\s*/g, "")
@@ -410,11 +419,25 @@ export function useChat({
       // dikhe toh footer mat lagao.
       const NO_GROUNDING_RE = /कोई सीधा (उल्लेख|संदर्भ|ज़िक्र|जिक्र)[^.।]{0,40}(नहीं मिला|नहीं मिलता)|श्लोक नहीं मिला|सामान्य (शास्त्र-?ज्ञान|ज्ञान) के आधार पर|इन उपलब्ध ग्रंथों[^.।]{0,40}नहीं मिला|no direct (reference|mention|verse)|couldn't find (any )?(direct|specific)|not (directly )?(mentioned|found) in (the )?(available|these) (scriptures|texts|books)|based on general (scriptural|shastra)? ?knowledge/i;
       const noGroundingDisclaimed = responseText && NO_GROUNDING_RE.test(responseText);
-      if (responseText && liveChunks && liveChunks.length > 0 && !responseText.includes("📚 Aadhaar") && !noGroundingDisclaimed) {
+      // AUDIT FIX (2026-08-03) — Fix 2: footer SIRF sach ke aadhaar par.
+      //
+      // Pehle yeh footer tab lag jaata tha jab liveChunks maujood ho —
+      // chahe woh passages jawab se juda hon ya na hon. Yaani app woh
+      // pramaan dikha rahi thi jo uske paas tha hi nahi.
+      //
+      // Ab ChatView har passage par `grounded` lagata hai, jo cross-encoder
+      // reranker ke faisle se aata hai (score >= 0.5). Reranker fail ho
+      // jaye toh grounded=false rehta hai — passages phir bhi AI ko jaate
+      // hain, par citation NAHI lagti. Kam bharosa theek hai; galat
+      // bharosa nahi.
+      const groundedChunks = (liveChunks || []).filter(c => c.grounded);
+      if (responseText && groundedChunks.length > 0 && !responseText.includes("📚 Aadhaar") && !noGroundingDisclaimed) {
         // BUG FIX: pehle book+page se dedupe hota tha — "Agni Purana · Agni
         // Purana · Agni Purana" dikhta tha. Ab ek book EK baar, pages jud kar.
         const byBook = new Map();
-        for (const r of liveChunks) {
+        // liveChunks nahi — sirf groundedChunks. Warna woh passages bhi
+        // cite ho jaate jinhe reranker ne khaarij kar diya tha.
+        for (const r of groundedChunks) {
           const bt = (r.chunk && (r.chunk.book_title || r.chunk.book)) || "";
           if (!bt) continue;
           const pg = r.chunk?.page;

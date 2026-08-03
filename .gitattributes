@@ -1,1 +1,24 @@
-public/embed-model/paraphrase-multilingual-MiniLM-L12-v2/onnx/model_quantized.onnx filter=lfs diff=lfs merge=lfs -text
+# AUDIT (2026-08-01/03) — item #16
+#
+# Yahan pehle ek Git LFS entry thi:
+#   public/embed-model/.../onnx/model_quantized.onnx filter=lfs ...
+#
+# Wahi is project ki sabse mehngi galti thi. Woh 118 MB ka embedding model
+# LFS mein rehta tha, par checkout/deploy par kabhi hydrate nahi hota tha —
+# disk par sirf 134-byte ka pointer aata tha. semanticSearch() fail-soft
+# thi, isliye woh chup-chaap [] laut deti thi aur poori app mahino tak sirf
+# keyword search par chalti rahi. Kisi ko pata hi nahi chala.
+#
+# Ab client par koi model hai hi nahi — query ka embedding Cloudflare
+# Workers AI par banta hai (@cf/baai/bge-m3), aur corpus vectors int8 mein
+# 18.4 MB ke hain. Koi LFS nahi, koi hydrate step nahi, koi chhupa hua
+# failure nahi.
+#
+# NIYAM: is repo mein LFS dobara mat jodna. Agar koi file itni badi hai ki
+# LFS chahiye, toh woh browser bundle mein bhi nahi honi chahiye — use
+# server par rakho.
+#
+# NOTE (2026-08-03): kuch der ke liye yahan `* text=auto eol=lf` bhi tha.
+# Usse Windows ke CRLF wale 12 se zyada JSON files jhoothe-much "modified"
+# dikhne lage the. Line-ending normalization ek alag, badi tabdeeli hai —
+# use is audit ke saath mila kar karna galat tha. Hata diya.
