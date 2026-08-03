@@ -229,6 +229,137 @@ export function toDevanagari(text) {
   }).join("");
 }
 
+// Aam angrezi shabd jo galti se Hindi lexicon mein match kar jaate hain
+// ("to"→तो, "use"→उसे, "me"→में, "hi"→ही). Bhasha pehchante waqt inhe
+// Hindi ka saboot mat maano — warna saaf English sawaal "Hinglish" gina
+// jayega.
+// Hindi ke JODNE WALE shabd (vyakaran). Inme se ek bhi mila toh vaakya ka
+// dhaancha Hindi ka hai — yaani Hinglish. Vishay ke shabd angrezi ho sakte
+// hain ("mera job chhut gaya hai"), phir bhi vaakya Hindi hi hai.
+const HI_GRAMMAR = new Set([
+  // hona
+  // NOTE: "the" (थे) jaanbujh ke NAHI hai — woh angrezi ka sabse aam shabd
+  // hai, aur usse "What happens to the soul after death?" bhi Hinglish gina
+  // jaata tha. थे ka nuksaan chhota hai, "the" ka takraav bada.
+  "hai","hain","tha","thi","hoga","hogi","hota","hoti","hote","hona","hua","hui","hue",
+  // sawaal
+  "kya","kyu","kyun","kyon","kaise","kese","kaisa","kaisi","kab","kahan","kaha",
+  "kaun","kon","kitna","kitni","kitne","konsa",
+  // vibhakti
+  "ka","ki","ke","ko","se","mein","par","tak","liye","wala","wali","wale","vala","vali","vale",
+  // sarvanaam
+  "mera","meri","mere","mujhe","mujhko","hum","hamara","hamari","humein",
+  "aap","aapka","aapki","aapke","tum","tumhara","apna","apni","apne",
+  "yeh","woh","uska","uski","iska","iski","unka","inka",
+  // kriya
+  "kar","karo","karna","karta","karti","karte","karein","kare","karu","karun",
+  "raha","rahi","rahe","rehta","gaya","gayi","gaye","jata","jaati","jaate",
+  "diya","dena","lena","chahiye","sakta","sakti","sakte","batao","bataye","bataiye",
+  // aam
+  "nahi","nahin","aur","lekin","agar","toh","bhi","phir","abhi","bahut","bohot",
+  "kuch","sab","koi","jab","tab","waise","aisa","aise",
+]);
+
+// Aam angrezi shabd jo galti se Hindi lexicon mein match kar jaate hain.
+// (Ab bhasha-pehchaan HI_GRAMMAR se hoti hai, par yeh list aage kaam aa
+// sakti hai — isliye rakhi hai.)
+const EN_STOP = new Set([
+  "a","an","the","and","or","if","is","are","was","were","be","been","being",
+  "to","of","in","on","at","by","for","from","with","as","it","its","this",
+  "that","these","those","i","you","he","she","we","they","me","my","your",
+  "do","does","did","have","has","had","can","could","will","would","should",
+  "not","no","yes","so","up","us","out","get","got","see","new","one","two",
+  "what","when","where","who","whom","how","why","which","all","any","some",
+  "use","using","used","hi","also","than","then","there","here","about",
+]);
+
+// ── CYRILLIC SAFAI (Fix 4) ────────────────────────────────────────────
+// Groq ka llama-3.3-70b kabhi-kabhi Devanagari ke beech Cyrillic akshar
+// ghusa deta hai — asli mein dekha gaya:
+//     "मैं आपको एक नарам सावाल पूछना चाहता हूं"   (नरम hona chahiye tha)
+//     "अपनी तैयारी की стратегी को दोबारा देखना"    (रणनीति hona chahiye tha)
+// Yeh token-level corruption hai (wahi jad jisse angrezi mein "by" gir
+// jaata hai). Us gire hue shabd ko toh code wapas nahi la sakta, PAR
+// Cyrillic akshar dikhne mein Devanagari/Latin jaise hi hote hain aur
+// unka dhwani-roop wahi hai — isliye unhe wapas badla ja sakta hai:
+//     н→न  а→(antarnihit)  р→र  м→म   ⇒  "нарам" → "नरम"  ✅ sahi shabd
+const CYR_TO_DEV = {
+  "а":"", "б":"ब", "в":"व", "г":"ग", "д":"द", "е":"े", "ж":"झ", "з":"ज",
+  "и":"ि", "й":"य", "к":"क", "л":"ल", "м":"म", "н":"न", "о":"ो", "п":"प",
+  "р":"र", "с":"स", "т":"त", "у":"ु", "ф":"फ", "х":"ह", "ц":"च", "ч":"च",
+  "ш":"श", "щ":"श", "ы":"ी", "э":"े", "ю":"यु", "я":"या", "ъ":"", "ь":"",
+};
+const CYR_TO_LAT = {
+  "а":"a","б":"b","в":"v","г":"g","д":"d","е":"e","ж":"zh","з":"z","и":"i",
+  "й":"y","к":"k","л":"l","м":"m","н":"n","о":"o","п":"p","р":"r","с":"s",
+  "т":"t","у":"u","ф":"f","х":"h","ц":"ts","ч":"ch","ш":"sh","щ":"sh",
+  "ы":"y","э":"e","ю":"yu","я":"ya","ъ":"","ь":"",
+};
+const CYR_RE = /[Ѐ-ӿ]/;
+
+/**
+ * Model ke jawab se Cyrillic corruption hatao.
+ * Devanagari-bahul text mein Cyrillic → Devanagari, warna → Latin.
+ *
+ * IMAANDARI: yeh sirf CYRILLIC ka ilaaj hai. Usi corruption ki doosri
+ * shakl — angrezi mein "by"/"of" jaise shabd gir jaana — code se theek
+ * NAHI ho sakti. Uske liye behtar engine hi hal hai (Gemini quota).
+ *
+ * @returns {{ text: string, fixed: number }}
+ */
+export function stripCyrillic(text) {
+  if (!text || !CYR_RE.test(text)) return { text, fixed: 0 };
+  const toDev = devanagariRatio(text) >= 0.3;
+  const map = toDev ? CYR_TO_DEV : CYR_TO_LAT;
+  let fixed = 0;
+  const out = text.replace(/[Ѐ-ӿ]/g, ch => {
+    const lower = ch.toLowerCase();
+    if (map[lower] === undefined) return ch;
+    fixed++;
+    return map[lower];
+  });
+  return { text: out, fixed };
+}
+
+/**
+ * Sawaal ki bhasha pehchano — jawab kis bhasha mein dena hai, yeh tay
+ * karne ke liye.
+ *
+ * KYUN (2026-08-03): pehle sirf app ka Hindi/English toggle faisla karta
+ * tha. User ne "मृत्यु के बाद आत्मा का क्या होता है?" poocha, toggle
+ * English par tha, aur poora jawab English mein aa gaya — jo saaf galat
+ * laga. Ab niyam yeh hai:
+ *
+ *   saaf Devanagari  → "hi"      (script jeetega, toggle chahe kuch bhi ho)
+ *   saaf English     → "en"      (script jeetega)
+ *   Hinglish/Roman   → "mixed"   (dhundhla case — yahan toggle faisla kare)
+ *
+ * Hindi shabd pehchanne ke liye wahi lexicon istemal hota hai jo
+ * transliteration ke liye banaya tha — corpus se nikale 6,000 shabd.
+ *
+ * @returns {"hi"|"en"|"mixed"|"unknown"}
+ */
+export function detectQueryLanguage(text) {
+  if (!text || !text.trim()) return "unknown";
+  if (devanagariRatio(text) >= 0.3) return "hi";
+
+  const words = (text.toLowerCase().match(/[a-z]+/g) || []).filter(w => w.length >= 2);
+  if (!words.length) return "unknown";
+
+  // ASLI PEHCHAAN: Hindi VYAKARAN, Hindi shabd nahi.
+  //
+  // Pehla tarika "kitne shabd Hindi lexicon mein hain" ginta tha — par
+  // usse "Explain karma yoga to me" bhi Hinglish gina gaya, kyunki karma
+  // aur yoga to Hindi shabd hain hi. Woh angrezi vaakya hai jisme sanskrit
+  // ke do shabd hain.
+  //
+  // Hinglish ki asli nishani uske JODNE WALE shabd hain — hai, kya, kaise,
+  // ka/ki/ke, mein, se, karo. Ye aate hain toh vaakya ka dhaancha Hindi ka
+  // hai, chahe vishay ke shabd angrezi hon ("mera job chhut gaya hai").
+  for (const w of words) if (HI_GRAMMAR.has(w)) return "mixed";
+  return "en";
+}
+
 /**
  * Search ke liye query taiyaar karo. Roman ho toh Devanagari banao,
  * warna jaisa hai waisa hi.

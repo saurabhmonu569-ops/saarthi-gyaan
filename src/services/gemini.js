@@ -56,6 +56,10 @@ function getProvider(key) {
 const GROQ_BASE    = "https://api.groq.com/openai/v1";
 const GROQ_MODEL   = "llama-3.3-70b-versatile"; // best free Groq model
 
+// Sawaal ki bhasha pehchanne ke liye (2026-08-03) — jawab ki bhasha ab
+// script se tay hoti hai jab script saaf ho, warna app ke toggle se.
+import { detectQueryLanguage } from "@/knowledge/translit";
+
 // ── AI PROXY (LIVE deploy ke liye) ───────────────────────────────────────────
 // VITE_AI_PROXY_URL set karo (jaise https://saarthi-ai.tumhara.workers.dev)
 // toh saare AI calls Cloudflare Worker se hokar jayenge — API key SERVER par
@@ -822,13 +826,47 @@ export async function sendMessage(userMessage, history = [], context = {}) {
                                                  replyLang = "shuddh saral HINDI (Devanagari) \u2014 user ne KHUD Hindi maangi hai, English ka ek bhi vakya nahi";
   else if (/\b(english)\s*(mein|me|mai|main)\b|\bin\s+english\b/i.test(userMessage))
                                                  replyLang = "ENGLISH only \u2014 user ne KHUD English maangi hai";
-  // GLOBAL TOGGLE: Home page ke Hindi/English switch ka faisla ab sabse upar
-  // maana jayega, script-guessing ke bajaye — user chahe Hindi/Hinglish/English
-  // kisi bhi tarah likhe, toggle ki bhasha mein hi jawab do.
+  // SCRIPT-JEETEGA (2026-08-03): user ne "मृत्यु के बाद आत्मा का क्या होता
+  // है?" Devanagari mein poocha, toggle English par tha, aur poora jawab
+  // English mein aa gaya. Saaf galat laga.
+  //
+  // Naya niyam — jab script SAAF ho tab wahi maano, toggle tabhi faisla
+  // kare jab sawaal dhundhla (Hinglish) ho:
+  //     saaf Devanagari  → Hindi
+  //     saaf English     → English
+  //     Hinglish (Roman) → toggle
+  // Hindi shabd pehchanne ke liye wahi corpus-lexicon lagta hai jo
+  // transliteration mein banaya tha.
+  else if (detectQueryLanguage(userMessage) === "hi")
+                                                 replyLang = "shuddh saral HINDI (Devanagari) — user ne Devanagari mein poochha hai, isliye jawab bhi Devanagari mein; English ka ek bhi vakya nahi";
+  else if (detectQueryLanguage(userMessage) === "en")
+                                                 replyLang = "ENGLISH only — user ne saaf English mein poochha hai, isliye jawab bhi English mein";
   else if (uiLang === "en")
                                                  replyLang = "ENGLISH only \u2014 poora jawab English mein, ek bhi Hindi/Hinglish shabd nahi (app-wide toggle English par set hai)";
   else                                           replyLang = "shuddh saral HINDI (Devanagari) \u2014 Hinglish/Roman script bilkul mat likho (app-wide toggle Hindi par set hai)";
-  const languagePinned = userMessage + `\n\n[REPLY LANGUAGE: ${replyLang}]`;
+  // ── FIX 5 — SWASTHYA GUARD (2026-08-03) ────────────────────────────────
+  // SYSTEM_PROMPT mein swasthya-seema pehle se likhi hai (line ~563), par
+  // Groq us lambe prompt ko nahi sambhal paata. Asli mein dekha gaya:
+  // "बवासीर नाशक टोटका" par jawab mein neem ke patton ka kaadha aur
+  // हरितकी ka sevan bata diya gaya — seedha ilaaj, jo sakht mana hai.
+  //
+  // Prompt ke shuru mein likha niyam 900 line door reh jaata hai. Isliye
+  // ab jab swasthya ka sawaal dikhe, wahi niyam DOBARA — user ke message
+  // ke bilkul saath, jahan model ka dhyan sabse zyada hota hai.
+  //
+  // Yeh suraksha ki DOOSRI parat hai, guarantee nahi — keyword list kabhi
+  // poori nahi hoti. Par jo aam sawaal aate hain, unpe asar padega.
+  const HEALTH_RE = /बवासीर|बुखार|दर्द|बीमार|रोग|इलाज|दवा|दवाई|औषधि|टोटका|नुस्खा|खांसी|सर्दी|पेट|कब्ज|एसिडिटी|शुगर|डायबिटीज|बीपी|ब्लड|थायरॉइड|कैंसर|माइग्रेन|सिरदर्द|घुटन|चक्कर|उल्टी|दस्त|एलर्जी|अस्थमा|टीबी|पथरी|piles|fever|pain|disease|illness|medicine|remedy|cure|treatment|diabetes|cancer|migraine|acidity|constipation|asthma|bimar|dawa|ilaj|dard|bukhar|khansi|pet\s|sugar\b/i;
+  const healthNote = HEALTH_RE.test(userMessage)
+    ? `\n\n[SWASTHYA-CHETAVANI: Yeh shaaririk swasthya ka sawaal hai. SAKHT NIYAM — `
+      + `(1) koi ilaaj, dawa, jadi-booti, kaadha, churna, mantra ya totka MAT batao, chahe woh diye gaye passages mein likha ho; `
+      + `(2) bimariyon ke naam ya symptoms ki list MAT banao; `
+      + `(3) dhancha yeh ho — ek line seh-anubhuti, phir SAAF kaho "iske liye kripya doctor se milein", `
+      + `phir granthon se sirf MANN ki shanti/dhairya ka bhaav; `
+      + `(4) yeh KABHI mat kaho ya ishara karo ki isse rog theek hoga.]`
+    : "";
+
+  const languagePinned = userMessage + `\n\n[REPLY LANGUAGE: ${replyLang}]` + healthNote;
 
   geminiHistory.push({ role: "user", parts: [{ text: languagePinned }] });
 

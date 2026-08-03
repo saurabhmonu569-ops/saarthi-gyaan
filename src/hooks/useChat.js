@@ -12,6 +12,8 @@
  */
 
 import { useState, useCallback, useRef, useEffect } from "react";
+// Fix 4 (2026-08-03) — model ke jawab se Cyrillic corruption saaf karne ke liye
+import { stripCyrillic } from "@/knowledge/translit";
 
 // ── Chat history persistence ──────────────────────────────────────────────────
 const STORAGE_KEY = "saarthi_chat_history";
@@ -375,6 +377,16 @@ export function useChat({
       // 📚 PDF mode: jawab ka aadhaar = uploaded document
       if (responseText && mode === "pdf" && pdfName && !responseText.includes("📚 Aadhaar")) {
         responseText += `\n\n---\n📚 *Aadhaar: ${pdfName}*`;
+      }
+      // FIX 4 (2026-08-03): Cyrillic corruption saaf karo — "नарам" → "नरम".
+      // Groq ke degraded output ki nishani. Kitni baar hua, log karo taaki
+      // pata rahe ki model kitna kharab chal raha hai.
+      if (responseText) {
+        const { text: cleanTxt, fixed } = stripCyrillic(responseText);
+        if (fixed) {
+          console.warn(`[Sanitize] ${fixed} Cyrillic akshar theek kiye — model degraded output de raha hai`);
+          responseText = cleanTxt;
+        }
       }
       // Model ne agar khud footer nakal kiya ho toh pehle use hatao
       if (responseText) responseText = responseText

@@ -283,11 +283,22 @@ export function ChatView() {
           .filter(Boolean);
       } catch { /* soft-fail — keyword+cross-book results still cover us */ }
 
-      // 3. Merge by chunk ID, prefer higher score
+      // 3. SOURCE-BALANCED MERGE (2026-08-03 fix)
+      //
+      // Pehle yahan teeno sources ko ek saath dal kar `r.score > existing.score`
+      // se chuna jaata tha. Par teeno ke paimane ALAG hain:
+      //     keyword  : (s/keywords.length) * (0.5 + 0.5*density)  — apna scale
+      //     semantic : cosine, −1..1
+      //     overview : hardcoded 0.05
+      // Inhe `>` se tolna kilo aur kilometre ki tulna hai. Isliye har source
+      // se ALAG-ALAG top-N lete hain (apne hi scale ke andar), aur asli
+      // faisla aage reranker par chhodte hain — wahi ekmatra bharosemand,
+      // aapas mein tulne-layak score deta hai.
+      const SRC_QUOTA = [[semResults, 10], [kwResults, 6], [crossFlat, 6]];
       const byId = new Map();
-      for (const r of [...crossFlat, ...kwResults, ...semResults]) {
-        const existing = byId.get(r.chunk.id);
-        if (!existing || r.score > existing.score) byId.set(r.chunk.id, r);
+      for (const [arr, k] of SRC_QUOTA) {
+        const sortedSrc = [...arr].sort((a, b) => b.score - a.score).slice(0, k);
+        for (const r of sortedSrc) if (!byId.has(r.chunk.id)) byId.set(r.chunk.id, r);
       }
 
       // 3.5 Agar user ne kisi book ka naam liya hai, USI book ke passages pehle
@@ -328,17 +339,9 @@ export function ChatView() {
         }
       }
 
-      // 4. Sort by score descending, take top 8
-      // 5. CLEAN each passage before it reaches the AI — raw OCR junk in the
-      //    prompt directly hurts answer quality. Trim to keep the prompt lean.
-      const sorted = [...byId.values()]
-        .sort((a, b) => {
-          if (hintedBook) {
-            const ab = a.chunk.book === hintedBook, bb = b.chunk.book === hintedBook;
-            if (ab !== bb) return ab ? -1 : 1;   // named book first
-          }
-          return b.score - a.score;
-        });
+      // 4. Candidates saaf karo aur rerank ke liye taiyaar karo.
+      //    (Purana `const sorted = ...` block yahan se hata diya — ab yehi
+      //    kaam neeche `cleaned` karta hai, ek hi jagah.)
       // VIVIDHTA-CAP (user complaint: "har jawab same book se aata hai" —
       // dobara cross-check ke baad aur sakht kiya gaya): ek book ke max 2
       // ansh, ab top-8 mein se — kam se kam 4 alag granth aayenge, taaki
@@ -389,21 +392,29 @@ export function ChatView() {
       //
       // Reranker score bimodal hai — ya 0.90+, ya lagbhag 0 — isliye 0.5
       // par dono taraf 0.44 ka margin milta hai.
-      const perBookCount = new Map();
-      const diverse = [];
-      for (const r of sorted) {
-        const b = r.chunk.book;
-        const c = perBookCount.get(b) || 0;
-        const cap = hintedBook ? (b === hintedBook ? 6 : 1) : 2;
-        if (c >= cap) continue;
-        perBookCount.set(b, c + 1);
-        diverse.push(r);
-        if (diverse.length >= 10) break;   // reranker ko thode zyada de do
-      }
-
-      const cleaned = diverse
+      // BUG FIX (2026-08-03, user ne pakda): pehle per-book cap YAHAN,
+      // rerank se PEHLE lagta tha. Nateeja — "मृत्यु के बाद आत्मा का क्या
+      // होता है" par Garuda Purana ke chunks cosine list mein rank 2, 4, 5,
+      // 6, 7... par the. Cap=2 sirf rank 2 aur 4 rakhta tha, aur rank 6
+      // wala — jiska rerank score 0.9406 tha, poore corpus mein doosra
+      // sabse achha — chhant jaata tha. Jawab mein sirf कठोपनिषद् aata tha,
+      // jabki Garuda Purana hi mrityu-ke-baad ka asli granth hai.
+      //
+      // Jad: cap ka faisla us mile-jule score par ho raha tha jo keyword
+      // aur cosine ko aapas mein tolta hai (alag paimane). Bharosemand
+      // score reranker ke baad milta hai — isliye ab kram ULTA hai:
+      // pehle rerank, phir diversity.
+      const cleaned = [...byId.values()]
         .map(r => ({ ...r, chunk: { ...r.chunk, text: cleanOcrText(r.chunk.text || "") } }))
-        .filter(r => r.chunk.text.trim().length > 40);   // pure OCR junk hatao
+        .filter(r => r.chunk.text.trim().length > 40)   // pure OCR junk hatao
+        .sort((a, b) => {
+          if (hintedBook) {
+            const ab = a.chunk.book === hintedBook, bb = b.chunk.book === hintedBook;
+            if (ab !== bb) return ab ? -1 : 1;
+          }
+          return b.score - a.score;
+        })
+        .slice(0, 20);   // worker ki rerank seema
 
       if (!cleaned.length) { setSacredChunks([]); return []; }
 
@@ -412,10 +423,22 @@ export function ChatView() {
 
       let kept;
       if (scores) {
-        kept = cleaned
+        const passed = cleaned
           .map((r, i) => ({ ...r, rerank: scores[i] ?? 0 }))
           .filter(r => r.rerank >= MIN_RERANK_SCORE)
           .sort((a, b) => b.rerank - a.rerank);
+
+        // AB diversity — reranker ke bharosemand score ke kram par.
+        // Ek granth ke max 3 ansh, taaki ek hi kitaab poora context na
+        // bhar de, par sabse achha ansh kabhi na chhoote.
+        const perBook = new Map();
+        kept = [];
+        for (const r of passed) {
+          const c = perBook.get(r.chunk.book) || 0;
+          if (c >= 3) continue;
+          perBook.set(r.chunk.book, c + 1);
+          kept.push(r);
+        }
         if (!kept.length) {
           // Yeh SAFALTA hai, vifalta nahi — user ka apna niyam:
           // "agar 1% bhi jawab nahi mila toh saada jawab dena, source ke
