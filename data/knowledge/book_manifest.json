@@ -502,7 +502,7 @@
       "title": "Chanakya Neeti",
       "tradition": "niti",
       "language": "hi",
-      "chunk_count": 563,
+      "chunk_count": 578,
       "chapters": [
         1
       ],
@@ -754,9 +754,11 @@
       "title": "Guru Granth Sahib (Hindi)",
       "tradition": "sikhism",
       "language": "hi+pa",
-      "chunk_count": 1627,
+      "chunk_count": 1870,
       "chapters": [
         1,
+        2,
+        3,
         42,
         43
       ],
@@ -764,14 +766,14 @@
         3,
         975
       ],
-      "chapter_count": 3
+      "chapter_count": 5
     },
     {
       "book_id": "ishadi_upanishad",
       "title": "Ishadi Upanishad",
       "tradition": "upanishad",
       "language": "sa+hi",
-      "chunk_count": 826,
+      "chunk_count": 877,
       "chapters": [
         1,
         2,
@@ -782,44 +784,44 @@
         9,
         10,
         11,
-        13,
         16,
         17,
-        21,
         31,
-        32,
-        33
+        32
       ],
       "page_range": [
         3,
-        547
+        545
       ],
-      "chapter_count": 16
+      "chapter_count": 13
     },
     {
       "book_id": "kathopanishad",
       "title": "Kathopanishad",
       "tradition": "upanishad",
       "language": "sa+hi",
-      "chunk_count": 184,
+      "chunk_count": 186,
       "chapters": [
         1,
         2,
         3,
-        8
+        9,
+        11,
+        21,
+        25
       ],
       "page_range": [
         4,
         182
       ],
-      "chapter_count": 4
+      "chapter_count": 7
     },
     {
       "book_id": "lal_kitab",
       "title": "Lal Kitab (Upay Sahit)",
       "tradition": "jyotish",
       "language": "hi",
-      "chunk_count": 209,
+      "chunk_count": 211,
       "chapters": [],
       "page_range": [
         3,
@@ -832,28 +834,29 @@
       "title": "Mantra Maha Sagar",
       "tradition": "mantra",
       "language": "sa+hi",
-      "chunk_count": 1127,
-      "chapters": [
-        443
-      ],
+      "chunk_count": 1146,
+      "chapters": [],
       "page_range": [
         4,
         612
       ],
-      "chapter_count": 1
+      "chapter_count": 0
     },
     {
       "book_id": "mantra_shakti",
       "title": "Mantra Shakti",
       "tradition": "mantra",
       "language": "sa+hi",
-      "chunk_count": 171,
-      "chapters": [],
+      "chunk_count": 173,
+      "chapters": [
+        1,
+        2
+      ],
       "page_range": [
         4,
         166
       ],
-      "chapter_count": 0
+      "chapter_count": 2
     },
     {
       "book_id": "narasimha_purana",
@@ -936,7 +939,7 @@
       "title": "Sampurna Rashi aur Muhurt Vigyan",
       "tradition": "jyotish",
       "language": "hi",
-      "chunk_count": 456,
+      "chunk_count": 460,
       "chapters": [],
       "page_range": [
         3,

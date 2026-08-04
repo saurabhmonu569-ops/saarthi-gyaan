@@ -513,14 +513,26 @@ export function ChatView() {
           const all = getBookChunks(r.chunk.book) || [];
           const idx = all.findIndex(c => c.id === r.chunk.id);
           if (idx < 0) continue;
-          const next = all[idx + 1];
-          if (next && !already.has(next.id) && (next.text || "").trim().length > 40) {
-            already.add(next.id);
-            // Padosi ko TURANT uske mool ansh ke BAAD rakho — model dono ko
-            // ek hi behaav mein padhe. Pehle yeh list ke ant mein jaata tha,
-            // apne mool se door.
+          // DONO taraf dekho — pichla AUR agla.
+          //
+          // KYUN (2026-08-04, asli ghatna): "कृत्तिका नक्षत्र में जन्मे जातक"
+          // par rashi_muhurt_vigyan ka idx-13 wala ansh mila (rerank 0.78).
+          // Par jawab idx-12 mein tha — TURANT PEHLE wale ansh mein. Woh
+          // ansh search ko dikhta hi nahi kyunki OCR ne uske shirshak
+          // "कृत्तिका" ko "Gitar" padh liya hai. Sirf agla ansh uthate toh
+          // idx-14 (वृषभ राशि) milta — bilkul bekaar.
+          //
+          // Yeh OCR ki galti ka sasta ilaaj bhi hai: jab kisi ansh ka
+          // vishay-shabd bigda ho, uska padosi aksar saaf hota hai — aur
+          // padosi ke rastey woh ansh wapas mil jaata hai.
+          for (const off of [-1, 1]) {
+            const nb = all[idx + off];
+            if (!nb || already.has(nb.id) || (nb.text || "").trim().length <= 40) continue;
+            already.add(nb.id);
+            // Padosi ko TURANT uske mool ansh ke saath rakho — model dono ko
+            // ek hi behaav mein padhe.
             withNeighbours.push({
-              chunk: { ...next, text: cleanOcrText(next.text || "") },
+              chunk: { ...nb, text: cleanOcrText(nb.text || "") },
               score: r.score, rerank: r.rerank, match_type: "neighbour",
             });
             added++;
@@ -542,12 +554,12 @@ export function ChatView() {
       // isliye use hamesha poora slice do.
       // Ansh AI ko jaate hain, par CITATION sirf unhi par jinme asli vaakya
       // hain — table/suchi/mukhprishth kabhi "aadhaar" nahi banenge.
-      const merged = kept.slice(0, 10).map((r, i) => ({
+      const merged = kept.slice(0, 12).map((r, i) => ({
         ...r,
         grounded: r.rerank != null && r.rerank >= MIN_RERANK_SCORE && hasSentences(r.chunk.text),
         chunk: {
           ...r.chunk,
-          text: r.chunk.text.slice(0, (i < 3 || r.match_type === "neighbour") ? 900 : 300),
+          text: r.chunk.text.slice(0, (i < 3 || r.match_type === "neighbour") ? 800 : 300),
         },
       }));
 

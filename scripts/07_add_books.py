@@ -89,14 +89,54 @@ def clean_text(raw):
         lines.append(line)
     return re.sub(r'\n{3,}', '\n\n', '\n'.join(lines)).strip()
 
-def ocr_page(doc, pg_no, lang="hin+eng"):
-    mat = fitz.Matrix(300/72, 300/72)
+# ─── OCR SETTINGS (2026-08-04 mein badle — poori wajah neeche) ───────────────
+#
+# ASLI GHATNA: "कृत्तिका नक्षत्र में जन्मे जातक" ka jawab kitab ke ULTA aaya.
+# Jaanch par mila ki content corpus mein HAI (rashi_muhurt_vigyan p.10), par
+# OCR ne shirshak ko aise padha tha:
+#
+#     कृत्तिका  →  Gitar        कटु      →  HY
+#     वृत्ति    →  ofa          हैं।     →  Sl
+#
+# Jo shabd DHOONDHNE ke liye chahiye tha, wahi bigda hua tha — isliye search
+# us panne tak pahunch hi nahi paati thi. 11 kitaabon mein 0.27% se 18.30%
+# tak shabd aise bigde hue nikle.
+#
+# JAD: `-l hin+eng` — humne Tesseract ko English likhne ki IJAZAT DI thi.
+# Jab koi Devanagari shabd dhundhla dikha, usne Latin likh diya. Yeh
+# Tesseract ki galti nahi thi; humne aisa bola tha.
+#
+# TEEN BADLAV:
+#   1. lang: "hin+eng" → book ke hisaab se "hin" ya "hin+san"
+#      eng HATA diya. Ab Latin nikal hi nahi sakta — Tesseract ko Devanagari
+#      hi likhna padega. (san = Sanskrit traineddata, in granthon mein
+#      shlok bhare hain; woh bhi Devanagari hai, isliye surakshit.)
+#   2. psm 6 → 3: psm 6 poore panne ko "ek hi block" maanta hai. Par
+#      rashi_muhurt_vigyan aur lal_kitab mein tables hain. psm 3 layout
+#      khud pehchanta hai.
+#   3. DPI 300 → 400: Devanagari ke matra-chinh (ि ी ु ू ृ) chhote hote
+#      hain aur 300 par aksar chipak jaate hain.
+#
+# IMAANDARI: `-l hin` se Latin kachra PAKKA khatam hoga. Par uski jagah SAHI
+# shabd aayega ya galat Devanagari — woh scan ki quality par hai. Isliye
+# pehle ek kitab ke 20 pages par test karo (--max-pages 20), p.10 dekho, aur
+# tabhi poora chalao.
+OCR_DPI = 400
+OCR_PSM = "3"
+
+def ocr_lang_for(book):
+    """eng KABHI nahi — wahi 'Gitar' wali galti ki jad thi."""
+    lg = (book.get("language") or "hi")
+    return "hin+san" if "sa" in lg else "hin"
+
+def ocr_page(doc, pg_no, lang="hin"):
+    mat = fitz.Matrix(OCR_DPI/72, OCR_DPI/72)
     pix = doc[pg_no].get_pixmap(matrix=mat, colorspace=fitz.csGRAY)
     with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tf:
         tf.write(pix.tobytes("png")); tmp = tf.name
     try:
-        r = subprocess.run(["tesseract", tmp, "stdout", "-l", lang, "--psm", "6", "--oem", "1"],
-                           capture_output=True, text=True, timeout=180,
+        r = subprocess.run(["tesseract", tmp, "stdout", "-l", lang, "--psm", OCR_PSM, "--oem", "1"],
+                           capture_output=True, text=True, timeout=300,
                            encoding="utf-8", errors="ignore")
         return r.stdout or ""
     except Exception:
@@ -106,7 +146,7 @@ def ocr_page(doc, pg_no, lang="hin+eng"):
         except Exception: pass
 
 # ─── EK BOOK NIKALO ──────────────────────────────────────────────────────────
-def extract_book(book, pdf_dir: Path, max_pages=None):
+def extract_book(book, pdf_dir: Path, max_pages=None, force_rebuild=False):
     bid  = book["book_id"]
     pdfp = pdf_dir / book["source_pdf"]
     outd = RAW_DIR / bid
@@ -129,7 +169,8 @@ def extract_book(book, pdf_dir: Path, max_pages=None):
     for pg in range(limit):
         if pg < SKIP_FIRST_PAGES: skipped += 1; continue
         outf = outd / f"page_{pg:04d}.json"
-        if outf.exists(): skipped += 1; continue   # resumable
+        # resumable — par --force par dobara banao (naye OCR settings ke liye)
+        if outf.exists() and not force_rebuild: skipped += 1; continue
 
         # 1) Text layer (turant + 100% sahi) — force_ocr wali books mein skip
         force  = book.get("force_ocr", False)
@@ -137,7 +178,7 @@ def extract_book(book, pdf_dir: Path, max_pages=None):
         method = "text"
         # 2) Kam text = scan page → OCR (ya force_ocr book)
         if (force or len(raw.strip()) < 120) and HAS_TESSERACT:
-            raw = ocr_page(doc, pg); method = "ocr"; ocr_used += 1
+            raw = ocr_page(doc, pg, ocr_lang_for(book)); method = "ocr"; ocr_used += 1
 
         text = clean_text(raw)
         conf = confidence_score(text, book["language"])
@@ -145,7 +186,7 @@ def extract_book(book, pdf_dir: Path, max_pages=None):
         # par woh Unicode Devanagari nahi (custom font encoding ka kachra).
         # Aisa dikhe toh OCR se dobara try karo — jo behtar ho wahi rakho.
         if method == "text" and conf < 0.12 and HAS_TESSERACT:
-            raw2 = ocr_page(doc, pg)
+            raw2 = ocr_page(doc, pg, ocr_lang_for(book))
             t2   = clean_text(raw2)
             c2   = confidence_score(t2, book["language"])
             if c2 > conf:
@@ -183,6 +224,11 @@ def main():
     ap.add_argument("--pdf-dir", required=True, help="folder jisme 11 nayi PDFs hain")
     ap.add_argument("--books", nargs="*", help="sirf yeh book_ids")
     ap.add_argument("--max-pages", type=int, default=None, help="test: har book ke pehle N pages")
+    # 2026-08-04: OCR settings badle (hin+eng → hin/hin+san, psm 3, 400 dpi).
+    # Bina iske script bane hue pages SKIP kar deti hai (resumable design) aur
+    # naye settings lagte hi nahi. Yeh flag unhe dobara banata hai.
+    ap.add_argument("--force", action="store_true",
+                    help="pehle se bane pages bhi DOBARA banao (naye OCR settings ke liye)")
     args = ap.parse_args()
 
     pdf_dir = Path(args.pdf_dir)
@@ -202,7 +248,7 @@ def main():
 
     t0 = time.time()
     for book in targets:
-        entry = extract_book(book, pdf_dir, args.max_pages)
+        entry = extract_book(book, pdf_dir, args.max_pages, args.force)
         if entry and entry["pages_extracted"] > 0:
             existing[entry["book_id"]] = entry
             manifest["books"] = list(existing.values())

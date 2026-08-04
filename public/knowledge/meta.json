@@ -3,7 +3,7 @@
  "schema": "saarthi-knowledge-v2",
  "embed_model": "models/text-embedding-004",
  "embed_dim": 768,
- "total_chunks": 23425,
+ "total_chunks": 23763,
  "books": [
   "agni_purana",
   "atharvaveda_1",
