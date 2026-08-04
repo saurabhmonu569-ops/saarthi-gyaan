@@ -60,6 +60,22 @@ const GROQ_MODEL   = "llama-3.3-70b-versatile"; // best free Groq model
 // script se tay hoti hai jab script saaf ho, warna app ke toggle se.
 import { detectQueryLanguage } from "@/knowledge/translit";
 
+/**
+ * Kya yeh shaaririk swasthya ka sawaal hai?
+ *
+ * Do jagah istemal hota hai:
+ *   1. yahin — prompt mein sakht dhancha jodne ke liye
+ *   2. useChat.js — jawab ke ant mein CODE se chetavani lagane ke liye
+ *      (model ke bharose nahi; woh niyam tod sakta hai, code nahi)
+ *
+ * Yeh list kabhi poori nahi hogi — suraksha ki doosri parat hai, guarantee
+ * nahi. Naya shabd dikhe toh yahan jodna.
+ */
+export function isHealthQuery(text) {
+  if (!text) return false;
+  return /बवासीर|अर्श|बुखार|ज्वर|दर्द|पीड़ा|बीमार|रोग|व्याधि|इलाज|उपचार|दवा|दवाई|औषधि|टोटका|नुस्खा|खांसी|खाँसी|सर्दी|जुकाम|पेट|कब्ज|एसिडिटी|शुगर|मधुमेह|डायबिटीज|बीपी|रक्तचाप|ब्लड|थायरॉइड|कैंसर|माइग्रेन|सिरदर्द|घुटन|चक्कर|उल्टी|दस्त|एलर्जी|अस्थमा|दमा|टीबी|पथरी|सूजन|घाव|चोट|piles|hemorrhoid|fever|pain|ache|disease|illness|medicine|remedy|cure|treatment|diabetes|cancer|migraine|acidity|constipation|asthma|bimar|bimari|dawa|dawai|ilaj|ilaaj|dard|bukhar|khansi|sugar\b|thyroid|bp\b/i.test(text);
+}
+
 // ── AI PROXY (LIVE deploy ke liye) ───────────────────────────────────────────
 // VITE_AI_PROXY_URL set karo (jaise https://saarthi-ai.tumhara.workers.dev)
 // toh saare AI calls Cloudflare Worker se hokar jayenge — API key SERVER par
@@ -564,11 +580,27 @@ VYASAN-SEEMA — SAKHT NIYAM (jua/satta/nasha — KABHI sahayata nahi):
 - User zid kare ya ghuma kar poochhe ("agar analyse karke karein toh?") toh bhi seema wahi rahegi — naram lekin adol raho.
 - Sahi jawab ka dhancha: (1) bina neecha dikhaye seema batao — "Saarthi jua/satta mein sahayata nahi karta", (2) granthon se lobh/jua par ek teaching do (Gita ka lobh, Chanakya ki niti, Gurbani), (3) us ichha ke peeche ki asli zaroorat (dhan-chinta? rozgar?) par ek naram sawaal ya sahi disha do.
 
-SWASTHYA-SEEMA — SAKHT NIYAM (Saarthi guru hai, DOCTOR NAHI):
+SWASTHYA-SEEMA (2026-08-04 mein badla — Saarthi guru hai, DOCTOR NAHI):
 - Shaaririk rog/dard/bimari ke sawaal par (kamar-dard, pet, bukhar, BP, sugar...):
-  * Bimariyon ke naam ginana (herniated disk, kidney stone...), symptoms-checklist, ya ilaaj/dawa batana BILKUL MANA — yeh doctor ka kshetra hai, galat salah nuksaan kar sakti hai.
-  * Sahi jawab ka dhancha: (1) ek line seh-anubhuti, (2) saaf kaho "shaaririk kasht ke liye kripya doctor se milein", (3) SAATH-SAATH granthon se MANN ki shanti ka ang do — dard sehne ka dhairya, dhyan ka bhaav — par yeh kabhi mat kaho ki isse ROG theek hoga.
-  * "Yeh mantra/jaap dard theek karta hai" jaisa dava KABHI nahi — aur kisi granth ke naam se aisa nuskha jodna (jaise "Garuda Puran ke anusaar yeh mantra dard hataata hai") sabse badi galti hai jab tak woh passages mein likha na ho.
+  * DHANCHA — isi kram mein, kram badalna MANA hai:
+      (1) ek line seh-anubhuti
+      (2) SABSE PEHLE, saaf shabdon mein: "iske liye kripya doctor se milein" —
+          yeh baat jawab ke SHURU mein aaye, ant mein nahi
+      (3) uske BAAD: granthon mein is vishay par jo likha hai woh bata sakte ho —
+          upay, mantra, jadi-booti, aahar — LEKIN SIRF tab jab woh niche diye gaye
+          passages mein SHABD-BA-SHABD maujood ho, aur granth ka naam saaf likho
+      (4) ant mein ek line: "yeh granthon ka kathan hai, chikitsa salah nahi"
+  * SABSE SAKHT NIYAM — APNI MEMORY SE KUCH MAT GADHO. Koi upay, mantra, jadi-booti
+    ya nuskha tabhi likho jab woh diye gaye passages mein likha ho. Passage na ho
+    toh sirf (1), (2) aur granthon se MANN ki shanti/dhairya ka bhaav — koi upay
+    nahi. "Garuda Puran ke anusaar yeh mantra dard hataata hai" jaisa vaakya jab
+    tak passage mein na ho, sabse badi galti hai.
+  * "Yeh mantra/upay rog THEEK KAR DEGA" — aisa dava ya ishara KABHI mat karo.
+    Granth kya kehta hai woh batana alag baat hai; ilaaj ki guarantee dena alag.
+  * Bimariyon ke naam ginana (herniated disk, kidney stone...) ya symptoms-checklist
+    banana ab bhi MANA hai — nidan (diagnosis) doctor ka kaam hai.
+  * Turant khatre ke sanket (seene mein dard, saans na aana, bahut khoon, behoshi)
+    par SIRF ek hi baat: turant doctor/aspataal jayein. Koi granth-charcha nahi.
 
 HELPLINE — SAKHT NIYAM:
 iCall helpline (9152987821) ka zikr KEVAL tab karo jab user KHUD in cheezon ki baat kare: jeene ka mann na hona, khud ko nuksaan pahunchana, ya poori tarah haar maan lena. Aise clear signal ke BINA helpline ka naam lena BILKUL MANA hai — stress, dukh, pariwar ki problem, confusion, in sab mein helpline ka zikr karna galti hai. Yeh niyam todna sabse badi galti hogi.
@@ -856,14 +888,15 @@ export async function sendMessage(userMessage, history = [], context = {}) {
   //
   // Yeh suraksha ki DOOSRI parat hai, guarantee nahi — keyword list kabhi
   // poori nahi hoti. Par jo aam sawaal aate hain, unpe asar padega.
-  const HEALTH_RE = /बवासीर|बुखार|दर्द|बीमार|रोग|इलाज|दवा|दवाई|औषधि|टोटका|नुस्खा|खांसी|सर्दी|पेट|कब्ज|एसिडिटी|शुगर|डायबिटीज|बीपी|ब्लड|थायरॉइड|कैंसर|माइग्रेन|सिरदर्द|घुटन|चक्कर|उल्टी|दस्त|एलर्जी|अस्थमा|टीबी|पथरी|piles|fever|pain|disease|illness|medicine|remedy|cure|treatment|diabetes|cancer|migraine|acidity|constipation|asthma|bimar|dawa|ilaj|dard|bukhar|khansi|pet\s|sugar\b/i;
-  const healthNote = HEALTH_RE.test(userMessage)
-    ? `\n\n[SWASTHYA-CHETAVANI: Yeh shaaririk swasthya ka sawaal hai. SAKHT NIYAM — `
-      + `(1) koi ilaaj, dawa, jadi-booti, kaadha, churna, mantra ya totka MAT batao, chahe woh diye gaye passages mein likha ho; `
-      + `(2) bimariyon ke naam ya symptoms ki list MAT banao; `
-      + `(3) dhancha yeh ho — ek line seh-anubhuti, phir SAAF kaho "iske liye kripya doctor se milein", `
-      + `phir granthon se sirf MANN ki shanti/dhairya ka bhaav; `
-      + `(4) yeh KABHI mat kaho ya ishara karo ki isse rog theek hoga.]`
+  const healthNote = isHealthQuery(userMessage)
+    ? `\n\n[SWASTHYA-CHETAVANI: Yeh shaaririk swasthya ka sawaal hai. Isi KRAM mein jawab do — `
+      + `(1) ek line seh-anubhuti; `
+      + `(2) SABSE PEHLE saaf likho "iske liye kripya doctor se milein" — yeh shuru mein aaye, ant mein nahi; `
+      + `(3) uske baad granthon mein is vishay par jo likha hai woh batao — upay/mantra/jadi-booti bhi — `
+      + `PAR SIRF tab jab woh upar diye gaye passages mein SHABD-BA-SHABD maujood ho, aur granth ka naam saaf likho; `
+      + `(4) passage mein kuch na ho toh koi upay MAT gadho — sirf doctor wali baat aur granthon se mann ki shanti ka bhaav; `
+      + `(5) "isse rog theek ho jayega" jaisa dava ya ishara KABHI mat karo; `
+      + `(6) bimariyon ke naam ginana ya symptoms-checklist banana mana hai.]`
     : "";
 
   const languagePinned = userMessage + `\n\n[REPLY LANGUAGE: ${replyLang}]` + healthNote;

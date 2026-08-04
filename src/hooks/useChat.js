@@ -77,6 +77,7 @@ import {
   sendMessage, askAboutPDF,
   hasApiKey, getErrorMessage, GeminiError,
   lastAnswerModel,
+  isHealthQuery,          // swasthya chetavani code se lagane ke liye
 } from "@/services/gemini";
 import { getFallbackResponse } from "@/services/fallback";
 import { isOwnerEmail } from "@/services/tier";
@@ -474,6 +475,21 @@ export function useChat({
         });
         if (srcs.length) responseText += `\n\n---\n📚 *Aadhaar: ${srcs.join(" · ")}*`;
       }
+      // SWASTHYA CHETAVANI (2026-08-04) — CODE se, model ke bharose NAHI.
+      //
+      // Faisla: granthon mein jo upay/mantra likha hai woh user ko dikhega
+      // (pehle poori tarah rok diya jaata tha). Uske saath yeh chetavani
+      // ZAROORI hai — aur ise prompt par nahi chhoda ja sakta, kyunki
+      // model niyam todta hai (audit mein baar-baar dekha). Prompt kehta
+      // hai, code NIBHATA hai.
+      if (responseText && isHealthQuery(text)) {
+        const en = getUiLang() === "en";
+        const note = en
+          ? "_⚕️ This is what the scriptures say — not medical advice. Please do consult a doctor._"
+          : "_⚕️ यह ग्रंथों में लिखी बात है, चिकित्सा सलाह नहीं। कृपया डॉक्टर से अवश्य मिलें।_";
+        if (!responseText.includes("⚕️")) responseText += `\n\n${note}`;
+      }
+
       // IMAANDAAR TAG: backup-model (8b) ka jawab tha toh user ko saaf batao —
       // taaki halka jawab dekh kar granth-bharosa na toote
       if (responseText && lastAnswerModel && lastAnswerModel.includes("8b")) {
