@@ -111,14 +111,37 @@ export function cleanOcrText(raw) {
   }).join("\n").replace(/\n{3,}/g, "\n\n");
 }
 
-function cleanForDisplay(raw) {
-  return cleanOcrText(raw);
+/**
+ * BUG FIX (2026-08-04): pehle yeh HAR Prose par cleanOcrText chalata tha —
+ * AI ke jawab par bhi.
+ *
+ * cleanOcrText scanned granthon ke OCR-kachre ke liye bani hai, aur uska
+ * ek niyam yeh hai: "Devanagari line mein koi bhi Latin token = OCR noise,
+ * hata do." Scanned pannon ke liye sahi hai. Par AI ke jawab par chalne se:
+ *
+ *   📚 *Aadhaar: कठोपनिषद् (p.12) · संक्षिप्त गरुडपुराण (p.559)*
+ *        ↓ 📚 hata, *Aadhaar: hata (Latin), (p.12) hata ('p' Latin hai),
+ *          · hata (allowed punctuation list mein nahi)
+ *   कठोपनिषद् संक्षिप्त गरुडपुराण
+ *
+ * Isi wajah se console "footer lagega — 3 grounded chunks" bolta tha par
+ * screen par sirf granth ka naam dikhta tha — footer ban raha tha, RENDER
+ * par kat raha tha.
+ *
+ * Aur bada khatra: agar AI Hindi jawab mein "OCR", "WHO", "AI" jaisa koi
+ * angrezi shabd likhta, woh bhi chup-chaap gayab ho jaata.
+ *
+ * Ab safai SIRF asli scripture par (scripture=true — BooksView). Chat,
+ * Amrit aur Search ka text pehle se saaf hai, use chhoona nahi.
+ */
+function cleanForDisplay(raw, scripture) {
+  return scripture ? cleanOcrText(raw) : (raw || "");
 }
 
 export function Prose({ text = "", size = F.base, scripture = false }) {
   // scripture=true → granth-jaisa serif + zyada saans (reader ke liye)
   const bodyFont = scripture ? { ...serif, lineHeight: 1.95 } : { lineHeight: 1.82 };
-  const lines = cleanForDisplay(text).split("\n");
+  const lines = cleanForDisplay(text, scripture).split("\n");
   const out   = [];
   let list    = [];
 
