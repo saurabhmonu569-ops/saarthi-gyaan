@@ -455,9 +455,45 @@ export function ChatView() {
         kept = cleaned.slice(0, 6).map(r => ({ ...r, rerank: null }));
       }
 
+      // ── PADOSI ANSH (2026-08-04) — chunk ki seema par kata jawab ─────
+      //
+      // ASLI GHATNA: "सूर्य के 12 नमस्कार" par nitya_karm_pooja p.125 mila,
+      // jisme likha tha "सूर्यके बारह नामोंके द्वारा होनेवाले बारह..." —
+      // aur wahin chunk KHATAM ho gaya. Baarah naam agle chunk (p.126)
+      // mein the. Model ke paas bhoomika thi, naam nahi — usne apni yaad
+      // se list bhar di aur 12 mein se 5 naam GALAT nikle (12 आदित्य ki
+      // alag list ghusa di).
+      //
+      // Yeh RAG ki jaani-mani samasya hai: jawab do chunks ke beech kat
+      // jaata hai. Standard ilaaj — jo ansh gate paar kare, uska AGLA
+      // ansh bhi saath bhejo. Sirf top-3 ke liye, taaki prompt na phoole.
+      //
+      // Padosi ko bhi grounded maante hain: woh usi passage ka agla hissa
+      // hai jise reranker ne pass kiya, aur uski kitaab pehle se cite ho
+      // rahi hai.
+      try {
+        const already = new Set(kept.map(r => r.chunk.id));
+        const extra = [];
+        for (const r of kept.slice(0, 3)) {
+          const all = getBookChunks(r.chunk.book) || [];
+          const idx = all.findIndex(c => c.id === r.chunk.id);
+          if (idx < 0) continue;
+          const next = all[idx + 1];
+          if (next && !already.has(next.id) && (next.text || "").trim().length > 40) {
+            already.add(next.id);
+            extra.push({ chunk: { ...next, text: cleanOcrText(next.text || "") },
+                         score: r.score, rerank: r.rerank, match_type: "neighbour" });
+          }
+        }
+        if (extra.length) {
+          console.log(`[Retrieval] ${extra.length} padosi ansh jode (chunk-seema par kata jawab bachane ke liye)`);
+          kept = kept.concat(extra);
+        }
+      } catch { /* padosi na mile toh koi baat nahi — mool ansh kaafi hain */ }
+
       // PRAMAAN-FIX: top-3 ansh MOTE (800) taaki AI seedha uddharan de sake,
       // baaki patle (300) — kul tokens lagbhag wahi (TPM surakshit)
-      const merged = kept.slice(0, 8).map((r, i) => ({
+      const merged = kept.slice(0, 10).map((r, i) => ({
         ...r,
         grounded: r.rerank != null && r.rerank >= MIN_RERANK_SCORE,
         chunk: { ...r.chunk, text: r.chunk.text.slice(0, i < 3 ? 800 : 300) },
@@ -477,7 +513,7 @@ export function ChatView() {
       console.warn("[Retrieval] failed:", e);
       return [];
     }
-  }, [knowledgeReady, crossBookSearch, hybridSearch]);
+  }, [knowledgeReady, crossBookSearch, hybridSearch, getBookChunks]);
 
   const { messages, isLoading, loadPhase, countdown, apiStatus, sendUserMessage, clearMessages, retryLast } = useChat({
     mode: "chat",
