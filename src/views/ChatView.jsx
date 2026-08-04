@@ -22,6 +22,37 @@ import { normalizeQueryForSearch } from "@/knowledge/translit";
 //
 // Ise badalna ho toh pehle naapo:  node scripts/test-reranker.mjs
 const MIN_RERANK_SCORE = 0.5;
+
+/**
+ * Kya is ansh mein asli VAAKYA hain, ya sirf table/suchi/mukhprishth hai?
+ *
+ * ASLI GHATNA (2026-08-04): "कृत्तिका नक्षत्र में जन्मे जातक" par
+ * rashi_muhurt_vigyan p.74 aur p.75 mile. Reranker ne pass kar diya —
+ * vishay to kritika hi tha. Par woh dono ansh TABLE hain:
+ *     "कृतिका नक्षत्र जन्म-उत्पत्तिकर . कृतिका 0. उत्तरा फा. 9. उत्तराषाढ़
+ *      संपत्तकर 2. रोहिणी ll. हस्त 20. श्रवण विपदकर 3. मृग…"
+ * Nakshatron ke naam aur ank — koi vivaran nahi. Model ke paas kehne ko
+ * kuch tha hi nahi, isliye usne apni taraf se bhar diya — aur jo likha
+ * woh kitab ke BILKUL ULTA tha (kitab: कंजूसी, आक्रामक, झूठ; app: दयालु,
+ * बुद्धिमान, सुख-समृद्धि). Aur footer ne unhi table-pannon ko cite kar
+ * diya. Yeh sabse dhoka dene wala roop hai — sahi kitab, sahi panna,
+ * ulta matlab.
+ *
+ * Naapne par saaf farak mila (prati 1000 akshar vaakya-chinh):
+ *     table / copyright page   → 0
+ *     asli Vedic richa         → 4.1 – 7.7
+ *     asli Hindi gadya         → 17.9 – 46.6
+ *
+ * NOTE: aise ansh PHENKTE nahi — 2.8% chunks aise hain aur unme kuch
+ * asli-par-kata-hua gadya bhi hai (agni_purana p.432 jaisa). Woh AI ko
+ * context ki tarah ja sakte hain; bas CITATION ka aadhaar nahi ban
+ * sakte. Content kabhi nahi khoyega, jhoothi citation nahi lagegi.
+ */
+function hasSentences(text) {
+  const t = (text || "").trim();
+  if (!t) return false;
+  return /।|॥|(?:है|हैं|था|थी|थे|हुआ|हुई|होता|होती|करते|करना|चाहिये|चाहिए|गया|गयी|रहता|रहती)(?=[\s।॥,.]|$)/.test(t);
+}
 import { C, F } from "@/styles/theme";
 import { SaarthiOrb, StatusDot, Btn, ThinkingBubble, Prose, cleanOcrText } from "@/components/ui/Primitives";
 import { AudioEngine, HAS_EL } from "@/services/audioEngine";
@@ -473,30 +504,51 @@ export function ChatView() {
       // rahi hai.
       try {
         const already = new Set(kept.map(r => r.chunk.id));
-        const extra = [];
-        for (const r of kept.slice(0, 3)) {
+        const withNeighbours = [];
+        let added = 0;
+        for (let n = 0; n < kept.length; n++) {
+          const r = kept[n];
+          withNeighbours.push(r);
+          if (n >= 3) continue;                       // sirf top-3 ke padosi
           const all = getBookChunks(r.chunk.book) || [];
           const idx = all.findIndex(c => c.id === r.chunk.id);
           if (idx < 0) continue;
           const next = all[idx + 1];
           if (next && !already.has(next.id) && (next.text || "").trim().length > 40) {
             already.add(next.id);
-            extra.push({ chunk: { ...next, text: cleanOcrText(next.text || "") },
-                         score: r.score, rerank: r.rerank, match_type: "neighbour" });
+            // Padosi ko TURANT uske mool ansh ke BAAD rakho — model dono ko
+            // ek hi behaav mein padhe. Pehle yeh list ke ant mein jaata tha,
+            // apne mool se door.
+            withNeighbours.push({
+              chunk: { ...next, text: cleanOcrText(next.text || "") },
+              score: r.score, rerank: r.rerank, match_type: "neighbour",
+            });
+            added++;
           }
         }
-        if (extra.length) {
-          console.log(`[Retrieval] ${extra.length} padosi ansh jode (chunk-seema par kata jawab bachane ke liye)`);
-          kept = kept.concat(extra);
+        if (added) {
+          console.log(`[Retrieval] ${added} padosi ansh jode (chunk-seema par kata jawab bachane ke liye)`);
+          kept = withNeighbours;
         }
       } catch { /* padosi na mile toh koi baat nahi — mool ansh kaafi hain */ }
 
       // PRAMAAN-FIX: top-3 ansh MOTE (800) taaki AI seedha uddharan de sake,
       // baaki patle (300) — kul tokens lagbhag wahi (TPM surakshit)
+      // NAAPA HUA (2026-08-04): padosi ansh ko 300 chars par kaatna use
+      // bekaar kar deta hai. nitya_karm_pooja p.126 mein "मित्राय" 383ve
+      // aur "भास्कराय" 624ve akshar par hai — 300 par kaato toh 12 naamon
+      // mein se EK bhi nahi dikhta, aur model phir se yaad se bhar deta
+      // hai. Padosi maujood hi isliye hai ki kata hua hissa poora ho —
+      // isliye use hamesha poora slice do.
+      // Ansh AI ko jaate hain, par CITATION sirf unhi par jinme asli vaakya
+      // hain — table/suchi/mukhprishth kabhi "aadhaar" nahi banenge.
       const merged = kept.slice(0, 10).map((r, i) => ({
         ...r,
-        grounded: r.rerank != null && r.rerank >= MIN_RERANK_SCORE,
-        chunk: { ...r.chunk, text: r.chunk.text.slice(0, i < 3 ? 800 : 300) },
+        grounded: r.rerank != null && r.rerank >= MIN_RERANK_SCORE && hasSentences(r.chunk.text),
+        chunk: {
+          ...r.chunk,
+          text: r.chunk.text.slice(0, (i < 3 || r.match_type === "neighbour") ? 900 : 300),
+        },
       }));
 
       // DIAGNOSTIC (2026-08-03): retrieval ka poora hisaab ek line mein —
@@ -506,6 +558,18 @@ export function ChatView() {
         + ` | grounded=${merged.filter(m => m.grounded).length}`
         + ` | granth: ${[...new Set(merged.map(m => m.chunk.book))].join(", ") || "koi nahi"}`
         + (scores ? ` | best-rerank=${Math.max(...scores).toFixed(3)}` : " | RERANK FAIL"));
+
+      // Agar EK BHI ansh cite-layak nahi (sab table/suchi hain), toh unhe
+      // AI ko bhejna hi galat hai — prompt unhe "RELEVANT PASSAGES FROM
+      // SACRED BOOKS" kehkar deta hai, aur khaali table dekh kar model
+      // apni taraf se bhar deta hai. Kritika wale case mein theek yahi hua.
+      // Aisi haalat mein kuch mat bhejo — saada jawab, koi granth-daava
+      // nahi. Yehi user ka apna niyam hai.
+      if (!merged.some(m => m.grounded)) {
+        console.log(`[Retrieval] ${merged.length} ansh mile par sab table/suchi hain — bina granth ke jawab`);
+        setSacredChunks([]);
+        return [];
+      }
 
       setSacredChunks(merged);
       return merged;
