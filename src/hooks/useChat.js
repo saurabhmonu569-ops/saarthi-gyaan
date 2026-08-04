@@ -14,6 +14,9 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 // Fix 4 (2026-08-03) — model ke jawab se Cyrillic corruption saaf karne ke liye
 import { stripCyrillic } from "@/knowledge/translit";
+// 2026-08-04 — gadhe hue uddharan aur jhoothi citation pakadne ke liye
+import { verifyAnswer } from "@/services/verifyAnswer";
+import { BOOK_META } from "@/data/bookMeta";
 
 // ── Chat history persistence ──────────────────────────────────────────────────
 const STORAGE_KEY = "saarthi_chat_history";
@@ -448,6 +451,35 @@ export function useChat({
       // DIAGNOSTIC (2026-08-03): footer laga ya nahi, aur NAHI toh KYUN —
       // chaaron shart alag-alag dikhti hain. Audit ka sabak: chup-chaap
       // fail hone mat do, warna mahino pata nahi chalta.
+      // ── JAWAB KI JAANCH (2026-08-04) — teesri parat ──────────────────
+      // Asli ghatna: "jap vidhi bataye" par model ko sirf mantra_shakti
+      // p.133 diya gaya tha, par usne likha:
+      //     📜 "जपमान् यस्य मनस्सहितम्" — मन्त्र महासागर (पृष्ठ १४)
+      // Woh shlok poore 23,425 chunks mein ek baar bhi nahi hai, aur
+      // मन्त्र महासागर ka panna 14 index (vishayanukramanika) hai. Shlok,
+      // granth aur panna — teeno gadhe gaye.
+      //
+      // SYSTEM_PROMPT mein yeh pehle se mana hai. Model ne phir bhi kiya.
+      // Isliye ab jaanch CODE karta hai: har uddharan diye gaye passages
+      // mein dhoondha jaata hai, aur har granth-naam grounded list se
+      // milaya jaata hai. Na mile toh hata do.
+      if (responseText && groundedChunks.length >= 0) {
+        const bookNames = {};
+        for (const [id, m] of Object.entries(BOOK_META)) {
+          bookNames[id] = [m.title, m.en].filter(Boolean);
+        }
+        // chunk ke apne book_title bhi jodo (kabhi alag hote hain)
+        for (const r of (liveChunks || [])) {
+          const id = r?.chunk?.book, bt = r?.chunk?.book_title;
+          if (id && bt && bookNames[id] && !bookNames[id].includes(bt)) bookNames[id].push(bt);
+        }
+        const v = verifyAnswer(responseText, groundedChunks, bookNames);
+        if (v.removed.quotes || v.removed.citations) {
+          console.warn(`[Verify] gadha hua hissa hataya — uddharan: ${v.removed.quotes}, citation: ${v.removed.citations}`);
+          responseText = v.text;
+        }
+      }
+
       const _why = !responseText ? "koi jawab nahi"
         : groundedChunks.length === 0 ? `grounded=0 (kul chunks ${(liveChunks || []).length})`
         : responseText.includes("📚 Aadhaar") ? "model ne khud footer likh diya"

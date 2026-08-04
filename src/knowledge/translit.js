@@ -45,6 +45,18 @@ const WORDS = {
   // sarvanaam
   main: "मैं", mai: "मैं", mera: "मेरा", meri: "मेरी", mere: "मेरे", mujhe: "मुझे",
   mujhko: "मुझको", hum: "हम", hamara: "हमारा", hamari: "हमारी", humein: "हमें",
+  // "hme" ki wajah se ek asli bug hua tha (2026-08-04): user ne
+  // "HME JAP VIDHI BATAYE" likha, "hme" kisi list mein nahi tha, Latin
+  // mein reh gaya — aur us EK anjaan token ne retrieval bigaad diya.
+  // Saaf "जप विधि बताइए" par nitya_karm_pooja p.69 rank-1 par rerank 0.95
+  // paata hai; "HME" jud'te hi wahi panna gate se hi bahar ho gaya.
+  hme: "हमें", hmein: "हमें", hume: "हमें", humey: "हमें", humko: "हमको",
+  hmko: "हमको", hamein: "हमें", hamko: "हमको", mereko: "मेरे को",
+  tumhe: "तुम्हें", tumko: "तुमको", aapko: "आपको", inko: "इनको", unko: "उनको",
+  // aur aam jodne wale shabd jo pehle chhoot rahe the
+  bare: "बारे", baare: "बारे", vishay: "विषय", kripya: "कृपया", kripaya: "कृपया",
+  zara: "ज़रा", jara: "ज़रा", thoda: "थोड़ा", poora: "पूरा", pura: "पूरा",
+  saral: "सरल", vistar: "विस्तार", detail: "विस्तार", short: "संक्षेप",
   aap: "आप", aapka: "आपका", aapki: "आपकी", aapke: "आपके", tum: "तुम",
   woh: "वह", wo: "वह", yeh: "यह", ye: "यह", uska: "उसका", uski: "उसकी",
   iska: "इसका", iski: "इसकी", unka: "उनका", inka: "इनका", koi: "कोई", kuch: "कुछ",
@@ -381,6 +393,20 @@ export function normalizeQueryForSearch(text) {
   const original = text;
   const ratio = devanagariRatio(text);
   if (ratio >= 0.3) return { query: text, transliterated: false, original };
+
   const dev = toDevanagari(text);
+
+  // NOTE (2026-08-04): yahan ek aur niyam AAZMAYA AUR HATAYA gaya —
+  // "agar translit ke baad query zyadatar Devanagari ho toh bache hue
+  // Latin token hata do" (soch: woh anpehchane Hindi shabd honge).
+  // Naapne par ULTA nikla:
+  //     "OCR me error ho to AI kya kare" → "में हो तो आई क्या करे"
+  //     "mera job chhut gaya hai..."     → "मेरा छूट गया है बहुत है"
+  // OCR/error/job/tension — asli vishay ke shabd hi ud gaye, aur query
+  // bematlab ho gayi. Isse wahi junk-rejection tootti jo reranker ke
+  // saath mehnat se banayi thi. Isliye hata diya.
+  //
+  // Sahi ilaaj: dictionary badhao (upar WORDS mein). Bounded aur
+  // surakshit hai — anjaan shabd Latin mein rehte hain, jo theek hai.
   return { query: dev, transliterated: dev !== text, original };
 }
