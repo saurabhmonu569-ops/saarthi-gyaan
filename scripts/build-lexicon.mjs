@@ -103,13 +103,20 @@ function devToRoman(w) {
  * Fuzzy key — hijje ke aam farak mita do, taaki "kitab" aur "kitaab"
  * dono ek hi key par pahunchein.
  */
+// ⚠️ Yeh src/knowledge/translit.js ke fuzzyKey se HUBAHU milna chahiye.
+//    Ek jagah badlo toh doosri jagah bhi — warna lookup chup-chaap fail
+//    hoga (key alag ban jayegi) aur pata bhi nahi chalega.
 export function fuzzyKey(roman) {
   let s = roman.toLowerCase();
   s = s.replace(/[^a-z]/g, "");
   s = s.replace(/aa/g, "a").replace(/ee/g, "i").replace(/ii/g, "i")
        .replace(/oo/g, "u").replace(/uu/g, "u").replace(/ou/g, "au");
   s = s.replace(/w/g, "v");
+  // "ज्ञ" → asli roman "jn", par Hinglish mein "gy" (यज्ञ=yagya, ज्ञान=gyan)
+  s = s.replace(/gy/g, "jn").replace(/gn/g, "jn");
   s = s.replace(/(.)\1+/g, "$1");     // dohre akshar → ek
+  // bahuvachan/vibhakti: मंत्रों (mantro/mantron) → मंत्र
+  s = s.replace(/(?:on|ein|en)$/, "").replace(/o$/, "");
   s = s.replace(/a$/, "");            // ant ka schwa Hindi mein girta hai
   return s;
 }

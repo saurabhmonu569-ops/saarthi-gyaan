@@ -98,6 +98,28 @@ export function verifyAnswer(text, groundedChunks = [], bookNames = {}) {
       return null;                          // poori line hatao
     }
 
+    // ── 1b. Vaakya ke ANDAR wali jhoothi attribution ─────────────────
+    // Asli ghatna (2026-08-04): grounded sirf mantra_shakti tha, par jawab
+    // mein likha tha "गरुड़ पुराण के अनुसार, पितृ यज्ञ के दौरान...".
+    // Pehla version ise nahi pakadta tha kyunki woh sirf ANT wali
+    // "— <granth>" citation dekhta tha.
+    //
+    // Yahan poora vaakya nahi hatate — sirf attribution ka hissa hatate
+    // hain. "गरुड़ पुराण के अनुसार, X" → "X". Baat model ki apni reh
+    // jaati hai, kisi granth ke naam par nahi thopi jaati.
+    for (const [name, id] of nameToId) {
+      if (groundedIds.has(id)) continue;              // sahi granth — chhodo
+      if (!out.includes(name)) continue;
+      const esc = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const attr = new RegExp(
+        `${esc}\\s*(?:के\\s+अनुसार|के\\s+मुताबिक|में\\s+(?:कहा|लिखा|बताया)\\s+गया\\s+है\\s+कि|में\\s+वर्णित\\s+है\\s+कि|according\\s+to|says\\s+that|states\\s+that)\\s*[,:—-]?\\s*`,
+        "gi"
+      );
+      const before = out;
+      out = out.replace(attr, "");
+      if (out !== before) citations++;
+    }
+
     // ── 2. Gadhi hui CITATION ────────────────────────────────────────
     // "— मन्त्र महासागर (पृष्ठ १४)" jaisa ant ka hissa. Agar us granth ka
     // koi passage diya hi nahi gaya tha, toh yeh attribution jhoothi hai.

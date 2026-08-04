@@ -87,6 +87,11 @@ const WORDS = {
   // aatmik / SAARTHI ke aam shabd
   bhagwan: "भगवान", ishwar: "ईश्वर", dharm: "धर्म", karm: "कर्म", karma: "कर्म",
   gyan: "ज्ञान", moksh: "मोक्ष", atma: "आत्मा", aatma: "आत्मा", mann: "मन",
+  // पितृ ka fuzzyKey "pitri" banta hai par log "pitr"/"pitra" likhte hain
+  pitr: "पितृ", pitra: "पितृ", pitru: "पितृ", pitar: "पितर",
+  tarpan: "तर्पण", shraddh: "श्राद्ध", shradh: "श्राद्ध",
+  yagya: "यज्ञ", yagna: "यज्ञ", yajna: "यज्ञ", hawan: "हवन", havan: "हवन",
+  namaskar: "नमस्कार", surya: "सूर्य", arghya: "अर्घ्य",
   man: "मन", jeevan: "जीवन", jivan: "जीवन", mrityu: "मृत्यु", janm: "जन्म",
   shanti: "शांति", dhyan: "ध्यान", pooja: "पूजा", puja: "पूजा", mantra: "मंत्र",
   vrat: "व्रत", paap: "पाप", punya: "पुण्य", guru: "गुरु", shishya: "शिष्य",
@@ -116,7 +121,15 @@ function fuzzyKey(roman) {
   s = s.replace(/aa/g, "a").replace(/ee/g, "i").replace(/ii/g, "i")
        .replace(/oo/g, "u").replace(/uu/g, "u").replace(/ou/g, "au");
   s = s.replace(/w/g, "v");
+  // SANSKRIT CONJUNCT (2026-08-04): "ज्ञ" ka asli roman "jn" hai, par Hinglish
+  // mein log "gy" likhte hain — यज्ञ=yagya, ज्ञान=gyan. Isi mismatch se
+  // "SURYA KE 12 NAMASKAR KIN MANTRO SE" wala sawaal fail hua tha.
+  s = s.replace(/gy/g, "jn").replace(/gn/g, "jn");
   s = s.replace(/(.)\1+/g, "$1");
+  // BAHUVACHAN / VIBHAKTI (2026-08-04): corpus mein "मंत्र" hai par user
+  // "मंत्रों" (mantro/mantron) likhta hai. Ant ka o/on/ein hata do taaki
+  // dono ek hi key par aayein.
+  s = s.replace(/(?:on|ein|en)$/, "").replace(/o$/, "");
   s = s.replace(/a$/, "");
   return s;
 }
