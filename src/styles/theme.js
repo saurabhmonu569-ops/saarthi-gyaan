@@ -35,8 +35,8 @@ export const HAS_PDF = new Set([
   "shiva_purana_1", "shiva_purana_2", "valmiki_ramayana", "vishnu_purana_1", "yajurveda",
   // Batch 2 — sabhi 11 (badi 3 ko 08_compress_pdf.py se chhota karke host kiya)
   "rashi_muhurt_vigyan", "chanakya_neeti", "ekadashi_mahatmya", "ishadi_upanishad",
-  "guru_granth_sahib", "kathopanishad", "nitya_devta_archana", "lal_kitab",
-  "mantra_maha_sagar", "mantra_shakti", "nitya_karm_pooja",
+  "guru_granth_sahib", "kathopanishad", "ramcharitmanas", "lal_kitab",
+  "mantra_maha_sagar", "yoga_vasishtha", "nitya_karm_pooja",
 ]);
 
 // ─── TYPOGRAPHY ───────────────────────────────────────────────────────────────

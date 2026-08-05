@@ -45,9 +45,15 @@ export const BOOK_HINTS = {
   "लाल किताब": "lal_kitab", "ज्योतिष": "lal_kitab",
   "rashi": "rashi_muhurt_vigyan", "muhurt": "rashi_muhurt_vigyan", "muhurat": "rashi_muhurt_vigyan",
   "राशि": "rashi_muhurt_vigyan", "मुहूर्त": "rashi_muhurt_vigyan",
-  "mantra shakti": "mantra_shakti", "मंत्र शक्ति": "mantra_shakti", "मन्त्र शक्ति": "mantra_shakti",
+  "yoga vasishtha": "yoga_vasishtha", "yog vashisth": "yoga_vasishtha",
+  "योगवासिष्ठ": "yoga_vasishtha", "योग वासिष्ठ": "yoga_vasishtha",
+  "योगवाशिष्ठ": "yoga_vasishtha", "वसिष्ठ": "yoga_vasishtha", "वशिष्ठ": "yoga_vasishtha",
+  "महारामायण": "yoga_vasishtha", "वैराग्य": "yoga_vasishtha",
   "pooja vidhi": "nitya_karm_pooja", "नित्य कर्म पूजा": "nitya_karm_pooja", "नित्य पूजा": "nitya_karm_pooja",
-  "archana": "nitya_devta_archana", "अर्चना": "nitya_devta_archana", "देवता अर्चना": "nitya_devta_archana",
+  "ramcharitmanas": "ramcharitmanas", "ramcharit manas": "ramcharitmanas",
+  "रामचरितमानस": "ramcharitmanas", "रामचरित मानस": "ramcharitmanas",
+  "मानस": "ramcharitmanas", "तुलसीदास": "ramcharitmanas", "tulsidas": "ramcharitmanas",
+  "चौपाई": "ramcharitmanas", "सुंदरकांड": "ramcharitmanas", "सुन्दरकाण्ड": "ramcharitmanas",
   "mantra": "mantra_maha_sagar", "मंत्र": "mantra_maha_sagar", "मन्त्र": "mantra_maha_sagar",
 };
 

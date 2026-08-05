@@ -3,7 +3,7 @@
  "schema": "saarthi-knowledge-v2",
  "embed_model": "models/text-embedding-004",
  "embed_dim": 768,
- "total_chunks": 23763,
+ "total_chunks": 32032,
  "books": [
   "agni_purana",
   "atharvaveda_1",
@@ -17,10 +17,9 @@
   "kathopanishad",
   "lal_kitab",
   "mantra_maha_sagar",
-  "mantra_shakti",
   "narasimha_purana",
-  "nitya_devta_archana",
   "nitya_karm_pooja",
+  "ramcharitmanas",
   "rashi_muhurt_vigyan",
   "rigveda_1",
   "samaveda",
@@ -28,7 +27,8 @@
   "shiva_purana_2",
   "valmiki_ramayana",
   "vishnu_purana_1",
-  "yajurveda"
+  "yajurveda",
+  "yoga_vasishtha"
  ],
  "index_shards": 8,
  "format": "split-v1"

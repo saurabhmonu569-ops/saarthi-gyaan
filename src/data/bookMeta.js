@@ -50,8 +50,20 @@ export const BOOK_META = {
   chanakya_neeti:        { icon:"🦉", title:"चाणक्य नीति",          en:"Chanakya Neeti",       sub:"जीवन, राजनीति और व्यवहार की अमर सूत्र-नीति", src:"संकलन: विश्वामित्र शर्मा · प्रकाशक अज्ञात", srcEn:"Compiled by Vishvamitra Sharma · Publisher unknown" },
   ekadashi_mahatmya:     { icon:"🌕", title:"एकादशी व्रत माहात्म्य", en:"Ekadashi Mahatmya",    sub:"सभी एकादशियों की कथा, विधि और फल", src:"गौड़ीय वेदांत प्रकाशन", srcEn:"Gaudiya Vedanta Publications" },
   mantra_maha_sagar:     { icon:"📿", title:"मंत्र महासागर",        en:"Mantra Maha Sagar",    sub:"मंत्रों का महाकोश — साधना और सिद्धि", src:"चौखम्बा कृष्णदास अकादमी, वाराणसी · 2017", srcEn:"Chowkhamba Krishnadas Academy, Varanasi · 2017" },
-  mantra_shakti:         { icon:"✨", title:"मंत्र शक्ति",          en:"Mantra Shakti",        sub:"मंत्र-विज्ञान और जप की शक्ति", src:"गोयल एंड कंपनी, दरीबा, दिल्ली · लगभग 1974", srcEn:"Goyal & Company, Dariba, Delhi · c. 1974" },
-  nitya_devta_archana:   { icon:"🪔", title:"नित्य देवता अर्चना",   en:"Nitya Devta Archana",  sub:"दैनिक देव-पूजन की सरल विधि", src:"श्री चित्रापुर मठ", srcEn:"Shri Chitrapur Math" },
+  // mantra_shakti ki jagah (2026-08-04) — wo kitab kharab nahi thi, par
+  // DUPLICATE thi: mantra_maha_sagar wahi vishay kai guna zyada cover karta
+  // hai (मन्त्र 652 vs 3,833 | टोटका 0 vs 92 | उपाय 11 vs 137).
+  // Yoga Vasishtha advaita vedanta ka granth hai — मन, वैराग्य, मोक्ष,
+  // संसार ka swaroop. Yahi wo vishay hain jinpe log SAARTHI se sabse zyada
+  // poochte hain, aur inka koi samarpit granth pehle tha hi nahi.
+  yoga_vasishtha:        { icon:"🪞", title:"श्रीयोगवासिष्ठ महारामायण", en:"Shri Yoga Vasishtha", sub:"वसिष्ठ-राम संवाद — मन, वैराग्य और मोक्ष का दर्शन", src:"श्रीयोगवासिष्ठ महारामायण (हिंदी अनुवाद) · 4 भाग", srcEn:"Shri Yoga Vasishtha Maharamayana (Hindi translation) · 4 parts" },
+  // nitya_devta_archana ki jagah (2026-08-04) — wo kitab hatai gayi kyunki
+  // uska vishay nitya_karm_pooja pehle se behtar cover karta tha, aur uska
+  // OCR sabse kharab tha (56% shabd garbled; "मन्त्र" shabd 0 baar).
+  // Ramcharitmanas ise isliye chuna gaya ki app pehle se iski chaupaiyan
+  // quote karti thi (DAILY_WISDOMS mein 3) par corpus mein ek bhi chunk
+  // nahi tha — yaani ek maujooda jhoothi citation theek ho rahi hai.
+  ramcharitmanas:        { icon:"🚩", title:"श्रीरामचरितमानस",      en:"Shri Ramcharitmanas", sub:"तुलसीदास कृत — भक्ति, मर्यादा और जीवन-नीति की चौपाइयाँ", src:"गोस्वामी तुलसीदास · गीता प्रेस, गोरखपुर", srcEn:"Goswami Tulsidas · Gita Press, Gorakhpur" },
   nitya_karm_pooja:      { icon:"🛕", title:"नित्य कर्म पूजा प्रकाश", en:"Nitya Karm Pooja",     sub:"संध्या, पूजन और नित्य कर्मों का संग्रह", src:"गीता प्रेस, गोरखपुर · 62वाँ पुनर्मुद्रण", srcEn:"Gita Press, Gorakhpur · 62nd reprint" },
   lal_kitab:             { icon:"📕", title:"लाल किताब (उपाय सहित)", en:"Lal Kitab",            sub:"ज्योतिष और सरल उपायों का प्रसिद्ध ग्रंथ", src:"प्रकाशक अज्ञात", srcEn:"Publisher unknown" },
   rashi_muhurt_vigyan:   { icon:"🪐", title:"सम्पूर्ण राशि और मुहूर्त विज्ञान", en:"Rashi & Muhurt Vigyan", sub:"राशियों, ग्रहों और शुभ मुहूर्त का विज्ञान", src:"आधुनिक संकलन · प्रकाशक अज्ञात", srcEn:"Modern compilation · Publisher unknown" },

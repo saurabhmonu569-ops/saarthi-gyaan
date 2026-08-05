@@ -12,7 +12,7 @@ describe("bookHints.js — Roman + Devanagari book detection", () => {
     // Real regression case: this query used to return null (Roman-only hints
     // never match Devanagari substrings), silently disabling the guaranteed
     // book-grounding fix for every Hindi-typed question.
-    expect(detectHintedBook("नित्य देवता अर्चना का उद्देश्य क्या है?")).toBe("nitya_devta_archana");
+    expect(detectHintedBook("रामचरितमानस में भक्ति के बारे में क्या कहा है?")).toBe("ramcharitmanas");
     expect(detectHintedBook("अथर्ववेद का आधुनिक उपयोग क्या है?")).toBe("atharvaveda_1");
     expect(detectHintedBook("यजुर्वेद क्या सिखाता है?")).toBe("yajurveda");
     expect(detectHintedBook("गीता में कर्म योग क्या है?")).toBe("bhagavad_gita_shankar");
@@ -28,12 +28,13 @@ describe("bookHints.js — Roman + Devanagari book detection", () => {
     expect(detectHintedBook(undefined)).toBeNull();
   });
 
-  it("mantra_shakti is matched before the generic mantra_maha_sagar hint", () => {
-    // Regression: mantra_shakti previously had NO hint at all and would have
-    // been swallowed by the generic "mantra" -> mantra_maha_sagar match.
-    expect(detectHintedBook("mantra shakti ke baare mein bataiye")).toBe("mantra_shakti");
-    expect(detectHintedBook("मंत्र शक्ति क्या है?")).toBe("mantra_shakti");
-    // Generic "mantra" (no "shakti") still falls back to mantra_maha_sagar
+  it("naye granth apne naam se pehchane jaate hain", () => {
+    // 2026-08-04: mantra_shakti aur nitya_devta_archana hataye gaye
+    // (duplicate + kharab OCR), unki jagah ye do aaye.
+    expect(detectHintedBook("योगवासिष्ठ में वैराग्य क्या है?")).toBe("yoga_vasishtha");
+    expect(detectHintedBook("yoga vasishtha ke baare mein bataiye")).toBe("yoga_vasishtha");
+    expect(detectHintedBook("रामचरितमानस की चौपाई बताइए")).toBe("ramcharitmanas");
+    // Generic "mantra" ab bhi mantra_maha_sagar par jaata hai
     expect(detectHintedBook("mantra ke baare mein bataiye")).toBe("mantra_maha_sagar");
   });
 

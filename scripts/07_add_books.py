@@ -48,12 +48,42 @@ NEW_BOOKS = [
     {"book_id":"chanakya_neeti",     "source_pdf":"CHANAKYA NEETI FULL BOOK.pdf",    "title":"Chanakya Neeti",          "short":"Chanakya Neeti", "tradition":"niti",     "language":"hi", "force_ocr":True},  # text-layer Kruti-Dev kachra hai
     {"book_id":"ekadashi_mahatmya",  "source_pdf":"EKADASHI FULL BOOK.pdf",          "title":"Ekadashi Vrat Mahatmya",  "short":"Ekadashi",       "tradition":"vrat",     "language":"hi"},
     {"book_id":"mantra_maha_sagar",  "source_pdf":"MANTRA MAHA SAGAR FULL BOOK.pdf", "title":"Mantra Maha Sagar",       "short":"Mantra Sagar",   "tradition":"mantra",   "language":"sa+hi"},
-    {"book_id":"mantra_shakti",      "source_pdf":"MANTRA SHAKTI FULL BOOK.pdf",     "title":"Mantra Shakti",           "short":"Mantra Shakti",  "tradition":"mantra",   "language":"sa+hi"},
-    {"book_id":"nitya_devta_archana","source_pdf":"NITYA DEVTA ARCHANA FULL BOOK.pdf","title":"Nitya Devta Archana",    "short":"Devta Archana",  "tradition":"pooja",    "language":"sa+hi"},
+    # mantra_shakti HATAYA (2026-08-04) — kharab nahi tha (aaj ke OCR ne use bhi
+    # saaf kar diya: Latin 3,837 → 0), par DUPLICATE tha. mantra_maha_sagar
+    # wahi vishay kai guna zyada cover karta hai:
+    #     मन्त्र 652 vs 3,833 | जप 331 vs 824 | टोटका 0 vs 92 | उपाय 11 vs 137
+    # Uski jagah Yoga Vasishtha — advaita vedanta ka granth (मन, वैराग्य,
+    # मोक्ष), jis vishay ka koi samarpit granth SAARTHI mein tha hi nahi.
+    # archive.org par woh 4 alag PDFs mein hai, isliye "source_pdfs" (list) —
+    # sab bhaag ek hi granth ban jaate hain, 4 alag kitaabein nahi.
+    {"book_id":"yoga_vasishtha",
+     "source_pdfs":["yog_va_part 1.pdf", "yog part 2.pdf", "yog part 3.pdf", "yog part 4.pdf"],
+     "title":"Shri Yoga Vasishtha Maharamayana", "short":"Yoga Vasishtha",
+     "tradition":"vedanta", "language":"sa+hi"},
+    # nitya_devta_archana HATAYA (2026-08-04) — do wajah:
+    #   1. Uska vishay nitya_karm_pooja pehle se cover karta hai, aur kai guna
+    #      behtar: पूजा 35 vs 354, संध्या 0 vs 124, मन्त्र 0 vs 320, विधि 1 vs 124
+    #   2. Uska OCR sabse kharab tha — 56% shabd poore corpus mein sirf ek baar
+    #      aate the (garbled). Ek mantra-kitab mein "मन्त्र" shabd 0 baar mila.
+    # Uski jagah Ramcharitmanas — jo app pehle se quote karti thi par uske paas
+    # thi nahi (DAILY_WISDOMS mein 3 chaupai, corpus mein 0 chunk).
+    {"book_id":"ramcharitmanas",     "source_pdf":"Shri Ramcharitmanas - Gita Press (Hindi).pdf","title":"Shri Ramcharitmanas","short":"Ramcharitmanas","tradition":"ramayana","language":"sa+hi"},
     {"book_id":"nitya_karm_pooja",   "source_pdf":"NITYA KARM POOJA FULL BOOK.pdf",  "title":"Nitya Karm Pooja Prakash","short":"Nitya Pooja",    "tradition":"pooja",    "language":"sa+hi"},
     # amit_kalrekha HATAYA (copyright-shak) | positive_mindset HATAYA (copyright)
     {"book_id":"rashi_muhurt_vigyan","source_pdf":"SAMPURNA RASHI AUR MUHURT VIGYAN FULL BOOK.pdf","title":"Sampurna Rashi aur Muhurt Vigyan","short":"Rashi-Muhurt","tradition":"jyotish","language":"hi"},
     {"book_id":"lal_kitab",          "source_pdf":"LAL KITAB UPAY SAHIT FULL BOOK.pdf","title":"Lal Kitab (Upay Sahit)","short":"Lal Kitab",      "tradition":"jyotish",  "language":"hi"},
+    # ── 2026-08-04 mein JODI GAYI (yeh batch-1 ki kitab hai, 01_ocr_extract.py se aayi thi) ──
+    # KYUN: "लंका कांड ke baare mein bataye" par app ne koi Aadhaar nahi diya.
+    # Jaanch par mila ki content corpus mein HAI hi nahi —
+    #     valmiki_ramayana   389 akshar/page
+    #     baaki 23 kitaabein 1,456 – 2,641 akshar/page
+    # Yaani har panne ka sirf ~20% text nikla tha. Nirnayak saboot:
+    #     "हनुमान"      → poori Ramayana mein 0 chunks
+    #     "युद्धकाण्ड"  → 0 chunks
+    #     "लंका"        → sirf 5 chunks
+    # Isliye ise bhi naye OCR settings (hin+san, psm 3, 400dpi) se dobara
+    # nikal rahe hain. Baaki 12 batch-1 kitaabein theek hain (1,456+ per page).
+    {"book_id":"valmiki_ramayana",   "source_pdf":"RAMAYAN FULL BOOK.pdf","title":"Valmiki Ramayana","short":"Ramayana","tradition":"ramayana","language":"sa+hi"},
 ]
 SKIP_FIRST_PAGES = 2   # cover/title pages
 
@@ -148,16 +178,30 @@ def ocr_page(doc, pg_no, lang="hin"):
 # ─── EK BOOK NIKALO ──────────────────────────────────────────────────────────
 def extract_book(book, pdf_dir: Path, max_pages=None, force_rebuild=False):
     bid  = book["book_id"]
-    pdfp = pdf_dir / book["source_pdf"]
     outd = RAW_DIR / bid
     outd.mkdir(parents=True, exist_ok=True)
 
     print(f"\n📖 [{bid}] {book['title']}")
-    if not pdfp.exists():
-        print(f"   ❌ PDF nahi mili: {pdfp}")
+
+    # MULTI-PDF SUPPORT (2026-08-04): kuch granth kai bhaagon mein aate hain —
+    # Yoga Vasishtha archive.org par 4 alag PDFs mein hai (2,608 pages). Woh
+    # SAARTHI mein 4 alag kitaabein nahi, EK granth dikhni chahiye. Isliye
+    # "source_pdfs" (list) diya ja sakta hai — sab bhaag ek hi doc mein jud
+    # jaate hain aur page numbering lagataar chalti hai.
+    srcs = book.get("source_pdfs") or [book["source_pdf"]]
+    missing = [s for s in srcs if not (pdf_dir / s).exists()]
+    if missing:
+        print(f"   ❌ PDF nahi mili: {', '.join(missing)}")
         return None
 
-    doc     = fitz.open(str(pdfp))
+    if len(srcs) == 1:
+        doc = fitz.open(str(pdf_dir / srcs[0]))
+    else:
+        doc = fitz.open()                       # khaali, phir sab jod do
+        for s in srcs:
+            with fitz.open(str(pdf_dir / s)) as d:
+                print(f"   + {s}  ({len(d)} pages)")
+                doc.insert_pdf(d)
     n       = len(doc)
     limit   = min(n, max_pages) if max_pages else n
     written = skipped = failed = ocr_used = 0
@@ -198,7 +242,7 @@ def extract_book(book, pdf_dir: Path, max_pages=None, force_rebuild=False):
         page_data = {
             # Naya sahi meta (02 isse titles/pages uthata hai — purana bug yahan nahi)
             "meta": {"book_id": bid, "book_title": book["title"], "tradition": book["tradition"],
-                     "source_pdf": book["source_pdf"], "source_page": pg, "page_display": pg + 1,
+                     "source_pdf": srcs[0] if len(srcs)==1 else " + ".join(srcs), "source_page": pg, "page_display": pg + 1,
                      "language": book["language"], "script": "devanagari"},
             "qa":   {"method": method, "status": st, "confidence": conf},
             # Purane format ke bhai-bandhu fields (compat)
@@ -214,7 +258,7 @@ def extract_book(book, pdf_dir: Path, max_pages=None, force_rebuild=False):
     print(f"   ✅ ok:{written}  blank/low:{failed}  skip:{skipped}  OCR-pages:{ocr_used}  chars:{total_chars:,}")
     return {"book_id": bid, "title": book["title"], "short": book["short"],
             "tradition": book["tradition"], "language": book["language"],
-            "script": "devanagari", "source_pdf": book["source_pdf"],
+            "script": "devanagari", "source_pdf": srcs[0] if len(srcs)==1 else " + ".join(srcs),
             "method": "text+ocr" if ocr_used else "text",
             "pages_extracted": written, "total_chars": total_chars, "pipeline": "v3-addbooks"}
 

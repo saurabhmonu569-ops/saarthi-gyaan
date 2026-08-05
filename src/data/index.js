@@ -110,11 +110,15 @@ export const DAILY_WISDOMS = [
   { icon:"🕉️", full:"बन्धुरात्मात्मनस्तस्य येनात्मैवात्मना जितः।", hi:"जिसने अपने मन को जीत लिया, उसका मन ही उसका सबसे अच्छा मित्र है।", text:"For one who has conquered the mind, the mind is the best of friends.", src:"Bhagavad Gita 6.6" },
   { icon:"🕉️", full:"यदा यदा हि धर्मस्य ग्लानिर्भवति भारत।", hi:"जब-जब धर्म की हानि होती है, तब-तब मैं प्रकट होता हूँ।", text:"Whenever dharma declines, I manifest myself.", src:"Bhagavad Gita 4.7" },
   { icon:"🕉️", full:"श्रद्धामयोऽयं पुरुषो यो यच्छ्रद्धः स एव सः।", hi:"मनुष्य अपनी श्रद्धा से बनता है — जैसी श्रद्धा, वैसा ही वह।", text:"A person is made by their faith — as their faith is, so are they.", src:"Bhagavad Gita 17.3" },
-  { icon:"🏹", full:"धरम न दूसर सत्य समाना।", hi:"सत्य के समान कोई दूसरा धर्म नहीं है।", text:"There is no dharma higher than truth.", src:"Ramcharitmanas" },
+  // Teenon Ramcharitmanas panktiyan ab corpus se ACTUAL milaayi gayi hain
+  // (public/knowledge/books/ramcharitmanas.json, Gita Press sanskaran).
+  // Pehle ye hi jagah thi jahan app apni hi kitab ko quote karti thi par
+  // corpus mein us kitab ka ek bhi chunk tha hi nahi — citation jhoothi thi.
+  { icon:"🏹", full:"धरमु न दूसर सत्य समाना।", hi:"सत्य के समान कोई दूसरा धर्म नहीं है।", text:"There is no dharma higher than truth.", src:"Ramcharitmanas (Ayodhyakand)" },
   { icon:"🏹", full:"जननी जन्मभूमिश्च स्वर्गादपि गरीयसी।", hi:"माता और मातृभूमि स्वर्ग से भी बढ़कर हैं।", text:"Mother and motherland are greater than heaven itself.", src:"Valmiki Ramayana" },
   { icon:"🏹", full:"शोको नाशयते धैर्यं शोको नाशयते श्रुतम्।", hi:"शोक धैर्य और ज्ञान — सब कुछ नष्ट कर देता है; शोक से बड़ा कोई शत्रु नहीं।", text:"Grief destroys courage and learning — there is no enemy like grief.", src:"Valmiki Ramayana 2.62" },
-  { icon:"🏹", full:"भगति हीन नर सोहइ कैसा। बिनु जल बारिद देखिअ जैसा।", hi:"भक्ति के बिना मनुष्य वैसा ही है जैसे बिना जल का बादल।", text:"Without devotion, a person is like a cloud without water.", src:"Ramcharitmanas" },
-  { icon:"🏹", full:"राम एक तापस तिय तारी। नाम कोटि खल कुमति सुधारी।", hi:"राम का नाम राम से भी बड़ा है — नाम ने करोड़ों का उद्धार किया।", text:"Rama's name is greater than Rama himself.", src:"Ramcharitmanas (Balkand)" },
+  { icon:"🏹", full:"भगति हीन नर सोहइ कैसा। बिनु जल वारिद देखिअ जैसा॥", hi:"भक्ति के बिना मनुष्य वैसा ही है जैसे बिना जल का बादल।", text:"Without devotion, a person is like a cloud without water.", src:"Ramcharitmanas (Balkand)" },
+  { icon:"🏹", full:"राम एक तापस तिय तारी। नाम कोटि खल कुमति सुधारी॥", hi:"राम का नाम राम से भी बड़ा है — नाम ने करोड़ों का उद्धार किया।", text:"Rama's name is greater than Rama himself.", src:"Ramcharitmanas (Balkand)" },
 ];
 
 // ─── AUDIO LESSONS ────────────────────────────────────────────────────────────

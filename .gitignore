@@ -16,6 +16,22 @@ data/raw/
 # (split-v1 format the live app actually reads). Confirmed unused at runtime.
 data/knowledge/knowledge.json
 data/knowledge/search_manifest.json
+# 2026-08-05: public/ ki WAHI do files bhi. Upar wala niyam sirf data/ par
+# laga tha, par `Copy-Item data\knowledge\*.json public\knowledge\` inhe
+# public/ mein bhi rakh deta hai — aur wahan se ye git mein chali gayi thin.
+#
+# App inhe padhti hi nahi: engine.js pehle split-v1 (meta.json + books/ +
+# index/) uthata hai; ye do sirf catch-block ka legacy fallback hain, jo
+# split-v1 maujood hone par kabhi nahi chalta. 05_split_knowledge.py inhe
+# INPUT ki tarah padhti hai, isliye disk par rehne dena hai — sirf commit
+# nahi karna.
+#
+# Kyun zaroori: knowledge.json 94MB par pahunch chuki hai. GitHub 100MB se
+# badi file ka push SEEDHE REJECT kar deta hai. Agli ek kitab bhi jodi to
+# push hamesha ke liye fail hone lagta. Ye do hatane se har deploy 152MB
+# halka bhi ho jaata hai.
+public/knowledge/knowledge.json
+public/knowledge/search_manifest.json
 
 # Environment (NEVER commit your API key!)
 .env
