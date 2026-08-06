@@ -13,6 +13,7 @@ import { C, F, serif, HAS_PDF } from "@/styles/theme";
 import { Prose } from "@/components/ui/Primitives";
 import { AudioEngine, HAS_EL } from "@/services/audioEngine";
 import { BOOK_META } from "@/data/bookMeta";
+import { canReadFull, restrictionInfo, bookRank } from "@/data/bookRights";
 
 function ChapterReader({ book, ch, onBack, markRead, isBookmarked, toggleBookmark }) {
   const t = useT();
@@ -413,6 +414,66 @@ function BookPdfView({ book, onBack }) {
   );
 }
 
+// ── BAND KITAB ─────────────────────────────────────────────────────────────
+// Kitab gaayab nahi hoti — naam, vivaran aur prakashak ka shrey dikhta hai.
+// Sirf poora paath band hai. Sandesh imaandar hai: "hum nahi de sakte"
+// bolte hain, "aapke paas suvidha nahi hai" nahi — kyunki asli wajah hamari
+// seema hai, user ki kami nahi. Kharidne ka link isliye ki jise sach mein
+// padhna hai wo prakashak tak pahunche.
+function BookLocked({ book, onBack }) {
+  const t = useT();
+  const { pub, url } = restrictionInfo(book.id);
+  return (
+    <div style={{ display: "flex", flexDirection: "column", height: "100%", background: C.cream }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", background: C.white, borderBottom: `1px solid ${C.border}`, flexShrink: 0 }}>
+        <button onClick={onBack} aria-label={t('back') || "वापस"}
+          style={{ border: `1px solid ${C.border}`, background: C.white, borderRadius: 10, padding: "6px 12px", cursor: "pointer", fontSize: F.base, fontWeight: 600, color: C.ink }}>
+          ←
+        </button>
+        <div style={{ minWidth: 0 }}>
+          <p style={{ margin: 0, fontWeight: 800, fontSize: F.lg, color: C.ink, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+            {book.icon} {book.title}
+          </p>
+          {book.subtitle && <p style={{ margin: 0, fontSize: F.xs, color: C.muted }}>{book.subtitle}</p>}
+        </div>
+      </div>
+
+      <div style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "32px 22px", textAlign: "center" }}>
+        <div style={{ fontSize: 44, marginBottom: 14 }} aria-hidden="true">🔒</div>
+
+        <h2 style={{ ...serif, margin: "0 0 10px", fontSize: F.xl, fontWeight: 800, color: C.ink, lineHeight: 1.4 }}>
+          यह ग्रंथ यहाँ पूरा नहीं पढ़ा जा सकता
+        </h2>
+
+        <p style={{ margin: "0 0 6px", fontSize: F.base, color: C.body, maxWidth: 460, lineHeight: 1.7 }}>
+          मूल ग्रंथ सार्वजनिक धरोहर है, परन्तु इस संस्करण का अनुवाद और संपादन
+          {pub ? <> <strong style={{ color: C.ink }}>{pub}</strong> का है</> : <> प्रकाशक का है</>} —
+          और वह अधिकार आज भी सुरक्षित है। इसलिए हम पूरी पुस्तक यहाँ नहीं दे सकते।
+        </p>
+
+        <p style={{ margin: "14px 0 0", fontSize: F.sm, color: C.muted, maxWidth: 460, lineHeight: 1.7 }}>
+          <strong style={{ color: C.body }}>पूछें</strong> अनुभाग में इस ग्रंथ से उत्तर मिलते रहेंगे —
+          वहाँ छोटे अंश स्रोत सहित दिए जाते हैं, जो नियम के भीतर है।
+        </p>
+
+        {url && (
+          <a href={url} target="_blank" rel="noopener noreferrer"
+             style={{ marginTop: 22, display: "inline-block", background: C.saffron, color: C.white,
+                      borderRadius: 12, padding: "11px 22px", fontSize: F.base, fontWeight: 700,
+                      textDecoration: "none", boxShadow: C.shadow }}>
+            {pub} से मूल पुस्तक लें →
+          </a>
+        )}
+
+        <p style={{ margin: "26px 0 0", fontSize: F.xs, color: C.faint, maxWidth: 420, lineHeight: 1.6 }}>
+          यदि आप इस ग्रंथ के अधिकारी हैं और कोई आपत्ति है, कृपया हमें लिखें —
+          हम तुरंत हटा देंगे।
+        </p>
+      </div>
+    </div>
+  );
+}
+
 export function BooksView() {
   const t = useT();
   const [book,   setBook]   = useState(null);
@@ -421,16 +482,28 @@ export function BooksView() {
   const { ready: knowledgeReady, getBooks: getEngineBooks, getChapters: getEngineChapters,
           getBookChunks, getChapterChunks, hybridSearch } = useKnowledge();
 
-  // PURANA SEEDHA ANDAZ (user ki pasand): naam dabao → poori ASLI PDF khule —
-  // jaise pehli 13 books mein tha. Ab sab 24 PDFs host hain (badi 3 compressed).
-  // Suraksha: agar kisi book ki PDF na ho (HAS_PDF mein nahi), toh 404-blank
-  // ki jagah text-reader khulega.
-  if (book) return book.fromEngine && HAS_PDF.has(book.id)
-    ? <BookPdfView book={book} onBack={() => setBook(null)} />
-    : <BookDetail book={book} onBack={() => setBook(null)}
-                  getChapters={getEngineChapters} getChapterChunks={getChapterChunks}
-                  getBookChunks={getBookChunks}
-                  knowledgeReady={knowledgeReady} />;
+  // PURANA SEEDHA ANDAZ (user ki pasand): naam dabao → poori ASLI PDF khule.
+  //
+  // ADHIKAR-JAANCH (2026-08-06): ab pehle canReadFull() poochha jaata hai.
+  // Jis kitab ka prakashak zinda hai, uski POORI kitab nahi kholte — na PDF,
+  // na text-reader. Dono ek hi cheez hain kaanoon ki nazar mein (poori kitab
+  // ka reproduction); sirf PDF band karke text khula chhod dena aadha kaam
+  // hota aur bachaav bhi nahi deta. Kitab ka naam, vivaran aur prakashak ka
+  // shrey phir bhi DIKHTA hai — sirf poora paath band hai.
+  //
+  // Ask section par iska koi asar NAHI hai: wahan chhote ansh source ke saath
+  // jaate rehte hain, jo fair dealing ke daayre mein aata hai.
+  if (book) {
+    if (!canReadFull(book.id)) {
+      return <BookLocked book={book} onBack={() => setBook(null)} />;
+    }
+    return book.fromEngine && HAS_PDF.has(book.id)
+      ? <BookPdfView book={book} onBack={() => setBook(null)} />
+      : <BookDetail book={book} onBack={() => setBook(null)}
+                    getChapters={getEngineChapters} getChapterChunks={getChapterChunks}
+                    getBookChunks={getBookChunks}
+                    knowledgeReady={knowledgeReady} />;
+  }
 
   // Merge knowledge engine books with static BOOKS for display metadata
   // Engine books have real extracted chunks; static BOOKS have icons, colors, descriptions
@@ -472,17 +545,14 @@ export function BooksView() {
         totalChapters: null,
       };
     });
-    // Order (Saurabh ka bataya hua): Ramayan → Gita → chaaron Ved → sab Puran
-    const ID_ORDER = [
-      "valmiki_ramayana", "bhagavad_gita_shankar",
-      "rigveda_1", "samaveda", "yajurveda", "atharvaveda_1",
-      "shiva_purana_1", "shiva_purana_2", "vishnu_purana_1", "garuda_purana_1",
-      "narasimha_purana", "bhavishya_purana", "agni_purana",
-    ];
-    displayBooks.sort((x, y) => {
-      const ox = ID_ORDER.indexOf(x.id), oy = ID_ORDER.indexOf(y.id);
-      return (ox === -1 ? 99 : ox) - (oy === -1 ? 99 : oy);
-    });
+    // Kram (Saurabh, 2026-08-06): Ramcharitmanas → Gita → Mahabharat →
+    // Yogvasishth → Ved → Puran → Upanishad → baaki.
+    //
+    // Poori soochi ab src/data/bookRights.js (BOOK_ORDER) mein hai — wahi
+    // ek jagah jahan ye faisla likha hai. Pehle yahan sirf 13 ids thi,
+    // isliye baad mein jodi gayi 11 kitaabein bina kisi kram ke aakhir
+    // mein pad jaati thi.
+    displayBooks.sort((x, y) => bookRank(x.id) - bookRank(y.id));
   } else {
     // Engine not loaded yet — fall back to static data
     displayBooks = BOOKS.map(b => ({ ...b, fromEngine: false }));
@@ -542,6 +612,15 @@ function BookCard({ book, progress, onClick }) {
           <p style={{ fontSize: F.md, fontWeight: 700, color: C.ink, margin: 0 }}>{book.title}</p>
           {badge && <span style={{ fontSize: F.xs, background: `${book.color}14`, color: book.color, borderRadius: 20, padding: "2px 9px", fontWeight: 700, flexShrink: 0 }}>{badge}</span>}
           {book.fromEngine && <span style={{ fontSize: F.xs - 1, background: "#E8F5E9", color: "#2E7D32", borderRadius: 20, padding: "2px 8px", fontWeight: 600, flexShrink: 0 }}>✓ Indexed</span>}
+          {/* Taala pehle hi dikh jaaye — user click karke nirash na ho.
+              Kitab list se GAAYAB nahi hoti, sirf poora paath band hai. */}
+          {!canReadFull(book.id) && (
+            <span title="पूरा पाठ उपलब्ध नहीं — प्रकाशक का अधिकार सुरक्षित है"
+              style={{ fontSize: F.xs - 1, background: C.goldBg, color: C.gold, border: `1px solid ${C.goldBdr}`,
+                       borderRadius: 20, padding: "2px 8px", fontWeight: 600, flexShrink: 0 }}>
+              🔒 पूरा पाठ नहीं
+            </span>
+          )}
         </div>
         <p style={{ fontSize: F.sm, color: C.muted, margin: "0 0 6px" }}>{book.subtitle}</p>
         <p style={{ fontSize: F.base, color: C.body, margin: "0 0 8px", overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", lineHeight: 1.55 }}>{book.description}</p>

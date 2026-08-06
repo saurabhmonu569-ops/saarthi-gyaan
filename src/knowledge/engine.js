@@ -183,7 +183,7 @@ const TRANSLIT = {
   "krishna": "कृष्ण", "arjuna": "अर्जुन", "arjun": "अर्जुन",
   "shiva": "शिव",     "shiv": "शिव", "vishnu": "विष्णु",
   "lakshmi": "लक्ष्मी", "hanuman": "हनुमान", "ganesh": "गणेश",
-  "sita": "सीता",     "ravan": "रावण", "yamraj": "यमराज",
+  "sita": "सीता",     "ravan": "रावण",
   "garud": "गरुड",    "garuda": "गरुड", "indra": "इंद्र", "som": "सोम",
   "guru": "गुरु",     "teacher": "गुरु", "god": "भगवान", "bhagwan": "भगवान",
   "ishwar": "ईश्वर",
@@ -213,7 +213,7 @@ const TRANSLIT = {
   "king": "राजा",    "raja": "राजा", "war": "युद्ध", "yuddh": "युद्ध",
   "victory": ["विजय", "जीत"], "vijay": "विजय", "defeat": "पराजय",
   "money": "धन",     "dhan": "धन", "wealth": "धन", "santan": "संतान",
-  "body": "शरीर",    "heart": "हृदय", "sleep": "निद्रा",
+  "body": "शरीर",    "heart": "हृदय",
   "dream": "स्वप्न", "swapna": "स्वप्न", "food": "अन्न", "water": "जल",
   "time": ["समय", "काल"], "samay": "समय",
   // ── Prakriti ──

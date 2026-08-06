@@ -104,6 +104,70 @@ const WORDS = {
   vidyarthi: "विद्यार्थी", chhatra: "छात्र", jyotish: "ज्योतिष", grah: "ग्रह",
   shani: "शनि", upay: "उपाय", totka: "टोटका", shlok: "श्लोक", shloka: "श्लोक",
   granth: "ग्रंथ", ved: "वेद", puran: "पुराण", gita: "गीता", ramayan: "रामायण",
+
+  // ── BOLCHAAL KE SHABD (2026-08-06) ────────────────────────────────────
+  //
+  // KYUN JODE GAYE: eval-ask.mjs mein "sacche mitra ki pehchan kya hai"
+  // fail hua, jabki uska theek jawab corpus mein maujood hai —
+  // "मित्र की पहचान भी विपत्ति के समय ही होती है" (चाणक्य नीति).
+  // Wajah retrieval nahi thi, TRANSLIT thi: query ban rahi thi
+  // "सचे मित्र की pehchan क्या है" — "pehchan" Latin mein hi reh gaya.
+  //
+  // Naapa gaya: 89 aam Hinglish shabdon mein se 37 (42%) Devanagari
+  // ban hi nahi rahe the. Aur ye theek wahi shabd hain jinse log apni
+  // PARESHANI batate hain — pareshani, dikkat, takleef, jhagda, rishta.
+  //
+  // Jad: LEXICON corpus se bana hai, aur corpus granth-bhasha likhta
+  // hai (मित्र, शत्रु, कलह). User bolchaal likhta hai (dost, dushman,
+  // jhagda). Dono kabhi mile hi nahi.
+  //
+  // NIYAM (naap ke tay kiya, andaaze se nahi): seedha lipyantaran hi
+  // dete hain. SIRF tab granth-shabd par le jaate hain jab bolchaal ka
+  // roop corpus mein lagbhag hai hi nahi (<30 hits) AUR arth bilkul
+  // wahi ho. Kachcha paryayvachi (thakan→श्रम jaisa) JAAN-BOOJH KAR
+  // nahi jodha — galat naksha na hone se bura hai.
+  //
+  // Yaad rahe: ye sirf DHOONDHNE ke liye hai (searchQ). AI ke prompt
+  // mein user ka apna sawaal jaisa ka taisa jaata hai.
+
+  // Chhoote hue function words. Ye chaar isliye reh gaye the ki inke
+  // angrezi roop bhi hain ("in", "us", "no", "jo") — par sawaal Hinglish
+  // ho to Hindi arth hi sahi hai. Naapa: 97 aam function words mein se
+  // sirf yahi 4 Latin mein reh rahe the.
+  ne: "ने", jo: "जो", us: "उस", in: "इन", inn: "इन",
+
+  // seedha lipyantaran — corpus mein ye roop maujood hai
+  pehchan: "पहचान", pahchan: "पहचान", pehchaan: "पहचान",    // पहचान 342
+  sacche: "सच्चे", saccha: "सच्चा", sachcha: "सच्चा", sachche: "सच्चे",
+  jhoot: "झूठ", jhuth: "झूठ", jhooth: "झूठ",                 // झूठ 352
+  kalesh: "क्लेश",                                            // क्लेश 398
+  prarthna: "प्रार्थना", prarthana: "प्रार्थना",              // प्रार्थना 1,531
+  jhagda: "झगड़ा", jhagra: "झगड़ा",                          // झगड़ा 73
+  ladai: "लड़ाई", ladayi: "लड़ाई",                           // लड़ाई 57
+  naukri: "नौकरी", nokri: "नौकरी",                           // नौकरी 148
+  bachpan: "बचपन", buddhapa: "बुढ़ापा",                      // बचपन 66
+  tanav: "तनाव", samasya: "समस्या", thakan: "थकान",
+  bimari: "बीमारी", dawa: "दवा", aaram: "आराम", neend: "नींद",
+  sasural: "ससुराल", bacche: "बच्चे", bachche: "बच्चे",
+  soch: "सोच", vichar: "विचार", dil: "दिल", chinta: "चिंता",
+
+  // bolchaal ka roop corpus mein lagbhag nahi — granth-shabd par le jao
+  rishta: "संबंध", rishte: "संबंध", rishton: "संबंध",        // रिश्ता 2 → संबंध 845
+  biwi: "पत्नी", patni: "पत्नी", pati: "पति",                // बीवी 12 → पत्नी 1,629
+  dikkat: "बाधा", dikkate: "बाधा",                           // दिक्कत 0 → बाधा 542
+  dost: "मित्र", dosti: "मित्रता", mitra: "मित्र",           // दोस्त 17 → मित्र 4,170
+  dushman: "शत्रु", bairi: "शत्रु", shatru: "शत्रु",         // दुश्मन 65 → शत्रु 5,588
+  dimag: "बुद्धि", dimaag: "बुद्धि",                         // दिमाग 22 → बुद्धि 5,210
+  sapna: "स्वप्न", sapne: "स्वप्न",                          // सपना 17 → स्वप्न 2,541
+  maafi: "क्षमा", maaf: "क्षमा", kshama: "क्षमा",            // माफी 2 → क्षमा 616
+  galti: "दोष", galtiyan: "दोष",                             // गलती 18 → दोष 2,774
+  khushi: "सुख", khush: "सुख",                               // खुशी 23 → सुख 9,221
+  jawani: "यौवन", umar: "आयु",                               // जवानी 16 → यौवन 314
+  takleef: "पीड़ा", pareshani: "कष्ट", pareshan: "कष्ट",     // तकलीफ 27 → पीड़ा 477
+  mushkil: "कठिनाई", mushkilein: "कठिनाई",                   // मुश्किल 18 → कठिन 680
+  ilaj: "चिकित्सा", ilaaj: "चिकित्सा",                       // इलाज 34 → चिकित्सा 308
+  karobar: "व्यापार", business: "व्यापार", vyapar: "व्यापार",// कारोबार 27 → व्यापार 833
+  bharosa: "विश्वास", vishwas: "विश्वास",                    // भरोसा 43 → विश्वास 572
 };
 
 // ── 1b. Corpus se bana lexicon (scripts/build-lexicon.mjs) ────────────
@@ -406,6 +470,29 @@ export function normalizeQueryForSearch(text) {
   const original = text;
   const ratio = devanagariRatio(text);
   if (ratio >= 0.3) return { query: text, transliterated: false, original };
+
+  // ANGREZI KO CHHEDO MAT (2026-08-06).
+  //
+  // Pehle yahan sirf Devanagari-ratio dekhi jaati thi, isliye SHUDDH
+  // ANGREZI sawaal bhi lipyantaran mein chala jaata tha — aur bigad
+  // jaata tha:
+  //     "what does the gita say about karma"
+  //         → "what does थे गीता साय about कर्म"     (the→थे, say→साय)
+  //     "in this life what is the purpose"
+  //         → "इन this life what एेसा थे purpose"    (is→एेसा !)
+  //     "my friend betrayed me"  → "my friend betrayed में"
+  // "the/say/is/me/do/in" jaise shabd Hindi lexicon mein galti se match
+  // kar jaate the. Angrezi bolne wale har user ki search-query aadhi
+  // bakwaas ban rahi thi.
+  //
+  // detectQueryLanguage() ye faisla theek karta hai — 28 sawaalon par
+  // jaancha (14 angrezi + 14 Hinglish): 28/28 sahi, ek bhi Hinglish
+  // sawaal "en" nahi bataya gaya. Isliye "en" par lipyantaran band.
+  //
+  // Hinglish ("mixed") par chalta rehta hai — wahi to iska asli kaam hai.
+  if (detectQueryLanguage(text) === "en") {
+    return { query: text, transliterated: false, original };
+  }
 
   const dev = toDevanagari(text);
 

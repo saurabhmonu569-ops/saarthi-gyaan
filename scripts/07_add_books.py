@@ -68,6 +68,28 @@ NEW_BOOKS = [
     # Uski jagah Ramcharitmanas — jo app pehle se quote karti thi par uske paas
     # thi nahi (DAILY_WISDOMS mein 3 chaupai, corpus mein 0 chunk).
     {"book_id":"ramcharitmanas",     "source_pdf":"Shri Ramcharitmanas - Gita Press (Hindi).pdf","title":"Shri Ramcharitmanas","short":"Ramcharitmanas","tradition":"ramayana","language":"sa+hi"},
+    # valmiki_ramayana ki jagah (2026-08-06). Wo kitab hatai gayi kyunki uska
+    # OCR poori tarah kachra tha — 381 akshar/page (baaki kitaabein ~2,000),
+    # shabd-tootna 0.50 (saaf kitaabein 0.20-0.33), aur ek bhi kand ka naam
+    # nahi milta tha (बालकांड 0, अयोध्या 0, लंका 0). Ramayan ka vishay ab
+    # Ramcharitmanas theek se cover karti hai (saare 7 kand, हनुमान 356).
+    #
+    # ⚠️ force_ocr ZAROORI HAI. In PDFs mein text-layer TO hai, par wo purani
+    # font-encoding (Kruti Dev jaisi) mein hai — Unicode ki jagah glyph-code.
+    # Bina force_ocr ke 07 wahi kachra padh leti hai:
+    #     "पÀचसËतȵततमोऽÉयायः द³, वैव×वत मनु तथा उनके पुčǆकɥ उÆपȷǺ"
+    # 10_probe_pdf.py se dono tarah naapa (20 page prati volume):
+    #     text-layer  → tootna 0.59-0.63  ❌
+    #     force OCR   → tootna 0.25-0.28  ✅  (1,569-1,751 akshar/page)
+    #
+    # Chhe volume = 15,432 pages ≈ 20 ghante OCR. Ek hi book_id mein jud
+    # jaate hain (source_pdfs list), 6 alag kitaabein nahi.
+    {"book_id":"mahabharata",
+     "source_pdfs":["Mahabharata Volume 1.pdf", "Mahabharata Volume 2.pdf",
+                    "Mahabharata Volume 3.pdf", "Mahabharata Volume 4.pdf",
+                    "Mahabharata Volume 5.pdf", "Mahabharata Volume 6.pdf"],
+     "title":"Mahabharata (Gita Press)", "short":"Mahabharata",
+     "tradition":"itihasa", "language":"sa+hi", "force_ocr":True},
     {"book_id":"nitya_karm_pooja",   "source_pdf":"NITYA KARM POOJA FULL BOOK.pdf",  "title":"Nitya Karm Pooja Prakash","short":"Nitya Pooja",    "tradition":"pooja",    "language":"sa+hi"},
     # amit_kalrekha HATAYA (copyright-shak) | positive_mindset HATAYA (copyright)
     {"book_id":"rashi_muhurt_vigyan","source_pdf":"SAMPURNA RASHI AUR MUHURT VIGYAN FULL BOOK.pdf","title":"Sampurna Rashi aur Muhurt Vigyan","short":"Rashi-Muhurt","tradition":"jyotish","language":"hi"},

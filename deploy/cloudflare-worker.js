@@ -328,15 +328,35 @@ async function verifyGoogleIdToken(idToken, env) {
   return payload;
 }
 
+/**
+ * SESSION_SECRET ka HMAC key.
+ *
+ * SURAKSHA FIX (2026-08-05 audit): pehle dono jagah `env.SESSION_SECRET || ""`
+ * likha tha. Agar secret dashboard se galti se hat jaata (ya naya environment
+ * bina secret ke deploy hota), toh HMAC KHAALI STRING se banta — jo har kisi
+ * ko pata hai. Koi bhi apna token sign karke `emailVerified: true` ke saath
+ * ghus sakta tha, aur verify bhi ho jaata. Yeh FAIL-OPEN tha.
+ *
+ * Ab fail-CLOSED hai: secret na ho toh key banti hi nahi. issue throw karta
+ * hai (500 — login banta hi nahi), verify null deta hai (token maanya nahi).
+ * Dono soorat mein galat aadmi andar nahi aata.
+ */
+async function sessionKey(env, usage) {
+  const secret = env.SESSION_SECRET;
+  if (!secret || secret.length < 16) return null;
+  return crypto.subtle.importKey(
+    "raw", new TextEncoder().encode(secret), { name: "HMAC", hash: "SHA-256" }, false, [usage]
+  );
+}
+
 /** Apna HMAC-signed session token — Google token expire (~1hr) ho jaane ke
  * baad bhi client 24h tak "verified" reh sakta hai, bina Google ko dobara
  * call kiye. SESSION_SECRET ke bina koi bhi isse forge nahi kar sakta. */
 async function issueSessionToken(claims, env) {
+  const key = await sessionKey(env, "sign");
+  if (!key) throw new Error("SESSION_SECRET set nahi hai (ya 16 akshar se chhota) — session token nahi ban sakta");
   const payload = { ...claims, exp: Date.now() + 24 * 3600_000 };
   const payloadB64 = bytesToB64url(new TextEncoder().encode(JSON.stringify(payload)));
-  const key = await crypto.subtle.importKey(
-    "raw", new TextEncoder().encode(env.SESSION_SECRET || ""), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]
-  );
   const sig = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(payloadB64));
   return `${payloadB64}.${bytesToB64url(new Uint8Array(sig))}`;
 }
@@ -346,9 +366,8 @@ async function verifySessionToken(token, env) {
   try {
     const [payloadB64, sigB64] = String(token || "").split(".");
     if (!payloadB64 || !sigB64) return null;
-    const key = await crypto.subtle.importKey(
-      "raw", new TextEncoder().encode(env.SESSION_SECRET || ""), { name: "HMAC", hash: "SHA-256" }, false, ["verify"]
-    );
+    const key = await sessionKey(env, "verify");
+    if (!key) return null;   // secret gayab = koi bhi token maanya nahi
     const ok = await crypto.subtle.verify("HMAC", key, b64urlToBytes(sigB64), new TextEncoder().encode(payloadB64));
     if (!ok) return null;
     const claims = JSON.parse(new TextDecoder().decode(b64urlToBytes(payloadB64)));

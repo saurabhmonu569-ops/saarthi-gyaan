@@ -180,29 +180,71 @@ export function getSemanticStatus() {
  * fail hone par app chalti rehti hai, par jhoothi citation kabhi nahi
  * jaati — failure ka natija "kam bharosa" hai, "galat bharosa" nahi.
  *
+ * ── BATCHING (2026-08-06) ────────────────────────────────────────────
+ * Worker ek call mein max 20 contexts leta hai (RERANK_MAX_CONTEXTS).
+ * Pehle yahan `passages.slice(0, 20)` likha tha — yaani reranker corpus
+ * ke 32,032 chunks mein se sirf 20 DEKH paata tha (0.06%). Reranker ka
+ * gap +0.8878 hai, par wo sirf usi par lag sakta hai jo use DIYA jaaye.
+ * Agar sahi ansh pehle stage (cosine top-12 / keyword top-6) mein nahi
+ * aaya, to wo hamesha ke liye gaayab tha — reranker kitna bhi achha ho.
+ *
+ * Ab passages ko 20-20 ke batch mein baant kar SAATH-SAATH (parallel)
+ * bheja jaata hai, isliye 80 candidates ka wall-clock samay lagbhag
+ * utna hi hai jitna 20 ka tha. Kharcha bhi na ke barabar: bge-reranker-
+ * base = 283 neurons/M token, 80 × 1200 akshar ≈ 38K token ≈ 0.011
+ * neuron prati sawaal.
+ *
+ * FAIL-SOFT waisa hi: koi ek batch fail ho to uske passages ko 0 milta
+ * hai (citation ke laayak nahi), baaki batch ka natija bach jaata hai.
+ * SAB batch fail hon tabhi null — yaani "kam bharosa", "galat bharosa"
+ * nahi.
+ *
  * @param {string} query        Devanagari-normalized sawaal
- * @param {string[]} passages   candidate texts (max 20)
+ * @param {string[]} passages   candidate texts (koi bhi sankhya)
  * @returns {Promise<number[]|null>}  har passage ka 0..1 score, usi kram mein
  */
+export const RERANK_BATCH = 20;          // worker ka RERANK_MAX_CONTEXTS
+export const RERANK_MAX_TOTAL = 100;     // suraksha-seema — 5 parallel call
+
 export async function rerankPassages(query, passages) {
   if (!query?.trim() || !passages?.length) return null;
   if (!AI_PROXY_URL) return null;
-  try {
-    const res = await fetch(`${AI_PROXY_URL}/rerank`, {
-      method:  "POST",
-      headers: { "Content-Type": "application/json" },
-      body:    JSON.stringify({ query, contexts: passages.slice(0, 20) }),
-    });
-    if (!res.ok) throw new Error(`/rerank HTTP ${res.status}`);
-    const j = await res.json();
-    if (!Array.isArray(j?.scores) || j.scores.length !== Math.min(passages.length, 20)) {
-      throw new Error("scores shape mismatch");
+
+  const list = passages.slice(0, RERANK_MAX_TOTAL);
+  const batches = [];
+  for (let i = 0; i < list.length; i += RERANK_BATCH) {
+    batches.push({ at: i, texts: list.slice(i, i + RERANK_BATCH) });
+  }
+
+  const results = await Promise.all(batches.map(async ({ at, texts }) => {
+    try {
+      const res = await fetch(`${AI_PROXY_URL}/rerank`, {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ query, contexts: texts }),
+      });
+      if (!res.ok) throw new Error(`/rerank HTTP ${res.status}`);
+      const j = await res.json();
+      if (!Array.isArray(j?.scores) || j.scores.length !== texts.length) {
+        throw new Error("scores shape mismatch");
+      }
+      return { at, scores: j.scores };
+    } catch (e) {
+      console.warn(`[Rerank] batch @${at} fail — un passages par citation nahi lagegi:`, e);
+      return { at, scores: null };
     }
-    return j.scores;
-  } catch (e) {
-    console.warn("[Rerank] failed — passages bina citation ke istemal honge:", e);
+  }));
+
+  if (results.every(r => r.scores === null)) {
+    console.warn("[Rerank] saare batch fail — passages bina citation ke istemal honge");
     return null;
   }
+
+  const out = new Array(list.length).fill(0);
+  for (const { at, scores } of results) {
+    if (scores) for (let j = 0; j < scores.length; j++) out[at + j] = scores[j];
+  }
+  return out;
 }
 
 /**

@@ -10,7 +10,8 @@
  */
 
 import { describe, it, expect } from "vitest";
-import { toDevanagari, detectQueryLanguage, devanagariRatio, stripCyrillic } from "./translit.js";
+import { toDevanagari, detectQueryLanguage, devanagariRatio, stripCyrillic,
+         normalizeQueryForSearch } from "./translit.js";
 
 describe("toDevanagari — Hinglish se Devanagari", () => {
   it("pehle se Devanagari text ko chhoota nahi", () => {
@@ -114,5 +115,81 @@ describe("devanagariRatio", () => {
   });
   it("bina akshar ke text par crash nahi karta", () => {
     expect(devanagariRatio("123 !!!")).toBe(0);
+  });
+});
+
+/**
+ * 2026-08-06: eval-ask.mjs ne "sacche mitra ki pehchan kya hai" fail
+ * hote dekha, jabki jawab corpus mein tha ("मित्र की पहचान भी विपत्ति
+ * के समय ही होती है" — चाणक्य नीति). Wajah retrieval nahi, translit thi.
+ * Naapa: 89 aam Hinglish shabdon mein se 37 (42%) Devanagari ban hi
+ * nahi rahe the — aur wahi shabd the jinse log apni pareshani batate
+ * hain.
+ */
+describe("bolchaal ke shabd — user apni pareshani inhi shabdon mein likhta hai", () => {
+  it("problem-shabd Devanagari mein badalte hain", () => {
+    const must = {
+      pehchan: "पहचान", jhagda: "झगड़ा", naukri: "नौकरी",
+      kalesh: "क्लेश", samasya: "समस्या", tanav: "तनाव",
+    };
+    for (const [en, hi] of Object.entries(must)) expect(toDevanagari(en)).toBe(hi);
+  });
+
+  it("jin shabdon ka bolchaal roop corpus mein nahi, wo granth-shabd par jaate hain", () => {
+    // Naapa gaya corpus-hits comment mein hain (translit.js). Misaal:
+    // दिक्कत 0 hits vs बाधा 542 — seedha lipyantaran yahan bekaar hota.
+    expect(toDevanagari("dikkat")).toBe("बाधा");
+    expect(toDevanagari("dost")).toBe("मित्र");
+    expect(toDevanagari("dushman")).toBe("शत्रु");
+    expect(toDevanagari("sapna")).toBe("स्वप्न");
+    expect(toDevanagari("maafi")).toBe("क्षमा");
+  });
+
+  it("'ne/jo/us/in' — chhoote hue function words", () => {
+    expect(toDevanagari("dost ne dhokha diya")).toBe("मित्र ने धोखा दिया");
+  });
+
+  it("asli sawaal poora sahi banta hai", () => {
+    expect(toDevanagari("sacche mitra ki pehchan kya hai"))
+      .toBe("सच्चे मित्र की पहचान क्या है");
+  });
+});
+
+/**
+ * 2026-08-06: yahi badlaav karte waqt ek PURANA bug pakda gaya —
+ * normalizeQueryForSearch sirf Devanagari-ratio dekhti thi, isliye
+ * SHUDDH ANGREZI sawaal bhi lipyantaran mein chala jaata tha aur bigad
+ * jaata tha: "in this life what is the purpose" → "इन this life what
+ * एेसा थे purpose". Angrezi bolne wale har user ki query aadhi bakwaas
+ * ban rahi thi.
+ */
+describe("normalizeQueryForSearch — teeno bhashaon ka sahi bartaav", () => {
+  it("shuddh angrezi ko bilkul nahi chhoota", () => {
+    for (const q of [
+      "what does the gita say about karma",
+      "in this life what is the purpose",
+      "my friend betrayed me",
+      "how do I find inner peace",
+    ]) {
+      const r = normalizeQueryForSearch(q);
+      expect(r.query, `angrezi query badal gayi: ${q}`).toBe(q);
+      expect(r.transliterated).toBe(false);
+    }
+  });
+
+  it("Hinglish ko Devanagari banata hai", () => {
+    const r = normalizeQueryForSearch("paise ki dikkat hai");
+    expect(r.transliterated).toBe(true);
+    expect(r.query).toBe("पैसे की बाधा है");
+  });
+
+  it("pehle se Devanagari ho to waisa hi rehta hai", () => {
+    const q = "मृत्यु के बाद आत्मा का क्या होता है";
+    expect(normalizeQueryForSearch(q).query).toBe(q);
+  });
+
+  it("original hamesha bacha rehta hai (AI ke prompt ke liye)", () => {
+    const q = "dost ne dhokha diya";
+    expect(normalizeQueryForSearch(q).original).toBe(q);
   });
 });

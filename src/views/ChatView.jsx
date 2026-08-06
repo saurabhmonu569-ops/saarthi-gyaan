@@ -10,7 +10,7 @@ import { useBookProgress } from "@/context/AppContext";
 import { BOOKS } from "@/data";
 import { useT } from "@/i18n";
 import { detectHintedBook } from "@/knowledge/bookHints";
-import { semanticSearch, preloadSemanticSearch, rerankPassages } from "@/knowledge/semanticSearch";
+import { semanticSearch, preloadSemanticSearch, rerankPassages, RERANK_MAX_TOTAL } from "@/knowledge/semanticSearch";
 import { normalizeQueryForSearch } from "@/knowledge/translit";
 
 // ── RELEVANCE GATE (item #17, 2026-08-03) ────────────────────────────────
@@ -52,6 +52,40 @@ function hasSentences(text) {
   const t = (text || "").trim();
   if (!t) return false;
   return /।|॥|(?:है|हैं|था|थी|थे|हुआ|हुई|होता|होती|करते|करना|चाहिये|चाहिए|गया|गयी|रहता|रहती)(?=[\s।॥,.]|$)/.test(t);
+}
+
+/**
+ * OCR-kachra pehchaan (2026-08-05 audit).
+ *
+ * KYUN ZAROORI: hasSentences() akela kaafi nahi hai. Bigda hua OCR bhi "॥"
+ * aur "है" ugal deta hai, isliye woh gate paar kar jaata hai. valmiki_ramayana
+ * (1927 sanskaran, kharab scan) ka asli text aisa nikla —
+ *   "द | चस्ति निधाधत ॥ ३२ जी थी कहने लगे कि, से शुक्त दन बड़ी कणा धर ल्क तै"
+ * — aur ye "grounded" bankar model ko jaa raha tha, yaani app apne hi kachre
+ * ko Valmiki Ramayana ke naam se quote kar sakti thi. Wahi "jhootha aadhaar"
+ * ki shikayat hai jo baar-baar aa rahi thi.
+ *
+ * KAISE: bigde OCR mein shabd TOOT jaate hain — "रामायण" → "रा मा यण". Toh
+ * 1-2 akshar waale Devanagari token ka anupaat naapo.
+ *
+ * NAAPA GAYA (poora corpus, 32,032 chunks, per-book):
+ *     madhya — 23 saaf kitaabein : 0.20 – 0.33
+ *     madhya — valmiki_ramayana  : 0.50
+ *   threshold 0.40 par:
+ *     valmiki ke      97.8% chunks pakde gaye
+ *     baaki 23 ke sirf 3.7% (jhootha alarm)
+ *   0.45/0.50 par jhootha alarm to girta hai, par valmiki ka 16%/50% bach
+ *   nikalta hai — isliye 0.40.
+ *
+ * hasSentences() ki tarah yeh bhi chunk PHENKTA nahi. Woh AI ko context ki
+ * tarah mil sakta hai; bas CITATION ka aadhaar nahi ban sakta.
+ */
+export const MAX_FRAGMENT_RATIO = 0.40;
+export function looksGarbled(text) {
+  const words = String(text || "").match(/[ऀ-ॿ]+/g);
+  // 12 se kam token par anupaat shor hai — chhote saaf ansh ko sazaa na mile
+  if (!words || words.length < 12) return false;
+  return words.filter(w => w.length <= 2).length / words.length > MAX_FRAGMENT_RATIO;
 }
 import { C, F } from "@/styles/theme";
 import { SaarthiOrb, StatusDot, Btn, ThinkingBubble, Prose, cleanOcrText } from "@/components/ui/Primitives";
@@ -292,8 +326,8 @@ export function ChatView() {
       const crossResults = crossBookSearch(searchQ, null, 3);
       const crossFlat = crossResults.flatMap(r => r.results);
 
-      // 2. Keyword: direct inverted-index search, top 12
-      const kwResults = hybridSearch(searchQ, null, {}, 12);
+      // 2. Keyword: direct inverted-index search
+      const kwResults = hybridSearch(searchQ, null, {}, 40);
 
       // 2.5 REAL semantic search (2026-07-26 fix — see src/knowledge/
       // semanticSearch.js for full context): keyword search sirf exact/
@@ -305,7 +339,7 @@ export function ChatView() {
       // kaam karte rehte hain, yeh sirf ADDITIONAL signal hai.
       let semResults = [];
       try {
-        const semHits = await semanticSearch(searchQ, 12);
+        const semHits = await semanticSearch(searchQ, 50);
         semResults = semHits
           .map(h => {
             const chunk = getChunk(h.id);
@@ -325,7 +359,19 @@ export function ChatView() {
       // se ALAG-ALAG top-N lete hain (apne hi scale ke andar), aur asli
       // faisla aage reranker par chhodte hain — wahi ekmatra bharosemand,
       // aapas mein tulne-layak score deta hai.
-      const SRC_QUOTA = [[semResults, 10], [kwResults, 6], [crossFlat, 6]];
+      // FUNNEL CHAUDA (2026-08-06) — kota 10/6/6 = ~22 tha, ab 45/20/20 = ~85.
+      //
+      // Jad: reranker hi ekmatra bharosemand judge hai (gap +0.8878 vs cosine
+      // ka +0.0059), par wo sirf UNHI par lag sakta hai jo use diye jaayein.
+      // Purane kote mein wo 32,032 chunks mein se 20 dekhta tha — 0.06%.
+      // Sahi ansh agar cosine ke top-12 mein nahi aaya to wo hamesha ke liye
+      // gaayab tha. Yahi "kabhi-kabhi galat granth aata hai" ki asli jad hai —
+      // corpus mein kami NAHI hai (36 jeevan-vishayon par 300 se 61,000 tak
+      // hits, 20-24 kitaabon mein faile hue), dhoondhne ka jaal chhota tha.
+      //
+      // rerankPassages ab 20-20 ke parallel batch bhejta hai, isliye 85
+      // candidates ka samay lagbhag 20 jitna hi hai.
+      const SRC_QUOTA = [[semResults, 45], [kwResults, 20], [crossFlat, 20]];
       const byId = new Map();
       for (const [arr, k] of SRC_QUOTA) {
         const sortedSrc = [...arr].sort((a, b) => b.score - a.score).slice(0, k);
@@ -445,7 +491,7 @@ export function ChatView() {
           }
           return b.score - a.score;
         })
-        .slice(0, 20);   // worker ki rerank seema
+        .slice(0, RERANK_MAX_TOTAL);   // rerankPassages ise 20-20 ke batch mein baantega
 
       if (!cleaned.length) { setSacredChunks([]); return []; }
 
@@ -556,7 +602,8 @@ export function ChatView() {
       // hain — table/suchi/mukhprishth kabhi "aadhaar" nahi banenge.
       const merged = kept.slice(0, 12).map((r, i) => ({
         ...r,
-        grounded: r.rerank != null && r.rerank >= MIN_RERANK_SCORE && hasSentences(r.chunk.text),
+        grounded: r.rerank != null && r.rerank >= MIN_RERANK_SCORE
+                  && hasSentences(r.chunk.text) && !looksGarbled(r.chunk.text),
         chunk: {
           ...r.chunk,
           text: r.chunk.text.slice(0, (i < 3 || r.match_type === "neighbour") ? 800 : 300),
