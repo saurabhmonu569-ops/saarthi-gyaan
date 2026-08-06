@@ -271,7 +271,17 @@ def extract_book(book, pdf_dir: Path, max_pages=None, force_rebuild=False):
             "book_id": bid, "page": pg, "text": text, "confidence": conf,
             "ocr_lang": "hin+eng" if method == "ocr" else "n/a", "pipeline": "v3-addbooks",
         }
-        outf.write_text(json.dumps(page_data, ensure_ascii=False), encoding="utf-8")
+        # ATOMIC WRITE (2026-08-06). Pehle seedhe outf par likhte the. 20-ghante
+        # ke run mein user beech mein Ctrl+C dabaye (ya bijli jaaye) to theek
+        # us page ki AADHI JSON disk par reh jaati — aur file "maujood" hone ke
+        # kaaran agli baar upar wala resume-check use SKIP kar deta. Nateeja:
+        # ek chupchaap kharab page, jo baad mein 02_chunk par crash karta.
+        # Ab pehle .tmp par likhte hain, phir replace() — jo OS star par
+        # atomic hai. Beech mein ruke to sirf .tmp bachta hai, asli file banti
+        # hi nahi, aur wo page agli baar dobara ho jaata hai.
+        tmpf = outf.with_suffix(".tmp")
+        tmpf.write_text(json.dumps(page_data, ensure_ascii=False), encoding="utf-8")
+        tmpf.replace(outf)
 
         if (pg + 1) % 25 == 0:
             print(f"   ...page {pg+1}/{limit}  (ok:{written} ocr:{ocr_used})", flush=True)
