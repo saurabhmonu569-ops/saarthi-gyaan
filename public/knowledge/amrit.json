@@ -1,5 +1,5 @@
 {
- "generated_on": "2026-08-05",
+ "generated_on": "2026-08-07",
  "lessons": {
   "agni_purana": [
    {
@@ -719,78 +719,6 @@
     "conclusion_en": "Japa brings positive change to our lives",
     "source": "Shiva Purana Khand 2",
     "book": "shiva_purana_2"
-   }
-  ],
-  "valmiki_ramayana": [
-   {
-    "title_hi": "जीवन की सच्चाई का परिचय",
-    "title_en": "Introduction to the Truth of Life",
-    "body_hi": "जीवन में हमें कई उतार-चढ़ाव का सामना करना पड़ता है। हमें अपने जीवन को सही दिशा में ले जाने के लिए एक उचित मार्गदर्शक की आवश्यकता होती है। यह अनubhav हमें सिखाता है कि जीवन की सच्चाई को समझने और अपने लक्ष्यों को प्राप्त करने के लिए हमें एक शांत और स्थिर मन की आवश्यकता है। हमें अपने जीवन को सही दिशा में ले जाने के लिए एक संतुलित और नियंत्रित जीवन जीने का प्रयास करना चाहिए।",
-    "body_en": "Life is full of ups and downs, and we need a guide to lead us in the right direction. This experience teaches us that to understand the truth of life and achieve our goals, we need a calm and stable mind. We should strive to live a balanced and controlled life to move in the right direction.",
-    "conclusion_hi": "जीवन की सच्चाई को समझने के लिए एक शांत और स्थिर मन आवश्यक है",
-    "conclusion_en": "A calm and stable mind is essential to understand the truth of life",
-    "source": "Valmiki Ramayana",
-    "book": "valmiki_ramayana"
-   },
-   {
-    "title_hi": "सुखद जीवन की राह",
-    "title_en": "Path to a Happy Life",
-    "body_hi": "जीवन में सुख और शांति प्राप्त करने के लिए हमें अपने कर्मों का ध्यान रखना चाहिए। हमारे कार्यों का परिणाम हमारे जीवन पर सीधा प्रभाव डालता है। यदि हम अच्छे कर्म करते हैं, तो हमें सुख मिलता है, और यदि हम बुरे कर्म करते हैं, तो हमें दुख का सामना करना पड़ता है। हमें अपने जीवन में सहनशीलता और धैर्य रखना चाहिए, और हमेशा अच्छे मार्ग पर चलने का प्रयास करना चाहिए।",
-    "body_en": "To achieve happiness and peace in life, we must be mindful of our actions. Our deeds have a direct impact on our lives. If we do good, we get happiness, and if we do bad, we face sorrow. We should cultivate tolerance and patience in our lives and always strive to follow the right path.",
-    "conclusion_hi": "सुखी जीवन के लिए सहनशीलता और अच्छे कर्म आवश्यक हैं",
-    "conclusion_en": "Tolerance and good deeds are essential for a happy life",
-    "source": "Valmiki Ramayana",
-    "book": "valmiki_ramayana"
-   },
-   {
-    "title_hi": "ज्ञानी की सच्ची परख",
-    "title_en": "The True Test of a Wise Person",
-    "body_hi": "ज्ञानी की सच्ची परख तब होती है जब वह कठिन परिस्थितियों में भी शांत और संयमित रहता है। जो व्यक्ति अपने ज्ञान का सही उपयोग जानता है, वह कभी भी हार नहीं मानता और अपने लक्ष्य की ओर बढ़ता रहता है। ज्ञानी की सच्ची पहचान है उसकी शांति और संयम, जो उसे जीवन की कठिनाइयों का सामना करने में मदद करते हैं।",
-    "body_en": "The true test of a wise person is when they remain calm and composed in difficult situations. One who knows how to use their knowledge correctly never gives up and keeps moving towards their goal. The true identity of a wise person is their peace and self-control, which helps them face life's challenges.",
-    "conclusion_hi": "ज्ञानी की सच्ची परख शांति और संयम में होती है",
-    "conclusion_en": "The true test of a wise person lies in their peace and self-control",
-    "source": "Valmiki Ramayana",
-    "book": "valmiki_ramayana"
-   },
-   {
-    "title_hi": "सफलता की राह में संघर्ष",
-    "title_en": "The Path to Success is Not Easy",
-    "body_hi": "जीवन में सफलता प्राप्त करना आसान नहीं है। हमें कई चुनौतियों का सामना करना पड़ता है और उन्हें पार करना होता है। हमारी बुद्धि और साहस ही हमें आगे बढ़ने में मदद करते हैं। हमें अपने लक्ष्यों को प्राप्त करने के लिए निरंतर प्रयास करना चाहिए और हार नहीं माननी चाहिए। जैसे कि रामायण में वर्णित है, देवताओं और असुरों के बीच भी युद्ध होते थे, लेकिन उन्होंने हार नहीं मानी और अपने लक्ष्यों को प्राप्त करने के लिए संघर्ष किया।",
-    "body_en": "Achieving success in life is not easy. We face many challenges and have to overcome them. Our intelligence and courage help us move forward. We should continuously strive to achieve our goals and not give up. As described in the Ramayana, even gods and demons fought wars, but they did not give up and struggled to achieve their goals.",
-    "conclusion_hi": "सफलता की राह में संघर्ष जरूरी है",
-    "conclusion_en": "Struggle is necessary for success",
-    "source": "Valmiki Ramayana",
-    "book": "valmiki_ramayana"
-   },
-   {
-    "title_hi": "सत्य की महत्ता",
-    "title_en": "The Importance of Truth",
-    "body_hi": "सत्य हमेशा से ही जीवन का एक महत्वपूर्ण हिस्सा रहा है। जैसा कि रामायण में वर्णित है, सत्य बोलना और सत्य का पालन करना हमारे जीवन को सही दिशा में ले जाता है। सत्य की महत्ता को समझने से हमें अपने जीवन में सच्चाई और ईमानदारी का मार्ग अपनाने की प्रेरणा मिलती है। यह हमें अपने कर्मों के लिए जिम्मेदार बनाता है और हमें एक अच्छा इंसान बनने की दिशा में आगे बढ़ने में मदद करता है।",
-    "body_en": "Truth has always been an essential part of life. As depicted in the Ramayana, speaking and following the truth guides our lives in the right direction. Understanding the importance of truth inspires us to adopt honesty and integrity in our lives. It makes us responsible for our actions and helps us become better individuals.",
-    "conclusion_hi": "सत्य जीवन का मार्गदर्शक है",
-    "conclusion_en": "Truth is the guiding principle of life",
-    "source": "Valmiki Ramayana",
-    "book": "valmiki_ramayana"
-   },
-   {
-    "title_hi": "सच्चाई और न्याय की जीत",
-    "title_en": "Victory of Truth and Justice",
-    "body_hi": "गौतम ऋषि के शाप से दंडित उस पत्थर को देखकर, राम ने अपने भाई लक्ष्मण से कहा कि यह पत्थर भी हमें सच्चाई और न्याय की महत्ता सिखाता है। जैसे तीर्थों के जल में पत्थर डालने से भी जल पवित्र नहीं होता, वैसे ही हमारे जीवन में भी सच्चाई और न्याय की कमी नहीं होनी चाहिए। हमें अपने जीवन में सच्चाई और न्याय को महत्व देना चाहिए, ताकि हमारा जीवन पवित्र और सुखी हो।",
-    "body_en": "Ram told Lakshman that the cursed stone teaches us the importance of truth and justice. Just as throwing a stone into holy water doesn't pollute it, our lives should also remain pure and just. We should prioritize truth and justice in our lives to make them happy and fulfilling.",
-    "conclusion_hi": "सच्चाई और न्याय की जीत ही असली जीत है",
-    "conclusion_en": "Victory of truth and justice is the real victory",
-    "source": "Valmiki Ramayana",
-    "book": "valmiki_ramayana"
-   },
-   {
-    "title_hi": "जीवन की सच्चाई और शक्ति",
-    "title_en": "The Truth and Power of Life",
-    "body_hi": "जीवन में हमें कई चुनौतियों का सामना करना पड़ता है, लेकिन हमें कभी हार नहीं माननी चाहिए। भगवान की शक्ति और वेदों की बातों पर विश्वास रखना चाहिए। हमें अपने जीवन में अच्छे कार्य करने चाहिए और दूसरों की मदद करनी चाहिए। इससे हमें जीवन में सच्ची खुशी और संतुष्टि मिलेगी।",
-    "body_en": "In life, we face many challenges, but we should never give up. We should have faith in God's power and the words of the Vedas. We should do good deeds and help others in our lives. This will bring us true happiness and satisfaction.",
-    "conclusion_hi": "जीवन में सच्चाई और शक्ति की पहचान ही हमारी सबसे बड़ी ताकत है",
-    "conclusion_en": "The true recognition of truth and power in life is our greatest strength",
-    "source": "Valmiki Ramayana",
-    "book": "valmiki_ramayana"
    }
   ],
   "vishnu_purana_1": [
@@ -1727,6 +1655,78 @@
     "conclusion_en": "Self-strength is the greatest power in life",
     "source": "Shri Yoga Vasishtha Maharamayana (p.2243)",
     "book": "yoga_vasishtha"
+   }
+  ],
+  "mahabharata": [
+   {
+    "title_hi": "महाभारत की महिमा",
+    "title_en": "The Glory of Mahabharata",
+    "body_hi": "महाभारत आर्य-संस्कृति और सनातन धर्म का एक महान ग्रंथ है, जिसमें वेदों के रहस्य, उपनिषदों का सार, इतिहास-पुराण के उन्मेष और निमेष, चातुर्वण्य के विधान, पुराणों के आशय, ग्रह-नक्षत्र-ताराओं के परिमाण, न्याय, शिक्षा, चिक्षा, दान, पाशुपत, तीर्थों, पुण्य देशों, नदियों, पर्वतों, वनों और समुद्रों का वर्णन है। यह ग्रंथ महाकाव्य, गढ़ार्थमय ज्ञान-विज्ञान-शास्त्र, धर्मग्रंथ, राजनीतिक दर्शन, कर्मयोग-दर्शन, भक्ति-शास्त्र, अध्यात्म-शास्त्र है। इसमें भगवान श्रीकृष्ण के गुण-गौरवका मधुर गान है, जो एक, अद्वितीय, सर्वज्ञ, सर्वशक्तिमान, सर्वलोकमहेश्वर हैं।",
+    "body_en": "The Mahabharata is a great scripture of Arya culture and Sanatana Dharma, containing the secrets of the Vedas, the essence of the Upanishads, the expansion of history and mythology, the rules of the four varnas, the meaning of the Puranas, and the measurement of the planets, stars, and constellations. It is a great epic, a treasure trove of knowledge and science, a religious text, a political philosophy, a treatise on karma yoga, devotion, and spirituality. It sings the praises of Lord Krishna, who is the one, unique, all-knowing, all-powerful, and supreme lord of all worlds.",
+    "conclusion_hi": "महाभारत की महिमा अपार है",
+    "conclusion_en": "The glory of Mahabharata is immense",
+    "source": "Mahabharata (Gita Press) (p.5)",
+    "book": "mahabharata"
+   },
+   {
+    "title_hi": "संतुलन और सहानुभूति का महत्व",
+    "title_en": "Importance of Balance and Empathy",
+    "body_hi": "हमें अपने जीवन में संतुलन और सहानुभूति का महत्व समझना चाहिए। जब हम दूसरों के साथ सहानुभूति रखते हैं और उनकी भावनाओं को समझते हैं, तो हम उनके दिलों में एक विशेष स्थान बना लेते हैं। इसी तरह, जब हम अपने समाज और पर्यावरण की रक्षा करते हैं, तो हम एक सुरक्षित और संतुलित वातावरण बनाने में मदद करते हैं।",
+    "body_en": "We should understand the importance of balance and empathy in our lives. When we show empathy towards others and understand their feelings, we earn a special place in their hearts. Similarly, when we protect our society and environment, we help create a safe and balanced atmosphere.",
+    "conclusion_hi": "संतुलन और सहानुभूति से हम एक बेहतर भविष्य बना सकते हैं",
+    "conclusion_en": "Balance and empathy can help us create a better future",
+    "source": "Mahabharata (Gita Press) (p.11100)",
+    "book": "mahabharata"
+   },
+   {
+    "title_hi": "आत्मसंयम और निष्काम भाव",
+    "title_en": "Self-Control and Selfless Desire",
+    "body_hi": "जो व्यक्ति अपने मन को वश में करके त्रिविध अग्नियों की उपासना करते हैं और नियमपूर्वक अपनी इन्द्रियों को वश में रखते हैं, वे अनन्यचित्त होकर भगवान की उपासना करते हैं। ऐसे व्यक्ति जप, यज्ञ और मानसयज्ञ के माध्यम से भगवान की आराधना करते हैं और शुद्धभाव से अग्नि की परिचर्या करते हैं। यह आत्मसंयम और निष्काम भाव की महत्ता को दर्शाता है। हमें अपने जीवन में भी इसी प्रकार के सिद्धांतों का पालन करना चाहिए।",
+    "body_en": "Those who control their mind and worship the three types of fire, and those who follow the rules and control their senses, worship God with a single-minded devotion. Such people worship God through chanting, sacrifice, and mental sacrifice, and serve the fire with a pure heart. This highlights the importance of self-control and selfless desire. We should also follow these principles in our lives.",
+    "conclusion_hi": "आत्मसंयम और निष्काम भाव से ही हम भगवान की प्राप्ति कर सकते हैं।",
+    "conclusion_en": "We can only attain God through self-control and selfless desire.",
+    "source": "Mahabharata (Gita Press) (p.13021)",
+    "book": "mahabharata"
+   },
+   {
+    "title_hi": "पञ्च महायज्ञों का महत्व",
+    "title_en": "The Significance of Five Great Sacrifices",
+    "body_hi": "हिंदू धर्म में पञ्च महायज्ञों का विशेष महत्व है। ये यज्ञ हमें ब्रह्मलोक की प्राप्ति का मार्ग दिखाते हैं। ऋभुयज्ञ, ब्रह्मयज्ञ, भूतयज्ञ, नृयज्ञ और पितृयज्ञ - ये पाँच यज्ञ हमें अपने जीवन में समाज और परिवार के प्रति अपने कर्तव्यों को पूरा करने का मार्गदर्शन करते हैं। तर्पण, स्वाध्याय, बलि देना, अतिथि पूजा और पितरों के लिए श्राद्ध करना - ये सभी हमारे जीवन में महत्वपूर्ण भूमिका निभाते हैं।",
+    "body_en": "In Hinduism, the five great sacrifices hold significant importance. They guide us towards attaining the realm of Brahman. The five sacrifices - Ribhu Yajna, Brahma Yajna, Bhuta Yajna, Nri Yajna, and Pitri Yajna - direct us to fulfill our duties towards society and family. Tarpan, self-study, offering oblations, honoring guests, and performing shraddha for our ancestors all play vital roles in our lives.",
+    "conclusion_hi": "पञ्च महायज्ञों का पालन करने से हम अपने जीवन को अर्थपूर्ण बना सकते हैं",
+    "conclusion_en": "By following the five great sacrifices, we can make our lives more meaningful",
+    "source": "Mahabharata (Gita Press) (p.15008)",
+    "book": "mahabharata"
+   },
+   {
+    "title_hi": "सूर्यदेव की महान शक्ति",
+    "title_en": "The Great Power of Sun God",
+    "body_hi": "सूर्यदेव की शक्ति से ही हमें जीवन मिलता है। वे अपने तेज से समस्त प्राणियों को ऊर्जा प्रदान करते हैं। सूर्यदेव के दक्षिणायन से शीतकाल आता है और उत्तरायण से ग्रीष्मकाल। इस प्रकार वे प्रकृति के चक्र को नियंत्रित करते हैं। हमें सूर्यदेव की महत्ता को समझना चाहिए और उनकी शक्ति का सम्मान करना चाहिए।",
+    "body_en": "The power of the Sun God gives us life. He provides energy to all living beings with his radiance. The Sun God's southward journey brings winter and his northward journey brings summer. Thus, he controls the cycle of nature. We should understand the importance of the Sun God and respect his power.",
+    "conclusion_hi": "सूर्यदेव की शक्ति का सम्मान करें",
+    "conclusion_en": "Respect the power of the Sun God",
+    "source": "Mahabharata (Gita Press) (p.3370)",
+    "book": "mahabharata"
+   },
+   {
+    "title_hi": "श्रीकृष्ण की शांति योजना",
+    "title_en": "Lord Krishna's Peace Plan",
+    "body_hi": "महाराज धृतराष्ट्र ने अपने पुत्र दुर्योधन से कहा कि वह भगवान श्रीकृष्ण की बात माने और शांति का मार्ग अपनाए। उन्होंने कहा कि श्रीकृष्ण की योजना कल्याणकारक और योगक्षेमकी प्राप्ति करानेवाली है। यदि दुर्योधन श्रीकृष्ण की बात मान ले तो भरतवंशी सम्मानित रहेंगे और कोई क्षति नहीं होगी। हमें श्रीकृष्ण की शांति योजना को अपनाना चाहिए और युद्ध की ओर बढ़ने से बचना चाहिए।",
+    "body_en": "King Dhritarashtra advised his son Duryodhana to accept Lord Krishna's peace plan, which would bring welfare and prosperity. If Duryodhana accepts Krishna's proposal, the Bharata dynasty will be honored and no harm will come to them. We should adopt Krishna's peace plan and avoid going to war.",
+    "conclusion_hi": "श्रीकृष्ण की शांति योजना को अपनाना ही सच्चा कल्याण है",
+    "conclusion_en": "Adopting Lord Krishna's peace plan is the true path to welfare",
+    "source": "Mahabharata (Gita Press) (p.5657)",
+    "book": "mahabharata"
+   },
+   {
+    "title_hi": "सारथी की भूमिका और विजय का मार्ग",
+    "title_en": "The Role of a Charioteer and the Path to Victory",
+    "body_hi": "सारथी की भूमिका बहुत महत्वपूर्ण होती है, जैसा कि दारुक की भूमिका अर्जुन के जीवन में थी। सारथी न केवल रथ को चलाता है, बल्कि वह योद्धा को भी मार्गदर्शन प्रदान करता है। इस पाठ में हम देख सकते हैं कि कैसे दारुक अर्जुन को युद्ध के मैदान में सही मार्गदर्शन प्रदान करता है और उनकी विजय में महत्वपूर्ण भूमिका निभाता है। हमें भी अपने जीवन में सारथी की भूमिका निभाने वाले लोगों का सम्मान करना चाहिए और उनके मार्गदर्शन को सुनना चाहिए।",
+    "body_en": "The role of a charioteer is very important, as seen in the life of Arjuna with Daruka. A charioteer not only drives the chariot but also guides the warrior. In this lesson, we see how Daruka provides Arjuna with the right guidance on the battlefield and plays a crucial role in his victory. We should also respect and listen to the guidance of those who play the role of charioteer in our lives.",
+    "conclusion_hi": "सारथी की भूमिका जीवन में बहुत महत्वपूर्ण होती है",
+    "conclusion_en": "The role of a charioteer is very important in life",
+    "source": "Mahabharata (Gita Press) (p.7702)",
+    "book": "mahabharata"
    }
   ]
  }

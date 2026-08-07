@@ -773,7 +773,7 @@
       "title": "Ishadi Upanishad",
       "tradition": "upanishad",
       "language": "sa+hi",
-      "chunk_count": 876,
+      "chunk_count": 877,
       "chapters": [
         1,
         2,
@@ -800,7 +800,7 @@
       "title": "Kathopanishad",
       "tradition": "upanishad",
       "language": "sa+hi",
-      "chunk_count": 185,
+      "chunk_count": 186,
       "chapters": [
         1,
         2,
@@ -830,11 +830,59 @@
       "chapter_count": 0
     },
     {
+      "book_id": "mahabharata",
+      "title": "Mahabharata (Gita Press)",
+      "tradition": "itihasa",
+      "language": "sa+hi",
+      "chunk_count": 25856,
+      "chapters": [
+        1,
+        2,
+        3,
+        5,
+        6,
+        7,
+        8,
+        9,
+        11,
+        17,
+        69,
+        70,
+        72,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111,
+        112,
+        113,
+        114,
+        115,
+        280,
+        281,
+        282,
+        283,
+        284,
+        286,
+        287
+      ],
+      "page_range": [
+        3,
+        15431
+      ],
+      "chapter_count": 34
+    },
+    {
       "book_id": "mantra_maha_sagar",
       "title": "Mantra Maha Sagar",
       "tradition": "mantra",
       "language": "sa+hi",
-      "chunk_count": 1145,
+      "chunk_count": 1146,
       "chapters": [],
       "page_range": [
         4,
@@ -1063,21 +1111,6 @@
         1108
       ],
       "chapter_count": 4
-    },
-    {
-      "book_id": "valmiki_ramayana",
-      "title": "Valmiki Ramayana",
-      "tradition": "",
-      "language": "",
-      "chunk_count": 552,
-      "chapters": [
-        1
-      ],
-      "page_range": [
-        3,
-        563
-      ],
-      "chapter_count": 1
     },
     {
       "book_id": "vishnu_purana_1",

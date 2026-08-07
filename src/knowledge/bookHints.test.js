@@ -8,6 +8,24 @@ describe("bookHints.js — Roman + Devanagari book detection", () => {
     expect(detectHintedBook("what does the gita say about karma")).toBe("bhagavad_gita_shankar");
   });
 
+  it("Ramayan ke hint ab Ramcharitmanas par jaate hain", () => {
+    // 2026-08-07: valmiki_ramayana hatai gayi (OCR kachra — 381 akshar/page,
+    // ek bhi kand ka naam nahi). Ramayan ka vishay ab Ramcharitmanas mein.
+    expect(detectHintedBook("ramayan me kya likha hai")).toBe("ramcharitmanas");
+    expect(detectHintedBook("रामायण की कथा बताइए")).toBe("ramcharitmanas");
+    expect(detectHintedBook("वाल्मीकि ने क्या कहा")).toBe("ramcharitmanas");
+  });
+
+  it("Mahabharat aur uske paatra pehchane jaate hain", () => {
+    expect(detectHintedBook("महाभारत में धर्म क्या है")).toBe("mahabharata");
+    expect(detectHintedBook("vidur neeti kya kehti hai")).toBe("mahabharata");
+    expect(detectHintedBook("भीष्म ने क्या उपदेश दिया")).toBe("mahabharata");
+    expect(detectHintedBook("द्रौपदी के बारे में बताइए")).toBe("mahabharata");
+    expect(detectHintedBook("शान्तिपर्व में क्या है")).toBe("mahabharata");
+    // "गीता" apna samarpit granth rakhti hai — Mahabharat par nahi jaati
+    expect(detectHintedBook("गीता में कर्म योग")).toBe("bhagavad_gita_shankar");
+  });
+
   it("detects Devanagari book names — the exact bug this fixed", () => {
     // Real regression case: this query used to return null (Roman-only hints
     // never match Devanagari substrings), silently disabling the guaranteed

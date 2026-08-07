@@ -11,7 +11,7 @@
 
 import { describe, it, expect } from "vitest";
 import { toDevanagari, detectQueryLanguage, devanagariRatio, stripCyrillic,
-         normalizeQueryForSearch } from "./translit.js";
+         normalizeQueryForSearch, expandQueryWithParyay, GRANTH_PARYAY } from "./translit.js";
 
 describe("toDevanagari — Hinglish se Devanagari", () => {
   it("pehle se Devanagari text ko chhoota nahi", () => {
@@ -191,5 +191,68 @@ describe("normalizeQueryForSearch — teeno bhashaon ka sahi bartaav", () => {
   it("original hamesha bacha rehta hai (AI ke prompt ke liye)", () => {
     const q = "dost ne dhokha diya";
     expect(normalizeQueryForSearch(q).original).toBe(q);
+  });
+});
+
+/**
+ * 2026-08-07: Mahabharata jodne ke BAAD bhi "पति पत्नी में झगड़ा हो तो
+ * क्या करें" 30 mein se akela fail hota raha — jabki jawab corpus mein
+ * saaf maujood hai ("पुरुषको चाहिये कि वह कुपित होनेपर भी पत्नीके साथ
+ * कोई अप्रिय बर्ताव न करे" — महाभारत, 79 chunks गृहस्थ-धर्म par).
+ *
+ * Jad: granth "कलह/भार्या/कुपित" likhte hain, user "झगड़ा/बीवी/नाराज".
+ * Hinglish ke liye ye pul kal ban gaya tha, par Devanagari mein type
+ * karne walon ko milta hi nahi tha.
+ */
+describe("expandQueryWithParyay — bolchaal se granth-bhasha ka pul", () => {
+  it("bolchaal ke shabd par granth-paryay jodta hai", () => {
+    const r = expandQueryWithParyay("पति पत्नी में झगड़ा हो तो क्या करें");
+    expect(r).toContain("कलह");
+    expect(r).toContain("विवाद");
+  });
+
+  it("user ke apne shabd KABHI nahi hataata — sirf jodta hai", () => {
+    const q = "मुझे नौकरी की दिक्कत है";
+    const r = expandQueryWithParyay(q);
+    expect(r.startsWith(q)).toBe(true);
+  });
+
+  it("roop badle shabd bhi pakadta hai (पैसे, गलतियों, रिश्ते)", () => {
+    // "पैसे" mein "पैसा" hai hi nahi — substring milaan yahan fail hota
+    expect(expandQueryWithParyay("पैसे की तंगी")).toContain("धन");
+    expect(expandQueryWithParyay("गलतियों की माफी")).toContain("दोष");
+    expect(expandQueryWithParyay("रिश्ते खराब हैं")).toContain("सम्बन्ध");
+  });
+
+  it("jis query mein bolchaal ka shabd nahi, use bilkul nahi chhoota", () => {
+    for (const q of ["मृत्यु के बाद आत्मा का क्या होता है", "भक्ति क्या है", "मोक्ष कैसे मिलता है"]) {
+      expect(expandQueryWithParyay(q)).toBe(q);
+    }
+  });
+
+  it("ek hi paryay do baar nahi judta", () => {
+    // "झगड़ा" aur "झगड़े" dono "कलह" dete hain
+    const r = expandQueryWithParyay("झगड़ा और झगड़े दोनों");
+    expect(r.match(/कलह/g).length).toBe(1);
+  });
+
+  it("agar paryay pehle se query mein hai to dobara nahi judta", () => {
+    const r = expandQueryWithParyay("घर में कलह और झगड़ा");
+    expect(r.match(/कलह/g).length).toBe(1);
+  });
+
+  it("khaali/undefined par crash nahi karta", () => {
+    expect(expandQueryWithParyay("")).toBe("");
+    expect(expandQueryWithParyay(undefined)).toBe("");
+  });
+
+  it("naksha mein koi bhi paryay khud ek bolchaal-shabd nahi hai", () => {
+    // Warna zanjeer ban jaati (A→B, B→C) aur query bekaboo phailti.
+    const keys = new Set(Object.keys(GRANTH_PARYAY));
+    for (const [bol, paryay] of Object.entries(GRANTH_PARYAY)) {
+      for (const p of paryay) {
+        expect(keys.has(p), `"${bol}" → "${p}" — par "${p}" khud naksha ki chaabi hai`).toBe(false);
+      }
+    }
   });
 });

@@ -52,12 +52,12 @@ export const BOOK_RIGHTS = {
   // lekhak/anuvaadak ki mrityu + 60 saal). archive.org par sarvajanik
   // roop se uplabdh hain.
   yoga_vasishtha:   { access: "open" },
-  valmiki_ramayana: { access: "open" },   // 1927 sanskaran — Mahabharat se badla jaayega
 
   // ── BAND ───────────────────────────────────────────────────────────
   // Gita Press (12) — prakashak zinda aur sakriya hai
   bhagavad_gita_shankar: { access: "restricted", pub: "गीता प्रेस" },
   ramcharitmanas:        { access: "restricted", pub: "गीता प्रेस" },
+  mahabharata:           { access: "restricted", pub: "गीता प्रेस" },
   shiva_purana_1:        { access: "restricted", pub: "गीता प्रेस" },
   shiva_purana_2:        { access: "restricted", pub: "गीता प्रेस" },
   garuda_purana_1:       { access: "restricted", pub: "गीता प्रेस" },
@@ -120,8 +120,6 @@ export const BOOK_ORDER = [
   // Baaki
   "guru_granth_sahib", "mantra_maha_sagar", "nitya_karm_pooja",
   "chanakya_neeti", "ekadashi_mahatmya", "lal_kitab", "rashi_muhurt_vigyan",
-  // Hataya jaana hai — isliye sabse aakhir mein
-  "valmiki_ramayana",
 ];
 
 /** Kram ke liye rank. Soochi mein na ho to sabse aakhir mein. */

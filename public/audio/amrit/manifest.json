@@ -69,13 +69,6 @@
  "shiva_purana_2_4": true,
  "shiva_purana_2_5": true,
  "shiva_purana_2_6": true,
- "valmiki_ramayana_0": true,
- "valmiki_ramayana_1": true,
- "valmiki_ramayana_2": true,
- "valmiki_ramayana_3": true,
- "valmiki_ramayana_4": true,
- "valmiki_ramayana_5": true,
- "valmiki_ramayana_6": true,
  "vishnu_purana_1_0": true,
  "vishnu_purana_1_1": true,
  "vishnu_purana_1_2": true,
@@ -166,5 +159,12 @@
  "yoga_vasishtha_3": true,
  "yoga_vasishtha_4": true,
  "yoga_vasishtha_5": true,
- "yoga_vasishtha_6": true
+ "yoga_vasishtha_6": true,
+ "mahabharata_0": true,
+ "mahabharata_1": true,
+ "mahabharata_2": true,
+ "mahabharata_3": true,
+ "mahabharata_4": true,
+ "mahabharata_5": true,
+ "mahabharata_6": true
 }

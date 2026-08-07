@@ -136,6 +136,74 @@ const WORDS = {
   // sirf yahi 4 Latin mein reh rahe the.
   ne: "ने", jo: "जो", us: "उस", in: "इन", inn: "इन",
 
+  // ── 100 ASLI SAWAALON SE MILI KAMIYAN (2026-08-07) ────────────────────
+  //
+  // Saurabh ne 100 asli sawaal diye. Unpar chalane par 100 mein se 56
+  // sawaalon mein Latin shabd bach rahe the — mera pichhla test sirf 89
+  // BANAYE HUE shabdon par tha, aur usne 1% batayi thi. Asli sawaalon ne
+  // 56% dikhaya. Yahi farak hai banaye hue aur asli data mein.
+  //
+  // Do GALAT anuvad bhi mile — ye zyada gambhir hain, kyunki inse sawaal
+  // ka MATLAB badal jaata hai:
+  //     "sabse bada daan"  → "sabse बाद दान"   (बाद = "after"!)
+  //     "bhakti ka saar"   → "भक्ति का सारा"
+  // Jad fuzzyKey ka takrav hai: "aa"→"a" aur aakhri "a" hatne se
+  //     bada → bad   aur   baad → bad     (dono ek hi chaabi)
+  //     saar → sar   aur   sara → sar
+  // Lexicon mein jo pehle mila wahi jeet gaya. WORDS lexicon se PEHLE
+  // dekha jaata hai, isliye yahan likhne se takrav khatam.
+  bada: "बड़ा", badi: "बड़ी", bade: "बड़े", saar: "सार", sar: "सार",
+
+  // Wahi takrav aur bhi jagah nikla — ye sab MATLAB badal dete the:
+  //     seekha → सिख   ("Nachiketa ne kya seekha" → "…क्या सिख")
+  //     maana  → मन    (माना = "samjha gaya", मन = "mind")
+  //     aana   → अन्न  (anaaj)      paana → पान (paan ka patta)
+  //     paar   → पर                 deen  → दिन (दीन = gareeb)
+  // Ek-ek karke 52 aam shabd jaanche, jo galat the wo yahan likhe.
+  maana: "माना", mana: "माना", maani: "मानी",
+  aana: "आना", aaye: "आये", aaya: "आया",
+  paana: "पाना", paaya: "पाया", paar: "पार",
+  seekha: "सीखा", seekhna: "सीखना", sikha: "सिखा", sikhna: "सीखना",
+  deen: "दीन", saab: "साहब",
+  dekhna: "देखना", samajhna: "समझना", sunna: "सुनना", bolne: "बोलने",
+  sochna: "सोचना", jeetna: "जीतना", haarna: "हारना", chhodna: "छोड़ना",
+  chhodi: "छोड़ी", chhoda: "छोड़ा", milta: "मिलता", milti: "मिलती",
+
+  // sabse aam — "sabse" akele 12 sawaalon mein tha
+  sabse: "सबसे", kaunsa: "कौनसा", kaunsi: "कौनसी", kounsa: "कौनसा",
+  asli: "असली", itna: "इतना", itni: "इतनी", doosre: "दूसरे", doosra: "दूसरा",
+  dusre: "दूसरे", cheez: "चीज", cheeze: "चीजें", karni: "करनी", karna: "करना",
+  pehla: "पहला", pehli: "पहली", jude: "जुड़े", judi: "जुड़ी",
+  padhna: "पढ़ना", banta: "बनता", banti: "बनती", banein: "बनें",
+  marti: "मरती", marta: "मरता", kehta: "कहता", kehti: "कहती",
+  padta: "पड़ता", padti: "पड़ती", bolna: "बोलना", badla: "बदला",
+  sikhata: "सिखाता", sikhati: "सिखाती", samjhate: "समझाते",
+  bhatakne: "भटकने", pehchanein: "पहचानें", pehchane: "पहचाने",
+
+  // vishay ke shabd
+  sandesh: "संदेश", shastriya: "शास्त्रीय", prabhavi: "प्रभावी",
+  prarabdh: "प्रारब्ध", vanvas: "वनवास", visheshta: "विशेषता",
+  visheshtayein: "विशेषताएँ", safalta: "सफलता", niyantrit: "नियंत्रित",
+  rajdharma: "राजधर्म", rajneeti: "राजनीति", aadat: "आदत", aadatein: "आदतें",
+  barbaad: "बर्बाद", upyog: "उपयोग", simran: "सिमरन", parmatma: "परमात्मा",
+  paramatma: "परमात्मा", adhura: "अधूरा", langar: "लंगर", zaruri: "ज़रूरी",
+  zaroori: "ज़रूरी", sujhav: "सुझाव", uttar: "उत्तर", prashn: "प्रश्न",
+  tattva: "तत्त्व", lakshan: "लक्षण", sarvottam: "सर्वोत्तम",
+  adhyatmik: "आध्यात्मिक", parampara: "परम्परा", kamai: "कमाई",
+  uchcharan: "उच्चारण", diksha: "दीक्षा", sankalp: "संकल्प",
+  samanata: "समानता", varnit: "वर्णित", sweekar: "स्वीकार",
+  kartavya: "कर्तव्य", dhairya: "धैर्य", tyag: "त्याग", nash: "नाश",
+
+  // naam
+  vibhishan: "विभीषण", lanka: "लंका", shabari: "शबरी", narsimha: "नृसिंह",
+  narasimha: "नृसिंह", mahabharat: "महाभारत", bhagavad: "भगवद्",
+  dashavatar: "दशावतार", nachiketa: "नचिकेता", maryada: "मर्यादा",
+  purushottam: "पुरुषोत्तम", kaliyug: "कलियुग", brahman: "ब्रह्म",
+  // NOTE: angrezi shabd (depression, leadership, practical, business,
+  // confusion, discipline, support, values) JAAN-BOOJH KAR nahi jode.
+  // Unka Devanagari roop corpus mein hai hi nahi ("डिप्रेशन" 0 baar),
+  // aur bge-m3 bahubhashi hai — wo unhe waise hi theek samajh leta hai.
+
   // seedha lipyantaran — corpus mein ye roop maujood hai
   pehchan: "पहचान", pahchan: "पहचान", pehchaan: "पहचान",    // पहचान 342
   sacche: "सच्चे", saccha: "सच्चा", sachcha: "सच्चा", sachche: "सच्चे",
@@ -466,6 +534,100 @@ export function detectQueryLanguage(text) {
  * warna jaisa hai waisa hi.
  * @returns {{ query: string, transliterated: boolean, original: string }}
  */
+/**
+ * BOLCHAAL → GRANTH-BHASHA (2026-08-07)
+ * =====================================================================
+ * ASLI GHATNA: eval-ask mein "पति पत्नी में झगड़ा हो तो क्या करें" 30 mein
+ * se akela fail hota raha — Mahabharata jodne ke BAAD bhi. Jabki jawab
+ * corpus mein saaf maujood hai:
+ *     "पुरुषको चाहिये कि वह कुपित होनेपर भी पत्नीके साथ कोई अप्रिय
+ *      बर्ताव न करे"                                   — महाभारत
+ *     "गृहस्थ पुरुष सदा अपनी ही स्त्रीसे प्रेम करे"      — महाभारत
+ * 79 chunks गृहस्थ-धर्म par, 13 kalah par.
+ *
+ * JAD: granth "कलह/भार्या/कुपित" likhte hain, user "झगड़ा/बीवी/नाराज"
+ * likhta hai. Kal maine yahi pul HINGLISH ke liye banaya tha (WORDS
+ * mein), par normalizeQueryForSearch Devanagari query par turant return
+ * kar deti hai — yaani Hindi mein type karne wale ko wo pul milta hi
+ * nahi tha. Aur wahi hamare sabse zyada users hain.
+ *
+ * NAAPKAR CHUNA (5.66 crore akshar ke corpus par):
+ *   niyam — bolchaal shabd <300 baar aaye AUR granth-shabd 3x se zyada
+ *   Misaal:  दिक्कत 1 vs बाधा 712  |  बीवी 13 vs पत्नी 2,654
+ *   Niyam ne 4 jodiyan THUKRAYIN bhi: झूठ (651 — khud hi kaafi aam),
+ *   बच्चे (300), सास (938), ससुराल (श्वसुर sirf 9 — ulta hota).
+ *
+ * PHIR HAATH SE SAAF KIYA — kuch paryay niyam paar kar gaye the par
+ * shor laate:
+ *   दिमाग→मन (मन ke 96,120 hits — har query mein daalna bekaar)
+ *   इज्जत→मान (65,415, aur मानव/मानस/प्रमाण ke andar bhi milta hai)
+ *   पैसा→अर्थ ("arth" = "matlab" bhi hota hai, do-arthi)
+ *   बुढ़ापा→जरा ("zara" = "thoda" bhi)
+ *   अकेलापन→विरह (virah = bichhadna, akelapan nahi)
+ *
+ * ⚠️ Ye query ko BADALTA nahi, BADHATA hai — user ke shabd hamesha
+ * rehte hain, sirf granth-shabd saath jud jaate hain. Isse keyword
+ * search ko seedha faayda hai (wo substring par chalti hai).
+ *
+ * ⚠️ Aur ye RERANKER ko nahi bheja jaata — dekho ChatView.jsx. Reranker
+ * ek cross-encoder hai jo SAWAAL padhkar faisla karta hai; usme paryay
+ * thoons dene se sawaal anaad ban jaata aur uska faisla bigadta. Use
+ * hamesha asli sawaal milta hai. Paryay sirf UMMEEDWAAR DHOONDHNE ke
+ * liye hain, unhe AANKNE ke liye nahi.
+ */
+export const GRANTH_PARYAY = {
+  // rishte aur ghar
+  "झगड़ा": ["कलह", "विवाद"],      "लड़ाई": ["युद्ध", "संग्राम"],
+  "बीवी": ["पत्नी", "भार्या"],     "शौहर": ["पति", "स्वामी"],
+  "घरवाले": ["कुटुम्ब", "परिवार"], "रिश्ता": ["सम्बन्ध", "संबंध"],
+  "दोस्त": ["मित्र", "सखा"],       "दुश्मन": ["शत्रु", "रिपु"],
+  // dukh aur samasya
+  "दिक्कत": ["बाधा", "विघ्न"],     "परेशानी": ["कष्ट", "क्लेश"],
+  "मुश्किल": ["कठिन", "दुष्कर"],   "तकलीफ": ["पीड़ा", "व्यथा"],
+  "तनाव": ["चिन्ता"],              "घबराहट": ["व्याकुल", "उद्विग्न"],
+  "अकेलापन": ["एकाकी"],            "नाराज": ["कुपित", "क्रुद्ध"],
+  // man aur charitra
+  "दिमाग": ["बुद्धि"],             "सपना": ["स्वप्न"],
+  "गलती": ["दोष", "प्रमाद"],       "माफी": ["क्षमा"],
+  "खुशी": ["सुख", "आनन्द"],        "इज्जत": ["सम्मान", "प्रतिष्ठा"],
+  "भरोसा": ["विश्वास", "श्रद्धा"],
+  // kaam aur jeevan
+  "नौकरी": ["सेवा", "वृत्ति"],     "कारोबार": ["व्यापार"],
+  "पैसा": ["धन"],                  "मेहनत": ["परिश्रम", "पुरुषार्थ"],
+  "इलाज": ["चिकित्सा", "औषध"],
+  "बुढ़ापा": ["वृद्धावस्था"],      "जवानी": ["यौवन"],  "बचपन": ["बाल्य"],
+
+  // ── ROOP-BHED ────────────────────────────────────────────────────────
+  // Milaan substring se hota hai, isliye "दोस्तों" mein "दोस्त" apne aap
+  // mil jaata hai. Par jahan shabd ka DHAANCHA badalta hai, wahan alag
+  // entry chahiye — warna sabse aam sawaal chhoot jaate hain:
+  //     "पैसे की परेशानी"  mein "पैसा" hai hi nahi
+  //     "गलतियों की माफी"  mein "गलती" hai hi nahi (ी → ि ho jaati hai)
+  "पैसे": ["धन"],        "पैसों": ["धन"],
+  "रिश्ते": ["सम्बन्ध", "संबंध"],  "रिश्तों": ["सम्बन्ध", "संबंध"],
+  "सपने": ["स्वप्न"],    "सपनों": ["स्वप्न"],
+  "गलतियों": ["दोष", "प्रमाद"],    "गलतियाँ": ["दोष", "प्रमाद"],
+  "झगड़े": ["कलह", "विवाद"],       "झगड़ों": ["कलह", "विवाद"],
+  "लड़ाइयाँ": ["युद्ध"],           "नौकरियाँ": ["सेवा", "वृत्ति"],
+};
+
+/**
+ * Query ke saath granth-shabd jod do (DHOONDHNE ke liye, aankne ke liye
+ * nahi). Anjaan shabd waise ke waise. Ek hi paryay do baar nahi judta.
+ * @param {string} text  Devanagari query
+ * @returns {string}
+ */
+export function expandQueryWithParyay(text) {
+  const s = String(text || "");
+  if (!s.trim()) return s;
+  const add = [];
+  for (const [bol, paryay] of Object.entries(GRANTH_PARYAY)) {
+    if (!s.includes(bol)) continue;
+    for (const p of paryay) if (!s.includes(p) && !add.includes(p)) add.push(p);
+  }
+  return add.length ? `${s} ${add.join(" ")}` : s;
+}
+
 export function normalizeQueryForSearch(text) {
   const original = text;
   const ratio = devanagariRatio(text);

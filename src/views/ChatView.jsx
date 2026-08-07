@@ -11,7 +11,7 @@ import { BOOKS } from "@/data";
 import { useT } from "@/i18n";
 import { detectHintedBook } from "@/knowledge/bookHints";
 import { semanticSearch, preloadSemanticSearch, rerankPassages, RERANK_MAX_TOTAL } from "@/knowledge/semanticSearch";
-import { normalizeQueryForSearch } from "@/knowledge/translit";
+import { normalizeQueryForSearch, expandQueryWithParyay } from "@/knowledge/translit";
 
 // ── RELEVANCE GATE (item #17, 2026-08-03) ────────────────────────────────
 // 13 sawaalon par naapa gaya. Reranker ka score bimodal nikla:
@@ -322,12 +322,28 @@ export function ChatView() {
       // DHOONDHNE ke liye hai.
       const { query: searchQ } = normalizeQueryForSearch(query);
 
+      // 0.5 GRANTH-PARYAY (2026-08-07)
+      //
+      // searchQ  = user ka sawaal, Devanagari mein (Hinglish ho to badla hua)
+      // findQ    = wahi + granth ke paryay  ("झगड़ा" ke saath "कलह विवाद")
+      //
+      // Ye antar JAAN-BOOJH KAR hai:
+      //   findQ  → DHOONDHNE ke liye (keyword, cross-book, semantic)
+      //   searchQ → AANKNE ke liye (reranker)
+      //
+      // Reranker ek cross-encoder hai jo SAWAAL ko padhkar faisla karta
+      // hai ki "kya ye ansh iska jawab deta hai". Usmein paryay thoons
+      // dene se sawaal anaad ban jaata hai aur uska faisla bigadta hai —
+      // aur wahi 0.5 ka gate hai jo aaj tak 0 jhoothi citation de raha
+      // hai. Isliye reranker ko hamesha asli sawaal hi jaata hai.
+      const findQ = expandQueryWithParyay(searchQ);
+
       // 1. Cross-book: top 3 per book
-      const crossResults = crossBookSearch(searchQ, null, 3);
+      const crossResults = crossBookSearch(findQ, null, 3);
       const crossFlat = crossResults.flatMap(r => r.results);
 
       // 2. Keyword: direct inverted-index search
-      const kwResults = hybridSearch(searchQ, null, {}, 40);
+      const kwResults = hybridSearch(findQ, null, {}, 40);
 
       // 2.5 REAL semantic search (2026-07-26 fix — see src/knowledge/
       // semanticSearch.js for full context): keyword search sirf exact/
@@ -339,7 +355,7 @@ export function ChatView() {
       // kaam karte rehte hain, yeh sirf ADDITIONAL signal hai.
       let semResults = [];
       try {
-        const semHits = await semanticSearch(searchQ, 50);
+        const semHits = await semanticSearch(findQ, 50);
         semResults = semHits
           .map(h => {
             const chunk = getChunk(h.id);
@@ -398,7 +414,7 @@ export function ChatView() {
       if (hintedBook) {
         const already = [...byId.values()].filter(r => r.chunk.book === hintedBook).length;
         if (already < 3) {
-          const withinBook = hybridSearch(searchQ, null, { book: hintedBook }, 6);
+          const withinBook = hybridSearch(findQ, null, { book: hintedBook }, 6);
           for (const r of withinBook) {
             const existing = byId.get(r.chunk.id);
             if (!existing || r.score > existing.score) byId.set(r.chunk.id, r);

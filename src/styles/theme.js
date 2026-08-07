@@ -32,7 +32,7 @@ export const C = {
 export const HAS_PDF = new Set([
   "agni_purana", "atharvaveda_1", "bhagavad_gita_shankar", "bhavishya_purana",
   "garuda_purana_1", "narasimha_purana", "rigveda_1", "samaveda",
-  "shiva_purana_1", "shiva_purana_2", "valmiki_ramayana", "vishnu_purana_1", "yajurveda",
+  "shiva_purana_1", "shiva_purana_2", "vishnu_purana_1", "yajurveda",
   // Batch 2 — sabhi 11 (badi 3 ko 08_compress_pdf.py se chhota karke host kiya)
   "rashi_muhurt_vigyan", "chanakya_neeti", "ekadashi_mahatmya", "ishadi_upanishad",
   "guru_granth_sahib", "kathopanishad", "ramcharitmanas", "lal_kitab",

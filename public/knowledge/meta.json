@@ -3,7 +3,7 @@
  "schema": "saarthi-knowledge-v2",
  "embed_model": "models/text-embedding-004",
  "embed_dim": 768,
- "total_chunks": 32032,
+ "total_chunks": 57339,
  "books": [
   "agni_purana",
   "atharvaveda_1",
@@ -16,6 +16,7 @@
   "ishadi_upanishad",
   "kathopanishad",
   "lal_kitab",
+  "mahabharata",
   "mantra_maha_sagar",
   "narasimha_purana",
   "nitya_karm_pooja",
@@ -25,7 +26,6 @@
   "samaveda",
   "shiva_purana_1",
   "shiva_purana_2",
-  "valmiki_ramayana",
   "vishnu_purana_1",
   "yajurveda",
   "yoga_vasishtha"

@@ -22,7 +22,7 @@ describe("bookRights — Read section ki adhikar-jaanch", () => {
     const gitaPress = Object.entries(BOOK_RIGHTS)
       .filter(([, r]) => r.pub === "गीता प्रेस")
       .map(([id]) => id);
-    expect(gitaPress.length).toBe(12);
+    expect(gitaPress.length).toBe(13);   // 2026-08-07: Mahabharata bhi Gita Press
     for (const id of gitaPress) expect(canReadFull(id)).toBe(false);
   });
 
@@ -39,7 +39,7 @@ describe("bookRights — Read section ki adhikar-jaanch", () => {
 
   it("sirf public-domain sanskaran khule hain", () => {
     const open = Object.entries(BOOK_RIGHTS).filter(([, r]) => r.access === "open").map(([id]) => id);
-    expect(open.sort()).toEqual(["valmiki_ramayana", "yoga_vasishtha"]);
+    expect(open.sort()).toEqual(["yoga_vasishtha"]);
   });
 });
 
@@ -50,9 +50,9 @@ describe("bookRights — dikhane ka kram", () => {
     ]);
   });
 
-  it("mahabharata ki jagah pehle se rakhi hai (ingest hone par apne aap sahi jagah)", () => {
-    expect(BOOK_ORDER).toContain("mahabharata");
-    expect(BOOK_META.mahabharata).toBeUndefined();   // abhi ingest nahi hui
+  it("mahabharata ab ingest ho chuki hai aur teesre sthan par hai", () => {
+    expect(BOOK_META.mahabharata).toBeDefined();
+    expect(bookRank("mahabharata")).toBe(2);   // 0-indexed: teesra
   });
 
   it("Ved, Puran, Upanishad isi kram mein hain", () => {
@@ -62,9 +62,10 @@ describe("bookRights — dikhane ka kram", () => {
     expect(r("ishadi_upanishad")).toBeLessThan(r("guru_granth_sahib"));
   });
 
-  it("valmiki_ramayana sabse aakhir mein hai (hataya jaana hai)", () => {
-    const ranks = Object.keys(BOOK_META).map(bookRank);
-    expect(bookRank("valmiki_ramayana")).toBe(Math.max(...ranks));
+  it("har maujooda kitab ko kram mila hai (koi aakhir mein nahi girti)", () => {
+    for (const id of Object.keys(BOOK_META)) {
+      expect(bookRank(id), `${id} BOOK_ORDER mein nahi hai`).toBeLessThan(BOOK_ORDER.length);
+    }
   });
 
   it("soochi mein na hone wali id aakhir mein jaati hai, crash nahi karti", () => {

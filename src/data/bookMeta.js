@@ -31,7 +31,20 @@
 //    nahi.
 export const BOOK_META = {
   bhagavad_gita_shankar: { icon:"🕉️", title:"श्रीमद्भगवद्गीता", en:"Shrimad Bhagavad Gita", sub:"शांकरभाष्य सहित — कर्म, भक्ति और ज्ञान का सार", src:"गीता प्रेस, गोरखपुर", srcEn:"Gita Press, Gorakhpur" },
-  valmiki_ramayana:      { icon:"🏹", title:"वाल्मीकि रामायण",   en:"Valmiki Ramayana",     sub:"मर्यादा पुरुषोत्तम श्रीराम की पावन गाथा", src:"अनु. चतुर्वेदी द्वारका प्रसाद शर्मा · राम नारायण लाल, प्रयाग · प्रथम संस्करण 1927", srcEn:"Tr. Chaturvedi Dwarka Prasad Sharma · Ram Narayan Lal, Allahabad · 1st edn. 1927" },
+  // valmiki_ramayana ki jagah (2026-08-07). Wo kitab isliye hatai gayi ki
+  // uska OCR poori tarah kachra tha — 381 akshar/page (baaki ~2,000),
+  // shabd-tootna 0.50 (saaf kitaabein 0.20-0.33), aur ek bhi kand ka naam
+  // nahi milta tha (बालकांड 0, अयोध्या 0, लंका 0). Ramayan ka vishay ab
+  // Ramcharitmanas theek se cover karti hai.
+  //
+  // Mahabharata isliye chuni gayi ki SAARTHI ka kaam logon ki asli
+  // samasyaon ka hal dena hai, aur wahi eval mein sabse bada gap tha:
+  // "पति पत्नी में झगड़ा" par poore corpus mein sirf 1 chunk milta tha.
+  // Mahabharata akele mein पति 5,737 · पत्नी 1,029 · गृहस्थ 460 · कलह 119,
+  // aur विदुर 1,408 (विदुर नीति) · क्षमा 1,135 · कर्तव्य 1,109.
+  // Saare 18 parv maujood hain — शान्तिपर्व aur अनुशासनपर्व sabse zyada,
+  // jo theek margdarshan waale hisse hain.
+  mahabharata:           { icon:"⚔️", title:"महाभारत",           en:"Mahabharata",          sub:"धर्म, कर्तव्य और जीवन-संकट का सबसे गहरा ग्रंथ — विदुर नीति सहित", src:"गीता प्रेस, गोरखपुर · 6 खण्ड", srcEn:"Gita Press, Gorakhpur · 6 volumes" },
   rigveda_1:             { icon:"📜", title:"ऋग्वेद",             en:"Rigveda",              sub:"विश्व का प्राचीनतम ग्रंथ — ऋचाओं का संग्रह", src:"संस्कृत साहित्य प्रकाशन · 2015", srcEn:"Sanskrit Sahitya Prakashan · 2015" },
   samaveda:              { icon:"🎵", title:"सामवेद",             en:"Samaveda",             sub:"संगीत और साम-गान का वेद", src:"प्रकाशक अज्ञात", srcEn:"Publisher unknown" },
   yajurveda:             { icon:"🔥", title:"यजुर्वेद",            en:"Yajurveda",            sub:"यज्ञ-विधि और मंत्रों का वेद", src:"संभवतः मोतीलाल बनारसीदास · 1971 (अपुष्ट)", srcEn:"Possibly Motilal Banarsidass · 1971 (unconfirmed)" },

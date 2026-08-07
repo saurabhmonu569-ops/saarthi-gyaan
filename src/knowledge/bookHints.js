@@ -20,8 +20,26 @@
 export const BOOK_HINTS = {
   "gita": "bhagavad_gita_shankar", "geeta": "bhagavad_gita_shankar",
   "गीता": "bhagavad_gita_shankar", "भगवद गीता": "bhagavad_gita_shankar", "भगवद्गीता": "bhagavad_gita_shankar",
-  "ramayan": "valmiki_ramayana", "ramayana": "valmiki_ramayana",
-  "रामायण": "valmiki_ramayana", "वाल्मीकि": "valmiki_ramayana",
+  // 2026-08-07: valmiki_ramayana hatai gayi (OCR kachra tha — 381 akshar/
+  // page, tootna 0.50, ek bhi kand ka naam nahi). Ramayan ke saare hint
+  // ab Ramcharitmanas par — wahi granth ab saara vishay theek se cover
+  // karta hai (saare 7 kand, हनुमान 356). "वाल्मीकि" bhi yahin isliye ki
+  // user wo naam le to use Ramayan hi chahiye, aur wo ab yahi hai.
+  "ramayan": "ramcharitmanas", "ramayana": "ramcharitmanas",
+  "रामायण": "ramcharitmanas", "वाल्मीकि": "ramcharitmanas",
+  // Mahabharat — "गीता" upar pehle aati hai (Object.entries ka kram =
+  // match ki priority), isliye "गीता में..." aaj bhi Gita par hi jaata hai.
+  // Yeh theek hai: Gita ka apna samarpit granth maujood hai.
+  "mahabharat": "mahabharata", "mahabharata": "mahabharata",
+  "महाभारत": "mahabharata", "विदुर": "mahabharata", "vidur": "mahabharata",
+  "vidur neeti": "mahabharata", "विदुर नीति": "mahabharata",
+  "युधिष्ठिर": "mahabharata", "yudhishthir": "mahabharata",
+  "भीष्म": "mahabharata", "bhishma": "mahabharata",
+  "द्रौपदी": "mahabharata", "draupadi": "mahabharata",
+  "कौरव": "mahabharata", "पांडव": "mahabharata", "पाण्डव": "mahabharata",
+  "kaurav": "mahabharata", "pandav": "mahabharata",
+  "शांतिपर्व": "mahabharata", "शान्तिपर्व": "mahabharata",
+  "अनुशासनपर्व": "mahabharata", "कुरुक्षेत्र": "mahabharata",
   "garud": "garuda_purana_1", "garuda": "garuda_purana_1",
   "गरुड़ पुराण": "garuda_purana_1", "गरुड पुराण": "garuda_purana_1",
   "shiv puran": "shiva_purana_1", "shiva puran": "shiva_purana_1", "शिव पुराण": "shiva_purana_1",
