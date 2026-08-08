@@ -15,17 +15,19 @@
  *      ka faisla kiya? (6 control sawaal — inka sahi natija "kuch nahi
  *      mila" hai. Yahan koi bhi citation JHOOTHI citation hai.)
  *
- * DAAYRA (saaf-saaf): ye sirf SEMANTIC + RERANK raasta naapta hai, jo
- * ChatView ke 85 candidates mein se 45 deta hai. Keyword aur cross-book
- * raaste browser ke inverted index par chalte hain aur yahan shaamil
- * nahi hain — yaani asli app ka recall isse THODA BEHTAR hoga, kharab
- * nahi. Ye number ek FARSH hai, chhat nahi.
+ * DAAYRA (2026-08-07 se POORA): pehle ye sirf SEMANTIC + RERANK naapta
+ * tha — yaani ChatView ke 85 ummeedwaaron mein se 45. Isliye score app ka
+ * aadha hissa dikhata tha (298 sawaal par 55%, jabki app usse behtar
+ * karti hai). Ab keyword search, cross-book search aur detectHintedBook
+ * bhi chalte hain — aur wo bhi engine.js ka ASLI code, dobara likha hua
+ * nahi (upar fetch-shim dekho).
  *
  * CHALAO:
- *   node scripts/eval-ask.mjs --paryay              # Hindi 100, paryay ka asar
- *   node scripts/eval-ask.mjs --new                 # Hindi 100, sirf naya config
- *   node scripts/eval-ask.mjs                       # Hindi 100, purana vs naya vs vistar
- *   node scripts/eval-ask.mjs --hinglish --paryay   # Hinglish 100
+ *   node scripts/eval-ask.mjs --300              # 298 sawaal, POORA raasta
+ *   node scripts/eval-ask.mjs --300 --both       # aadha vs poora, tulna
+ *   node scripts/eval-ask.mjs --300 --paryay     # purana vs paryay (aadha)
+ *   node scripts/eval-ask.mjs --hinglish         # Hinglish 100
+ *   node scripts/eval-ask.mjs                    # Hindi 100, poora
  *
  * Sawaal scripts/eval-questions.json mein hain — nayi sawaal jodne ke liye
  * bas wahi file badlein, ye script chhune ki zaroorat nahi.
@@ -37,6 +39,38 @@ import { readFileSync, existsSync, readdirSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { toDevanagari, expandQueryWithParyay, stripMetaFraming } from "../src/knowledge/translit.js";
+import { detectHintedBook } from "../src/knowledge/bookHints.js";
+
+// ── ENGINE KA ASLI CODE, DOBARA LIKHE BINA (2026-08-07) ──────────────
+//
+// Pehle ye script sirf SEMANTIC + RERANK naapti thi. Asli app teen aur
+// cheezein chalati hai — keyword search, cross-book search, aur
+// detectHintedBook — jo 85 ummeedwaaron mein se 40 dete hain. Un teenon
+// ke bina 55% ka number app ka aadha hissa naap raha tha.
+//
+// Unhe yahan DOBARA LIKHNA sabse aasan tha, par sabse kharab bhi: do
+// copies hamesha alag ho jaati hain, aur phir eval jhooth bolne lagta
+// hai. Isliye engine.js ka ASLI code hi chalate hain.
+//
+// Ek hi rukawat thi — engine.js browser ke liye bana hai aur `fetch` se
+// /knowledge/... uthata hai. Toh yahan fetch par ek patli parat chadha
+// dete hain: /knowledge/ waale raaste disk se padho, baaki (Cloudflare
+// API) asli fetch ko de do. engine.js ko pata bhi nahi chalta.
+const ROOT_DIR = join(dirname(fileURLToPath(import.meta.url)), "..");
+const _realFetch = globalThis.fetch;
+globalThis.fetch = async (url, opts) => {
+  const u = String(url);
+  if (u.startsWith("/knowledge/")) {
+    const p = join(ROOT_DIR, "public", u.replace(/^\//, ""));
+    if (!existsSync(p)) return { ok: false, status: 404, json: async () => ({}) };
+    const txt = readFileSync(p, "utf8");
+    return { ok: true, status: 200, json: async () => JSON.parse(txt) };
+  }
+  return _realFetch(url, opts);
+};
+
+const { loadKnowledge, hybridSearch, crossBookSearch, getChunk, getBookChunks }
+  = await import("../src/knowledge/engine.js");
 
 const ROOT  = join(dirname(fileURLToPath(import.meta.url)), "..");
 const EMB   = join(ROOT, "public", "knowledge", "embeddings");
@@ -51,15 +85,21 @@ const KEEP = 12;                 // ChatView.jsx — kul kitne ansh AI ko jaate 
 // `paryay`: kya query ke saath granth-shabd jode jaayein (2026-08-07)?
 //   dhoondhne mein paryay jodte hain, par RERANK hamesha asli sawaal par —
 //   ChatView.jsx mein bilkul yahi antar hai.
+// `full: true` = teenon raaste (semantic + keyword + cross-book +
+// detectHintedBook) — bilkul ChatView.jsx jaisa. `quota` = SRC_QUOTA.
 const CONFIGS = {
-  purana: { sem: 12, rerank: 20,  paryay: false },
-  naya:   { sem: 50, rerank: 100, paryay: false },
+  purana: { sem: 12, rerank: 20,  paryay: false, full: false },
+  naya:   { sem: 50, rerank: 100, paryay: false, full: false },
+  // sirf paryay, purana aadha-harness — tulna ke liye
+  adha:   { sem: 50, rerank: 100, paryay: true,  full: false },
   // `paryay: true` ab teen cheezein ek saath karta hai —
   //   1. meta-dhaancha hatana ("शास्त्र क्या कहते हैं", "के अनुसार")
   //   2. angrezi shabd ko UNKI JAGAH par Devanagari ("Forgiveness ka
   //      importance" → "क्षमा का महत्व") — jodna nahi, badalna
   //   3. bolchaal → granth-shabd  ("झगड़ा" ke saath "कलह")
-  vistar: { sem: 50, rerank: 100, paryay: true  },
+  vistar: { sem: 50, rerank: 100, paryay: true,  full: false },
+  // POORA — jo asli app chalati hai
+  poora:  { sem: 50, rerank: 100, paryay: true,  full: true, quota: [45, 20, 20] },
 };
 
 // ── Sawaal ────────────────────────────────────────────────────────────
@@ -122,7 +162,11 @@ const CORPUS_SHARE = new Map();   // book → corpus ka hissa (0..1)
   const tot = [...cnt.values()].reduce((a, b) => a + b, 0);
   for (const [k, v] of cnt) CORPUS_SHARE.set(k, v / tot);
 }
-console.log(`  ${n.toLocaleString()} chunks, ${TEXT.size.toLocaleString()} texts\n`);
+console.log(`  ${n.toLocaleString()} chunks, ${TEXT.size.toLocaleString()} texts`);
+// engine.js ka apna knowledge store — keyword aur cross-book iske bina
+// nahi chalte. fetch-shim ki wajah se ye disk se load ho jaata hai.
+const _kOk = await loadKnowledge();
+console.log(`  engine.js knowledge store: ${_kOk ? "load ho gaya ✅" : "FAIL ❌"}\n`);
 
 // ChatView.jsx ke gate — yahan bilkul wahi tark hona chahiye
 const hasSentences = (t) => !!String(t || "").trim() &&
@@ -133,12 +177,33 @@ function looksGarbled(t) {
   return w.filter(x => x.length <= 2).length / w.length > MAX_FRAG;
 }
 
+// QUOTA KHATAM HONE PAR TURANT RUKO (2026-08-07)
+// Pehle aisa nahi tha: quota khatam hui to script 35 minute tak wahi
+// error 298 baar chhapti rahi aur ant mein "0/298" likh diya — jo
+// nateeja LAGTA hai par hai nahi. Ab pehli hi quota-error par rukte
+// hain, taaki jhootha score kabhi na bane.
+function assertQuota(j) {
+  const msg = JSON.stringify(j?.errors || j || "");
+  if (/free allocation|neurons|quota|rate limit/i.test(msg)) {
+    console.error("\n" + "=".repeat(72));
+    console.error("  ⛔ CLOUDFLARE KA QUOTA KHATAM — run rok diya");
+    console.error("=".repeat(72));
+    console.error("  Aaj ke 10,000 free neurons istemal ho chuke hain.");
+    console.error("  Ye NATEEJA NAHI hai — aadha run kabhi score mat maano.\n");
+    console.error("  Do raaste:");
+    console.error("    1. Kal dobara chalayein (quota roz UTC aadhi raat ko reset)");
+    console.error("    2. Workers Paid ($5/mah) — uske baad ek poora run ~$0.03\n");
+    process.exit(2);
+  }
+}
+
 async function embed(text) {
   const r = await fetch(api("@cf/baai/bge-m3"), {
     method: "POST", headers: { Authorization: `Bearer ${TOK}`, "Content-Type": "application/json" },
     body: JSON.stringify({ text: [text], truncate_inputs: true }),
   });
   const j = await r.json();
+  assertQuota(j);
   const raw = (j?.result?.data || j?.data)?.[0];
   if (!raw) throw new Error("embed fail: " + JSON.stringify(j).slice(0, 200));
   let nm = 0; for (const v of raw) nm += v * v; nm = Math.sqrt(nm) || 1;
@@ -157,6 +222,7 @@ async function rerank(query, texts) {
         body: JSON.stringify({ query, contexts: t.map(text => ({ text: text.slice(0, 1200) })), top_k: t.length }),
       });
       const j = await r.json();
+      assertQuota(j);
       const list = j?.result?.response || j?.response;
       if (!Array.isArray(list)) return { at, s: null };
       const s = new Array(t.length).fill(0);
@@ -187,16 +253,65 @@ async function run(query, cfg) {
     for (let d = 0; d < DIM; d++) dot += q8[off + d] * qv[d];
     sc[i] = dot * scales[i] / 127;
   }
-  const top = Array.from({ length: n }, (_, i) => i)
+  // ── SOURCE-BALANCED MERGE — ChatView.jsx jaisa hi ─────────────────
+  // Pehle yahan sirf semantic ke top-N jaate the. Ab teenon raaste, wahi
+  // kote ke saath: semantic 45 + keyword 20 + cross-book 20 = ~85.
+  const semTop = Array.from({ length: n }, (_, i) => i)
     .sort((a, b) => sc[b] - sc[a]).slice(0, cfg.sem)
-    .map(i => ({ id: idx.chunks[i].id, book: idx.chunks[i].book, text: TEXT.get(idx.chunks[i].id) || "" }))
-    .filter(c => c.text)
-    .slice(0, cfg.rerank);
-  if (!top.length) return [];
+    .map(i => ({ id: idx.chunks[i].id, book: idx.chunks[i].book,
+                 text: TEXT.get(idx.chunks[i].id) || "", score: sc[i] }))
+    .filter(c => c.text);
+
+  const byId = new Map();
+  const push = (arr, k) => {
+    for (const r of [...arr].sort((a, b) => b.score - a.score).slice(0, k)) {
+      if (!byId.has(r.id) && r.text) byId.set(r.id, r);
+    }
+  };
+  push(semTop, cfg.quota ? cfg.quota[0] : cfg.sem);
+
+  if (cfg.full) {
+    const asRow = (r) => ({ id: r.chunk.id, book: r.chunk.book,
+                            text: (r.chunk.text || "").trim(), score: r.score });
+    push(hybridSearch(findQ, null, {}, 40).map(asRow), cfg.quota[1]);
+    push(crossBookSearch(findQ, null, 3).flatMap(b => b.results).map(asRow), cfg.quota[2]);
+
+    // detectHintedBook — user ne granth ka naam liya ho to usi granth se
+    // asli ansh milna GUARANTEE karo (ChatView.jsx step 3.6).
+    const hinted = detectHintedBook(query);
+    if (hinted) {
+      const have = [...byId.values()].filter(r => r.book === hinted).length;
+      if (have < 2) {
+        push(hybridSearch(findQ, null, { book: hinted }, 6).map(asRow), 6);
+        const now = [...byId.values()].filter(r => r.book === hinted).length;
+        if (now < 2) {
+          const all = (getBookChunks(hinted) || []).filter(c => (c.text || "").trim().length > 120);
+          for (const frac of [0.15, 0.5, 0.85]) {
+            const c = all[Math.floor(all.length * frac)];
+            if (c && !byId.has(c.id)) byId.set(c.id, { id: c.id, book: c.book, text: c.text.trim(), score: 0.05 });
+          }
+        }
+      }
+    }
+  }
+
+  const top = [...byId.values()].slice(0, cfg.rerank);
+  if (!top.length) { const e = []; e.best = 0; e.pool = 0; return e; }
   const scores = await rerank(rerankQ, top.map(c => c.text));
-  const passed = top
-    .map((c, i) => ({ ...c, rerank: scores[i] }))
-    .filter(c => c.rerank >= MIN_RERANK && hasSentences(c.text) && !looksGarbled(c.text))
+
+  // DIAGNOSIS (2026-08-07): fail hone par sabse zaroori sawaal ye hai —
+  // "koi ansh MILA hi nahi, ya mila par gate ne roka?" Isliye SABSE ACHHA
+  // rerank score sambhal kar rakhte hain, chahe wo gate se neeche ho.
+  //   best 0.45  → jawab tha, 0.5 ke gate ne roka   → gate ki baat hai
+  //   best 0.02  → sach mein kuch tha hi nahi        → corpus ki baat hai
+  // Bina is antar ke gate ko chhedna juaa hoga — aur wahi gate aaj tak
+  // 0 jhoothi citation de raha hai.
+  const scored = top.map((c, i) => ({ ...c, rerank: scores[i] }));
+  const usable = scored.filter(c => hasSentences(c.text) && !looksGarbled(c.text));
+  const best   = usable.length ? Math.max(...usable.map(c => c.rerank)) : 0;
+
+  const passed = usable
+    .filter(c => c.rerank >= MIN_RERANK)
     .sort((a, b) => b.rerank - a.rerank);
 
   // ChatView.jsx ka DIVERSITY step — pehle ye yahan tha hi nahi, isliye eval
@@ -212,13 +327,17 @@ async function run(query, cfg) {
     kept.push(r);
     if (kept.length >= KEEP) break;
   }
+  kept.best = best;         // gate se neeche ho tab bhi
+  kept.pool = top.length;   // kitne ummeedwaar bheje the
   return kept;
 }
 
 // ── chalao ────────────────────────────────────────────────────────────
 const only = process.argv.includes("--new")    ? ["naya"]
+           : process.argv.includes("--full")   ? ["poora"]
+           : process.argv.includes("--both")   ? ["vistar", "poora"]
            : process.argv.includes("--paryay") ? ["naya", "vistar"]
-           : Object.keys(CONFIGS);
+           : ["poora"];
 const summary = {};
 
 for (const name of only) {
@@ -228,6 +347,7 @@ for (const name of only) {
   let hit = 0, grounded = 0, cmpTotal = 0, cmpHit = 0;
   const bookHits = new Map();   // kaun si kitab kitne ansh mein aayi
   const distinct = [];          // har sawaal mein kitni alag kitaabein
+  const failBest = [];          // fail sawaalon ka sabse achha rerank score
   console.log(`  ${"sawaal".padEnd(38)}${"aadhaar".padStart(6)}${"vishay".padStart(6)}  #  granth`);
   console.log("  " + "-".repeat(84));
   for (const { q, any } of QUESTIONS) {
@@ -243,8 +363,13 @@ for (const name of only) {
     for (const c of g) bookHits.set(c.book, (bookHits.get(c.book) || 0) + 1);
     if (bks.length) distinct.push(bks.length);
     const shown = bks.slice(0, 3).map(b => b.slice(0, 13)).join(", ") + (bks.length > 3 ? ` +${bks.length - 3}` : "");
+    // fail par: sabse achha rerank score — yahi batata hai ki gate ki
+    // galti hai ya corpus ki
+    if (!ok) { failBest.push(g.best ?? 0); }
+    const tail = ok ? (shown || "—")
+      : `best-rerank ${(g.best ?? 0).toFixed(3)}` + ((g.best ?? 0) >= 0.30 ? "  ← gate ke kareeb" : "");
     console.log(`  ${(COMPARE.has(q) ? "⇄ " : "  ") + q.slice(0, 34)}`.padEnd(38)
-      + `${(ok ? "✅" : "❌").padStart(6)}${(rel ? "✅" : "❌").padStart(6)}  ${String(bks.length).padStart(2)}  ${shown || "—"}`);
+      + `${(ok ? "✅" : "❌").padStart(6)}${(rel ? "✅" : "❌").padStart(6)}  ${String(bks.length).padStart(2)}  ${tail}`);
   }
   // META — tulna waale sawaal. Inka jawab kisi EK ansh mein ho hi nahi
   // sakta, isliye inhe ALAG gina jaata hai, ASLI SCORE mein nahi. Yahan
@@ -281,6 +406,17 @@ for (const name of only) {
   }
   if (META.length) console.log(`  meta-sawaal  : ${metaOk}/${META.length}  (alag gina — ek ansh se jawab banta hi nahi)`);
   console.log(`  jhoothi cite : ${falseCite}/${CONTROL.length}  (kam = behtar, 0 chahiye)`);
+
+  // ── FAIL KYUN HUE — gate ki galti ya corpus ki? ────────────────────
+  if (failBest.length) {
+    const b = (lo, hi) => failBest.filter(x => x >= lo && x < hi).length;
+    const near = b(0.30, 0.50), mid = b(0.10, 0.30), none = b(0, 0.10);
+    console.log(`\n  FAIL KA VISHLESHAN  —  ${failBest.length} sawaal`);
+    console.log(`    best-rerank 0.30-0.50 : ${String(near).padStart(3)}  ← jawab THA, gate ne roka`);
+    console.log(`    best-rerank 0.10-0.30 : ${String(mid).padStart(3)}  ← kuch mila, par kamzor`);
+    console.log(`    best-rerank 0.00-0.10 : ${String(none).padStart(3)}  ← corpus mein sach mein nahi`);
+    console.log(`    (gate abhi ${MIN_RERANK} par hai)`);
+  }
 
   // ── GRANTH-VITARAN ─────────────────────────────────────────────────
   // Saurabh ne pakda (2026-08-07): "aisa feel hai ki ye har baar same
