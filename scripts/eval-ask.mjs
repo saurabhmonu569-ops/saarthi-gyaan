@@ -36,7 +36,7 @@
 import { readFileSync, existsSync, readdirSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { toDevanagari, expandQueryWithParyay } from "../src/knowledge/translit.js";
+import { toDevanagari, expandQueryWithParyay, stripMetaFraming } from "../src/knowledge/translit.js";
 
 const ROOT  = join(dirname(fileURLToPath(import.meta.url)), "..");
 const EMB   = join(ROOT, "public", "knowledge", "embeddings");
@@ -54,6 +54,11 @@ const KEEP = 12;                 // ChatView.jsx — kul kitne ansh AI ko jaate 
 const CONFIGS = {
   purana: { sem: 12, rerank: 20,  paryay: false },
   naya:   { sem: 50, rerank: 100, paryay: false },
+  // `paryay: true` ab teen cheezein ek saath karta hai —
+  //   1. meta-dhaancha hatana ("शास्त्र क्या कहते हैं", "के अनुसार")
+  //   2. angrezi shabd ko UNKI JAGAH par Devanagari ("Forgiveness ka
+  //      importance" → "क्षमा का महत्व") — jodna nahi, badalna
+  //   3. bolchaal → granth-shabd  ("झगड़ा" ke saath "कलह")
   vistar: { sem: 50, rerank: 100, paryay: true  },
 };
 
@@ -62,7 +67,9 @@ const CONFIGS = {
 // EK sahi ansh mein hona chahiye; ye corpus mein pehle se ginkar chune gaye
 // hain, isliye fail hona = DHOONDHNE ki galti, kitab mein kami nahi.
 const QFILE = JSON.parse(readFileSync(join(ROOT, "scripts", "eval-questions.json"), "utf8"));
-const SET  = process.argv.includes("--hinglish") ? "hinglish_100" : "hindi_100";
+const SET  = process.argv.includes("--300")      ? "hinglish_300"
+           : process.argv.includes("--hinglish") ? "hinglish_100"
+           : "hindi_100";
 const ALL  = QFILE[SET];
 
 // META sawaal alag gine jaate hain — "Mahabharat aur Ramayan mein antar"
@@ -167,9 +174,12 @@ async function rerank(query, texts) {
 
 /** Ek sawaal ka poora raasta — grounded passages lautata hai */
 async function run(query, cfg) {
-  const dev  = toDevanagari(query);
-  // findQ = dhoondhne ke liye (paryay ke saath) | dev = aankne ke liye
-  const findQ = cfg.paryay ? expandQueryWithParyay(dev) : dev;
+  const dev = toDevanagari(query);
+  // ChatView.jsx ka wahi teen-query wala tark:
+  //   rerankQ = meta-dhaancha hataya   → reranker ko
+  //   findQ   = rerankQ + granth-paryay → dhoondhne ko
+  const rerankQ = cfg.paryay ? stripMetaFraming(dev) : dev;
+  const findQ   = cfg.paryay ? expandQueryWithParyay(rerankQ) : dev;
   const qv = await embed(findQ);
   const sc = new Float64Array(n);
   for (let i = 0; i < n; i++) {
@@ -183,7 +193,7 @@ async function run(query, cfg) {
     .filter(c => c.text)
     .slice(0, cfg.rerank);
   if (!top.length) return [];
-  const scores = await rerank(dev, top.map(c => c.text));
+  const scores = await rerank(rerankQ, top.map(c => c.text));
   const passed = top
     .map((c, i) => ({ ...c, rerank: scores[i] }))
     .filter(c => c.rerank >= MIN_RERANK && hasSentences(c.text) && !looksGarbled(c.text))

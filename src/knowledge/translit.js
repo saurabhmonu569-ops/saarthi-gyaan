@@ -135,6 +135,11 @@ const WORDS = {
   // ho to Hindi arth hi sahi hai. Naapa: 97 aam function words mein se
   // sirf yahi 4 Latin mein reh rahe the.
   ne: "ने", jo: "जो", us: "उस", in: "इन", inn: "इन",
+  // "main" par ek do-arthi maamla hai: Hindi mein "मैं" (I), angrezi
+  // mein "mukhya". Upar `main: "मैं"` pehle se hai aur wahi rehne diya —
+  // user "main pareshan hu" zyada likhta hai bajaye "main message" ke.
+  // "Ramayan ka main message" mein arth phir bhi bach jaata hai kyunki
+  // EN_CONCEPT "message" ko "संदेश" bana deta hai.
 
   // ── 100 ASLI SAWAALON SE MILI KAMIYAN (2026-08-07) ────────────────────
   //
@@ -168,6 +173,23 @@ const WORDS = {
   dekhna: "देखना", samajhna: "समझना", sunna: "सुनना", bolne: "बोलने",
   sochna: "सोचना", jeetna: "जीतना", haarna: "हारना", chhodna: "छोड़ना",
   chhodi: "छोड़ी", chhoda: "छोड़ा", milta: "मिलता", milti: "मिलती",
+
+  // 298 sawaalon par mile do aur matlab-badalne wale takrav:
+  //     shastra → शस्त्र  (hathiyaar!)  — chahiye शास्त्र (granth)
+  //     kaha    → कहाँ    (kahan/where) — chahiye कहा (said)
+  // "kaha gaya hai" bahut aam vaakya hai; uska matlab "kahan chala gaya"
+  // ban raha tha. Inke saath kehna/kehte/kehti ke roop bhi jode.
+  shastra: "शास्त्र", shastron: "शास्त्रों", shaastra: "शास्त्र",
+  kaha: "कहा", kahe: "कहे", kahi: "कही", kahin: "कहीं",
+  kehte: "कहते", kehta: "कहता", kehti: "कहती", kehna: "कहना",
+  karne: "करने", karke: "करके", karta: "करता", karti: "करती",
+  hone: "होने", hoti: "होती", hone_ke: "होने के",
+  jaata: "जाता", jaati: "जाती", jaate: "जाते",
+  dete: "देते", deti: "देती", deta: "देता",
+  lete: "लेते", leti: "लेती", leta: "लेता",
+  batao: "बताओ", bataya: "बताया", batate: "बताते",
+  samjhao: "समझाओ", samjhaya: "समझाया", samjha: "समझा",
+  seekh: "सीख", seekhne: "सीखने", sikhe: "सीखे",
 
   // sabse aam — "sabse" akele 12 sawaalon mein tha
   sabse: "सबसे", kaunsa: "कौनसा", kaunsi: "कौनसी", kounsa: "कौनसा",
@@ -609,6 +631,25 @@ export const GRANTH_PARYAY = {
   "गलतियों": ["दोष", "प्रमाद"],    "गलतियाँ": ["दोष", "प्रमाद"],
   "झगड़े": ["कलह", "विवाद"],       "झगड़ों": ["कलह", "विवाद"],
   "लड़ाइयाँ": ["युद्ध"],           "नौकरियाँ": ["सेवा", "वृत्ति"],
+
+  // ── 2026-08-07 ke fail sawaalon se ──────────────────────────────────
+  // Ye shabd corpus mein lagbhag hain hi nahi, par unka BHAAV bharpoor
+  // maujood hai. Bina pul ke ye sawaal hamesha khaali lautte the.
+  //     हिसाब 58 hits      → कर्मफल/फल/यम        ("कर्मों का हिसाब")
+  //     आत्मविश्वास 6      → धैर्य/बल/साहस
+  //     राजयोग 44          → योग/समाधि
+  //     संतुलन 20          → समता
+  //     तनाव 38            → उद्वेग/क्लेश        (upar chinta bhi hai)
+  //     सकारात्मक 4        → शुभ
+  //     नकारात्मक ~0       → अशुभ/दोष
+  "हिसाब": ["फल", "यम"],           "आत्मविश्वास": ["धैर्य", "बल", "साहस"],
+  "राजयोग": ["योग", "समाधि"],      "संतुलन": ["समता"],
+  "सकारात्मक": ["शुभ"],            "नकारात्मक": ["अशुभ", "दोष"],
+  "एकाग्रता": ["एकाग्र", "धारणा"], "जागरूकता": ["जाग्रत", "विवेक"],
+  "ऊर्जा": ["तेज", "ओज", "प्राण"], "शक्तिशाली": ["बलवान", "समर्थ"],
+  // NOTE: "रहस्य" (1,114 hits) aur "आदर्श" (106) yahan JAAN-BOOJH KAR
+  // nahi hain — wo khud corpus mein kaafi hain, paryay jodna sirf shor
+  // badhata. Naksha mein wahi shabd aate hain jo corpus mein hain hi nahi.
 };
 
 /**
@@ -621,12 +662,163 @@ export function expandQueryWithParyay(text) {
   const s = String(text || "");
   if (!s.trim()) return s;
   const add = [];
+  // 1. Devanagari bolchaal → granth-shabd
   for (const [bol, paryay] of Object.entries(GRANTH_PARYAY)) {
     if (!s.includes(bol)) continue;
     for (const p of paryay) if (!s.includes(p) && !add.includes(p)) add.push(p);
   }
   return add.length ? `${s} ${add.join(" ")}` : s;
 }
+
+/**
+ * Angrezi vishay-shabd ko UNKI APNI JAGAH par Devanagari kar do.
+ *
+ * ⚠️ SUDHAAR (2026-08-07, dopahar): pehle ye shabd query ke AAKHIR mein
+ * jode jaate the — "Jealousy को कैसे control करे? ईर्ष्या". Us soorat
+ * mein query ka dhaancha angrezi hi rehta tha aur embedding par angrezi
+ * token haavi rehte the. Ab badal-kar-wahin rakhte hain —
+ *     "ईर्ष्या को कैसे control करे?"
+ * — vaakya Hindi ka Hindi rehta hai aur shabd sahi jagah baithta hai.
+ *
+ * Shabd-seema (\b) zaroori hai warna "mind" ko "reminder" ke andar bhi
+ * pakad leta. Bade-chhote akshar dono chalte hain (user "Ego" bhi likhta
+ * hai aur "ego" bhi).
+ */
+export function mapEnglishConcepts(text) {
+  let s = String(text || "");
+  if (!s) return s;
+  for (const [en, hi] of Object.entries(EN_CONCEPT)) {
+    s = s.replace(new RegExp(`\\b${en}\\b`, "gi"), hi);
+  }
+  return s;
+}
+
+/**
+ * META-DHAANCHA HATAO (2026-08-07)
+ * =====================================================================
+ * ASLI GHATNA: "क्रोध को नियंत्रित करने के लिए शास्त्र क्या कहते हैं?"
+ * par retrieval ne 0 ansh diye — jabki corpus mein krodh-niyantran par
+ * 464 chunks hain. Aise hi "इच्छाओं को नियंत्रित…" (349 chunks) aur
+ * "आत्मविश्वास बढ़ाने के लिए आध्यात्मिक ज्ञान क्या कहता है".
+ *
+ * JAD: "शास्त्र क्या कहते हैं" / "क्या कहता है" jaise shabd sawaal ko
+ * VISHAY se hata kar KITAB par le jaate hain. Reranker ek cross-encoder
+ * hai — wo poochta hai "kya ye ansh batata hai ki SHASTRA KYA KEHTE
+ * HAIN". Jo ansh seedha "क्रोध को त्यागे" kehta hai, wo is ghumaav-daar
+ * sawaal par pass nahi hota. Ansh maujood tha, sawaal ka dhaancha
+ * raaste mein aa gaya.
+ *
+ * Ye SIRF dhoondhne/aankne ki query se hatte hain. AI ke prompt mein
+ * user ka sawaal poora jaata hai — jawab ki bhasha nahi badalti.
+ *
+ * Kitab ka naam JAAN-BOOJH KAR nahi hataya: "गीता के अनुसार" mein sirf
+ * "के अनुसार" jaata hai, "गीता" rehti hai — warna detectHintedBook aur
+ * book-grounding dono toot jaate.
+ */
+const META_FRAMES = [
+  /\s*(?:के|का|की)\s*अनुसार\s*/g,
+  /\s*शास्त्र(?:ों)?\s*(?:में)?\s*क्या\s*(?:कहते|कहता|कहती)\s*(?:हैं|है)\s*/g,
+  /\s*(?:आध्यात्मिक\s*)?ज्ञान\s*क्या\s*(?:कहता|कहती)\s*है\s*/g,
+  /\s*क्या\s*(?:कहते|कहता|कहती)\s*(?:हैं|है)\s*/g,
+  /\s*में\s*क्या\s*(?:बताया|कहा|लिखा)\s*गया\s*है\s*/g,
+  /\s*के\s*बारे\s*में\s*/g,
+  /\s*ke\s+(?:according|anusaar)\s*/gi,
+];
+
+/**
+ * Angrezi ka DHAANCHA-SHOR — sirf wo shabd jo SACH MEIN khaali hain.
+ *
+ * ⚠️ SUDHAAR (2026-08-07, dopahar): pehli koshish mein maine "meaning",
+ * "importance", "significance", "difference" ko bhi shor maan kar hata
+ * diya tha. Wo GALTI thi — 298 sawaalon par chalane se dikha ki wahi
+ * shabd sawaal ka matlab the, aur unhe hatane se sirf THOONTH bachta tha:
+ *     "Seva ka spiritual meaning kya hai?"   → "सेवा का क्या है?"
+ *     "Forgiveness ka importance kya hai?"   → "Forgiveness का क्या है?"
+ * Aisi khaali query par reranker kuch bhi pass nahi karta — isliye दान
+ * (21,097 baar corpus mein) par bhi 0 jawab aaya.
+ *
+ * Ab wo shabd HATTE nahi, EN_CONCEPT mein BADALTE hain (meaning→अर्थ,
+ * importance→महत्व/माहात्म्य). Yahan sirf wahi bache hain jinka koi
+ * Devanagari joda hai hi nahi aur jo query mein kuch nahi jodte.
+ */
+const EN_NOISE = new RegExp(
+  "\\b(?:spiritual(?:ly|ity)?|actual(?:ly)?|real(?:ly)?|according|"
+  + "view|point|simple|basic|proper|exact|complete|full)\\b",
+  "gi");
+
+export function stripMetaFraming(text) {
+  let s = String(text || "");
+  for (const re of META_FRAMES) s = s.replace(re, " ");
+  s = s.replace(EN_NOISE, " ");
+  s = mapEnglishConcepts(s);   // angrezi vishay-shabd → Devanagari, wahin par
+  // meta hatne ke baad akela bacha "?" ya "," saaf karo
+  s = s.replace(/\s+([?,.])/g, "$1").replace(/\s+/g, " ").trim();
+  s = s.replace(/^[\s?,.]+|[\s,.]+$/g, "");
+  return s || String(text || "");
+}
+
+/**
+ * Angrezi VISHAY-shabd → granth ka shabd (2026-08-07).
+ *
+ * KYUN: user Hinglish likhta hai par mool shabd aksar angrezi hi rakhta
+ * hai — "Consciousness kya hoti hai", "destiny change kar sakta hai",
+ * "attachment aur love me difference". Ye shabd Devanagari corpus se
+ * kabhi match nahi karte. Keyword search ke liye to bilkul bekaar hain.
+ *
+ * Sirf wahi shabd yahan hain jinka granth mein SAAF ek shabd hai. Jinka
+ * nahi (leadership, mindfulness, energy) unhe chhod diya — jhootha
+ * paryay na paryay se bura hai.
+ */
+export const EN_CONCEPT = {
+  // sawaal ka DHAANCHA — ye pehle "shor" maane the, par ye hi sawaal ka
+  // matlab hain. Hatane se query thoonth ban jaati thi.
+  meaning: "अर्थ", importance: "महत्व", significance: "माहात्म्य",
+  difference: "भेद", concept: "स्वरूप", purpose: "उद्देश्य",
+  benefit: "लाभ", effect: "प्रभाव", reason: "कारण", result: "फल",
+  types: "प्रकार", qualities: "गुण", rules: "नियम", lesson: "शिक्षा",
+  message: "संदेश", secret: "रहस्य", nature: "स्वरूप", state: "अवस्था",
+  // vishay ke shabd
+  soul: "आत्मा", atma: "आत्मा", consciousness: "चेतना", awareness: "चेतना",
+  mind: "मन", intellect: "बुद्धि", ego: "अहंकार", thoughts: "विचार",
+  destiny: "प्रारब्ध", fate: "प्रारब्ध", luck: "दैव",
+  death: "मृत्यु", rebirth: "पुनर्जन्म", birth: "जन्म",
+  liberation: "मोक्ष", salvation: "मोक्ष", meditation: "ध्यान",
+  devotion: "भक्ति", worship: "पूजा", prayer: "प्रार्थना",
+  sacrifice: "त्याग", charity: "दान", service: "सेवा",
+  forgiveness: "क्षमा", patience: "धैर्य", anger: "क्रोध",
+  fear: "भय", desire: "काम", greed: "लोभ", attachment: "आसक्ति",
+  jealousy: "ईर्ष्या", happiness: "सुख", suffering: "दुःख",
+  peace: "शान्ति", truth: "सत्य", knowledge: "ज्ञान", wisdom: "विवेक",
+  ignorance: "अज्ञान", illusion: "माया", creation: "सृष्टि",
+  universe: "जगत", duty: "कर्तव्य", discipline: "संयम",
+  anxiety: "चिन्ता", stress: "क्लेश", gratitude: "कृतज्ञता",
+  humility: "विनय", compassion: "करुणा", friendship: "मित्रता",
+  enemy: "शत्रु", wealth: "धन", money: "धन", food: "आहार",
+  guru: "गुरु", teacher: "आचार्य", student: "शिष्य", family: "कुटुम्ब",
+  chanting: "जप", mantra: "मन्त्र", breath: "प्राण", body: "शरीर",
+  life: "जीवन", success: "सिद्धि", failure: "पराजय", growth: "उन्नति",
+  // granth aur paribhashik naam — ye Latin mein hi reh jaate the
+  vedas: "वेद", veda: "वेद", upanishads: "उपनिषद", upanishad: "उपनिषद",
+  puranas: "पुराण", purana: "पुराण", gita: "गीता", ramayan: "रामायण",
+  mahabharat: "महाभारत", vedanta: "वेदान्त", advaita: "अद्वैत",
+  dvaita: "द्वैत", triguna: "गुण", sattva: "सत्त्व", rajas: "रजस",
+  tamas: "तमस", sadguru: "सद्गुरु", samadhi: "समाधि", yoga: "योग",
+  karma: "कर्म", dharma: "धर्म", moksha: "मोक्ष", bhakti: "भक्ति",
+  atman: "आत्मा", brahman: "ब्रह्म", maya: "माया", chakra: "चक्र",
+  chakras: "चक्र", kundalini: "कुण्डलिनी", pranayama: "प्राणायाम",
+  mindfulness: "एकाग्रता", nishkam: "निष्काम", sthitaprajna: "स्थितप्रज्ञ",
+  // 298 sawaalon par chalane ke baad bache hue aam shabd
+  scriptures: "शास्त्र", scripture: "शास्त्र", control: "संयम",
+  problems: "कष्ट", problem: "कष्ट", solution: "समाधान",
+  relation: "सम्बन्ध", relationship: "सम्बन्ध", connection: "सम्बन्ध",
+  character: "चरित्र", decision: "निर्णय", war: "युद्ध",
+  avatar: "अवतार", science: "विज्ञान", students: "विद्यार्थी",
+  student_life: "विद्यार्थी", career: "वृत्ति", balance: "समता",
+  emotions: "भाव", healing: "आरोग्य", disease: "रोग", health: "आरोग्य",
+  journey: "यात्रा", practice: "अभ्यास", teachings: "शिक्षा",
+  summary: "सार", story: "कथा", king: "राजा", warrior: "योद्धा",
+  equality: "समानता", surrender: "शरण", sacrifice_tyag: "त्याग",
+};
 
 export function normalizeQueryForSearch(text) {
   const original = text;

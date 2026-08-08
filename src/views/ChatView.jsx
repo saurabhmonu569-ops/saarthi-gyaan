@@ -11,7 +11,7 @@ import { BOOKS } from "@/data";
 import { useT } from "@/i18n";
 import { detectHintedBook } from "@/knowledge/bookHints";
 import { semanticSearch, preloadSemanticSearch, rerankPassages, RERANK_MAX_TOTAL } from "@/knowledge/semanticSearch";
-import { normalizeQueryForSearch, expandQueryWithParyay } from "@/knowledge/translit";
+import { normalizeQueryForSearch, expandQueryWithParyay, stripMetaFraming } from "@/knowledge/translit";
 
 // ── RELEVANCE GATE (item #17, 2026-08-03) ────────────────────────────────
 // 13 sawaalon par naapa gaya. Reranker ka score bimodal nikla:
@@ -324,19 +324,24 @@ export function ChatView() {
 
       // 0.5 GRANTH-PARYAY (2026-08-07)
       //
-      // searchQ  = user ka sawaal, Devanagari mein (Hinglish ho to badla hua)
-      // findQ    = wahi + granth ke paryay  ("झगड़ा" ke saath "कलह विवाद")
+      // Teen alag query, teen alag kaam (2026-08-07):
       //
-      // Ye antar JAAN-BOOJH KAR hai:
-      //   findQ  → DHOONDHNE ke liye (keyword, cross-book, semantic)
-      //   searchQ → AANKNE ke liye (reranker)
+      //   query   = user ka asli sawaal   → AI ke PROMPT mein (achhoota)
+      //   rerankQ = meta-dhaancha hataya  → RERANKER ko
+      //   findQ   = rerankQ + granth-paryay → DHOONDHNE ko
       //
-      // Reranker ek cross-encoder hai jo SAWAAL ko padhkar faisla karta
-      // hai ki "kya ye ansh iska jawab deta hai". Usmein paryay thoons
-      // dene se sawaal anaad ban jaata hai aur uska faisla bigadta hai —
-      // aur wahi 0.5 ka gate hai jo aaj tak 0 jhoothi citation de raha
-      // hai. Isliye reranker ko hamesha asli sawaal hi jaata hai.
-      const findQ = expandQueryWithParyay(searchQ);
+      // KYUN rerankQ se meta hataya: "क्रोध को नियंत्रित करने के लिए
+      // शास्त्र क्या कहते हैं?" par 0 ansh mile the — jabki corpus mein
+      // krodh-niyantran par 464 chunks hain. Reranker cross-encoder hai;
+      // "शास्त्र क्या कहते हैं" use KITAB ke baare mein sawaal lagta hai,
+      // vishay ke baare mein nahi. Wahi dhaancha hata dene se sawaal
+      // seedha ho jaata hai: "क्रोध को नियंत्रित करने के लिए".
+      //
+      // KYUN findQ alag: paryay sirf UMMEEDWAAR dhoondhne ke liye hain.
+      // Reranker ko paryay dene se sawaal anaad ho jaata hai aur wahi
+      // 0.5 ka gate bigadta hai jo aaj tak 0 jhoothi citation de raha hai.
+      const rerankQ = stripMetaFraming(searchQ);
+      const findQ   = expandQueryWithParyay(rerankQ);
 
       // 1. Cross-book: top 3 per book
       const crossResults = crossBookSearch(findQ, null, 3);
@@ -512,7 +517,7 @@ export function ChatView() {
       if (!cleaned.length) { setSacredChunks([]); return []; }
 
       // ── RELEVANCE GATE ────────────────────────────────────────────────
-      const scores = await rerankPassages(searchQ, cleaned.map(r => r.chunk.text.slice(0, 1200)));
+      const scores = await rerankPassages(rerankQ, cleaned.map(r => r.chunk.text.slice(0, 1200)));
 
       let kept;
       if (scores) {
