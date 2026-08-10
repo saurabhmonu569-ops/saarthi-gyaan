@@ -232,6 +232,65 @@ const WORDS = {
   narasimha: "नृसिंह", mahabharat: "महाभारत", bhagavad: "भगवद्",
   dashavatar: "दशावतार", nachiketa: "नचिकेता", maryada: "मर्यादा",
   purushottam: "पुरुषोत्तम", kaliyug: "कलियुग", brahman: "ब्रह्म",
+
+  // ── RAMAYAN KE NAAM (2026-08-10, user ne pakda) ────────────────────
+  //
+  // ASLI GHATNA: "Bharat ji jab Ram ko wapas lane van gaye to unki Ram se
+  // kya baat hui?" — is sawaal ka jawab MAHABHARAT (p.4103) se aaya, aur
+  // Ramcharitmanas gate tak pahuncha hi nahi (gate-paar sirf 2, best 0.526).
+  //
+  // Jad do shabd the:
+  //     bharat → भारत   (Ram ka bhai NAHI, DESH!)
+  //     van    → वां     (bilkul bekaar)
+  //
+  // "भारत" par sabse bada dher kahan milega? महा-भारत mein. Yaani
+  // transliteration khud sawaal ko galat granth ki taraf le ja rahi thi.
+  // Ye wahi kism ka bug hai jo pehle `war → वर` mein tha.
+  //
+  // Jaanchne par pata chala ye akela nahi tha — 38 Ramayan-shabdon mein se
+  // 19 transliterate ho hi nahi rahe the (Latin mein hi jaate the, jahan
+  // corpus mein unka koi match nahi):
+  //   ayodhya, kaikeyi, dashrath, sugriv, kumbhkaran, chitrakoot, paduka,
+  //   jatayu, kewat, meghnad, sanjeevani, setu, agnipariksha, mandodari,
+  //   urmila, shatrughna, angad, panchvati, laxman (spelling)
+  //
+  // Ye WORDS mein hain, LEXICON mein nahi, kyunki toDevanagari() pehle
+  // WORDS dekhta hai — corpus-lexicon ka fuzzyKey inhi par ya to fail
+  // hota hai ya galat jagah le jaata hai.
+  //
+  // ⚠️ bharat = भरत ka faisla: "bharat" ka doosra matlab DESH bhi hai.
+  // Par ye granth-app hai — yahan "Bharat ne Ram se kya kaha" jaise sawaal
+  // "Bharat desh" se kai guna zyada aate hain. Desh wale artha ke liye
+  // shastriya shabd bharatvarsh hai, jo alag se neeche joda hai.
+  bharat: "भरत", bharatji: "भरत", bharatvarsh: "भारतवर्ष",
+  bharatvarsha: "भारतवर्ष",
+  van: "वन", vann: "वन",
+  laxman: "लक्ष्मण", lakshmana: "लक्ष्मण", laxmana: "लक्ष्मण",
+  shatrughna: "शत्रुघ्न", shatrughan: "शत्रुघ्न",
+  dashrath: "दशरथ", dasharath: "दशरथ", dashratha: "दशरथ",
+  kaikeyi: "कैकेयी", kaikai: "कैकेयी", kausalya: "कौसल्या",
+  sumitra: "सुमित्रा", urmila: "उर्मिला", mandavi: "माण्डवी",
+  sugriv: "सुग्रीव", sugreev: "सुग्रीव", bali: "बालि", baali: "बालि",
+  angad: "अंगद", jambavan: "जाम्बवान्", nal: "नल", neel: "नील",
+  jatayu: "जटायु", sampati: "सम्पाति", kewat: "केवट", kevat: "केवट",
+  guh: "गुह", nishad: "निषाद",
+  kumbhkaran: "कुम्भकर्ण", kumbhakarna: "कुम्भकर्ण",
+  meghnad: "मेघनाद", meghnath: "मेघनाद", indrajit: "इन्द्रजित्",
+  mandodari: "मन्दोदरी", surpanakha: "शूर्पणखा", shurpanakha: "शूर्पणखा",
+  mareech: "मारीच", marich: "मारीच", tadka: "ताड़का", taraka: "ताड़का",
+  ahalya: "अहल्या", ahilya: "अहल्या", gautam: "गौतम",
+  vishwamitra: "विश्वामित्र", vasishth: "वसिष्ठ", vashishth: "वसिष्ठ",
+  parshuram: "परशुराम", parashuram: "परशुराम", janak: "जनक",
+  ayodhya: "अयोध्या", mithila: "मिथिला", kishkindha: "किष्किन्धा",
+  chitrakoot: "चित्रकूट", panchvati: "पञ्चवटी", panchavati: "पञ्चवटी",
+  dandakvan: "दण्डकवन", ashokvatika: "अशोकवाटिका",
+  paduka: "पादुका", padukayen: "पादुका",
+  sanjeevani: "संजीवनी", sanjivani: "संजीवनी",
+  setu: "सेतु", ramsetu: "रामसेतु",
+  agnipariksha: "अग्निपरीक्षा", vanvaas: "वनवास",
+  swayamvar: "स्वयंवर", swayamvara: "स्वयंवर",
+  // sarvanaam jo LEXICON se chhoot rahe the
+  unki: "उनकी", unke: "उनके", unko: "उनको", unhe: "उन्हें",
   // NOTE: angrezi shabd (depression, leadership, practical, business,
   // confusion, discipline, support, values) JAAN-BOOJH KAR nahi jode.
   // Unka Devanagari roop corpus mein hai hi nahi ("डिप्रेशन" 0 baar),

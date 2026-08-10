@@ -474,13 +474,13 @@ function BookLocked({ book, onBack }) {
   );
 }
 
-export function BooksView() {
+export function BooksView({ active = false }) {
   const t = useT();
   const [book,   setBook]   = useState(null);
   const [search, setSearch] = useState("");
   const { lastChapter } = useBookProgress();
   const { ready: knowledgeReady, getBooks: getEngineBooks, getChapters: getEngineChapters,
-          getBookChunks, getChapterChunks, hybridSearch } = useKnowledge({ load: true });
+          getBookChunks, getChapterChunks, hybridSearch } = useKnowledge({ load: active });
 
   // PURANA SEEDHA ANDAZ (user ki pasand): naam dabao → poori ASLI PDF khule.
   //

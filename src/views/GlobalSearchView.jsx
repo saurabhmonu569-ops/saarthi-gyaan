@@ -13,11 +13,11 @@ import { C, F } from "@/styles/theme";
 import { Prose, cleanOcrText } from "@/components/ui/Primitives";
 import { QuotaPill } from "@/views/AuthWidgets";
 
-export function GlobalSearchView({ onNav }) {
+export function GlobalSearchView({ onNav, active = false }) {
   const t = useT();
   const { uiLang } = useUiLang();
   const { profile } = useAuth();
-  const { ready, hybridSearch, crossBookSearch } = useKnowledge({ load: true });
+  const { ready, hybridSearch, crossBookSearch } = useKnowledge({ load: active });
   const [query,   setQuery]   = useState("");
   const [results, setResults] = useState([]); // SearchResult[]
   const [mode,    setMode]    = useState("cross"); // "cross" | "single"

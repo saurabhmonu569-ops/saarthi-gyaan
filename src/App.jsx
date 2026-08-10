@@ -136,10 +136,15 @@ export default function App() {
   });
   const [tab,     setTab]     = useState("home");
 
+  // Kaun-kaun se tab user ab tak khol chuka hai. Read aur Search ka 258 MB
+  // ka corpus isi se bandha hai — neeche <BooksView active=…> dekhein.
+  const [visited, setVisited] = useState(() => new Set(["home"]));
+
   // Stop all audio whenever the user navigates to a different tab
   const navigate = (newTab) => {
     if (newTab !== tab) AudioEngine.stop();
     setTab(newTab);
+    setVisited(prev => prev.has(newTab) ? prev : new Set(prev).add(newTab));
   };
 
   const boot = () => {
@@ -228,15 +233,33 @@ export default function App() {
             </ErrorBoundary>
           </div>
 
+          {/* ⚠️ `visited` — 258 MB kab utre (P2 fix, 2026-08-10)
+              SAARE views ek saath mount hote hain aur sirf CSS se chhupte
+              hain (viewPane: visibility hidden). Iska matlab BooksView aur
+              GlobalSearchView app khulte hi mount ho jaate the — aur unka
+              useKnowledge({ load: true }) 258 MB khinchna shuru kar deta,
+              chahe user kabhi Read/Search tab par jaaye hi na.
+
+              Ye galti maine PEHLI baar mein kar di thi: maine samjha ki
+              `load: true` sirf "jab user wahan jaaye" wala matlab rakhta
+              hai. Live console ne pakda —
+                  [KnowledgeEngine] Loaded 57339 chunks
+              Ask ke sawaal ke saath hi chhap raha tha, jabki Ask ko us data
+              ki ab zaroorat hi nahi.
+
+              Ab load tabhi shuru hota hai jab user us tab par PEHLI BAAR
+              jaata hai. `visited` — `tab === id` nahi — kyunki wapas aane
+              par download dobara shuru nahi hona chahiye; ek baar utar gaya
+              to utar gaya. */}
           <div style={viewPane("books")}>
             <ErrorBoundary name="Books">
-              <BooksView />
+              <BooksView active={visited.has("books")} />
             </ErrorBoundary>
           </div>
 
           <div style={viewPane("search")}>
             <ErrorBoundary name="Search">
-              <GlobalSearchView onNav={navigate} />
+              <GlobalSearchView onNav={navigate} active={visited.has("search")} />
             </ErrorBoundary>
           </div>
 
