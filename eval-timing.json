@@ -1,0 +1,571 @@
+[
+ {
+  "q": "आत्मा और मन में क्या अंतर है?",
+  "set": "hindi_100",
+  "books": [
+   "yoga_vasishtha",
+   "mahabharata"
+  ],
+  "n": 11,
+  "ms": 7168,
+  "best": 0.6313,
+  "hinted": null,
+  "t": null
+ },
+ {
+  "q": "मनुष्य को अपने जीवन का उद्देश्य कैसे पता चलता है?",
+  "set": "hindi_100",
+  "books": [
+   "yoga_vasishtha",
+   "mahabharata",
+   "guru_granth_sahib",
+   "garuda_purana_1",
+   "ishadi_upanishad",
+   "nitya_karm_pooja"
+  ],
+  "n": 18,
+  "ms": 2922,
+  "best": 1,
+  "hinted": null,
+  "t": null
+ },
+ {
+  "q": "सच्ची शांति प्राप्त करने का सबसे सरल मार्ग क्या है?",
+  "set": "hindi_100",
+  "books": [
+   "yoga_vasishtha",
+   "mahabharata",
+   "chanakya_neeti",
+   "atharvaveda_1"
+  ],
+  "n": 14,
+  "ms": 2506,
+  "best": 0.9971,
+  "hinted": null,
+  "t": null
+ },
+ {
+  "q": "क्रोध को नियंत्रित करने के लिए शास्त्र क्या कहते हैं?",
+  "set": "hindi_100",
+  "books": [],
+  "n": 0,
+  "ms": 2128,
+  "best": 0.0331,
+  "hinted": null,
+  "t": null
+ },
+ {
+  "q": "मोह और प्रेम में क्या अंतर होता है?",
+  "set": "hindi_100",
+  "books": [
+   "yoga_vasishtha",
+   "ramcharitmanas"
+  ],
+  "n": 6,
+  "ms": 6736,
+  "best": 0.8398,
+  "hinted": null,
+  "t": null
+ },
+ {
+  "q": "अच्छे कर्मों का फल कब और कैसे मिलता है?",
+  "set": "hindi_100",
+  "books": [
+   "mahabharata",
+   "shiva_purana_2",
+   "garuda_purana_1",
+   "bhagavad_gita_shankar",
+   "shiva_purana_1"
+  ],
+  "n": 15,
+  "ms": 2077,
+  "best": 0.9039,
+  "hinted": null,
+  "t": null
+ },
+ {
+  "q": "भाग्य और कर्म में कौन अधिक शक्तिशाली है?",
+  "set": "hindi_100",
+  "books": [
+   "mahabharata",
+   "rigveda_1",
+   "shiva_purana_2",
+   "ishadi_upanishad",
+   "agni_purana",
+   "rashi_muhurt_vigyan",
+   "yoga_vasishtha",
+   "chanakya_neeti"
+  ],
+  "n": 18,
+  "ms": 6843,
+  "best": 0.9991,
+  "hinted": null,
+  "t": null
+ },
+ {
+  "q": "भगवान से जुड़ने का सही तरीका क्या है?",
+  "set": "hindi_100",
+  "books": [
+   "ishadi_upanishad",
+   "mahabharata",
+   "rashi_muhurt_vigyan",
+   "chanakya_neeti",
+   "guru_granth_sahib",
+   "yajurveda",
+   "garuda_purana_1",
+   "mantra_maha_sagar"
+  ],
+  "n": 18,
+  "ms": 2370,
+  "best": 0.9996,
+  "hinted": null,
+  "t": {
+   "embed": 189,
+   "vectorize": 238,
+   "fts": 711,
+   "d1-text": 127,
+   "rerank": 711
+  }
+ },
+ {
+  "q": "ध्यान करते समय मन को स्थिर कैसे करें?",
+  "set": "hindi_100",
+  "books": [
+   "mahabharata",
+   "shiva_purana_2",
+   "agni_purana",
+   "garuda_purana_1",
+   "ishadi_upanishad",
+   "yoga_vasishtha",
+   "bhagavad_gita_shankar"
+  ],
+  "n": 17,
+  "ms": 2625,
+  "best": 0.8464,
+  "hinted": null,
+  "t": {
+   "embed": 78,
+   "vectorize": 368,
+   "fts": 1207,
+   "d1-text": 130,
+   "rerank": 490
+  }
+ },
+ {
+  "q": "आत्मविश्वास बढ़ाने के लिए आध्यात्मिक ज्ञान क्या कहता है?",
+  "set": "hindi_100",
+  "books": [],
+  "n": 0,
+  "ms": 2099,
+  "best": 0.183,
+  "hinted": null,
+  "t": {
+   "embed": 66,
+   "vectorize": 212,
+   "fts": 699,
+   "d1-text": 343,
+   "rerank": 486
+  }
+ },
+ {
+  "q": "भय को समाप्त करने का उपाय क्या है?",
+  "set": "hindi_100",
+  "books": [
+   "mahabharata",
+   "mantra_maha_sagar",
+   "agni_purana",
+   "garuda_purana_1"
+  ],
+  "n": 14,
+  "ms": 3487,
+  "best": 0.9995,
+  "hinted": null,
+  "t": {
+   "embed": 104,
+   "vectorize": 199,
+   "fts": 862,
+   "d1-text": 339,
+   "rerank": 722
+  }
+ },
+ {
+  "q": "जीवन में दुख क्यों आते हैं?",
+  "set": "hindi_100",
+  "books": [
+   "shiva_purana_2",
+   "mahabharata",
+   "chanakya_neeti",
+   "ishadi_upanishad"
+  ],
+  "n": 14,
+  "ms": 6091,
+  "best": 0.9983,
+  "hinted": null,
+  "t": {
+   "embed": 70,
+   "vectorize": 198,
+   "fts": 568,
+   "d1-text": 130,
+   "rerank": 4809
+  }
+ },
+ {
+  "q": "सुख और दुख को समान भाव से कैसे स्वीकार करें?",
+  "set": "hindi_100",
+  "books": [
+   "yoga_vasishtha",
+   "mahabharata",
+   "chanakya_neeti"
+  ],
+  "n": 12,
+  "ms": 11251,
+  "best": 0.9632,
+  "hinted": null,
+  "t": {
+   "embed": 68,
+   "vectorize": 199,
+   "fts": 1276,
+   "d1-text": 378,
+   "rerank": 8984
+  }
+ },
+ {
+  "q": "अहंकार मनुष्य के पतन का कारण क्यों बनता है?",
+  "set": "hindi_100",
+  "books": [
+   "mahabharata",
+   "yoga_vasishtha",
+   "guru_granth_sahib"
+  ],
+  "n": 13,
+  "ms": 3454,
+  "best": 0.9915,
+  "hinted": null,
+  "t": {
+   "embed": 128,
+   "vectorize": 199,
+   "fts": 707,
+   "d1-text": 135,
+   "rerank": 932
+  }
+ },
+ {
+  "q": "विनम्रता का महत्व क्या है?",
+  "set": "hindi_100",
+  "books": [
+   "mahabharata",
+   "chanakya_neeti"
+  ],
+  "n": 6,
+  "ms": 9170,
+  "best": 0.6053,
+  "hinted": null,
+  "t": {
+   "embed": 57,
+   "vectorize": 197,
+   "fts": 594,
+   "d1-text": 106,
+   "rerank": 7937
+  }
+ },
+ {
+  "q": "मनुष्य को क्षमा करना क्यों सीखना चाहिए?",
+  "set": "hindi_100",
+  "books": [
+   "mahabharata",
+   "chanakya_neeti"
+  ],
+  "n": 12,
+  "ms": 11439,
+  "best": 0.9793,
+  "hinted": null,
+  "t": {
+   "embed": 69,
+   "vectorize": 199,
+   "fts": 704,
+   "d1-text": 1398,
+   "rerank": 7954
+  }
+ },
+ {
+  "q": "सच्चा गुरु किसे कहा जाता है?",
+  "set": "hindi_100",
+  "books": [
+   "guru_granth_sahib",
+   "mahabharata",
+   "rigveda_1"
+  ],
+  "n": 11,
+  "ms": 3792,
+  "best": 0.8174,
+  "hinted": null,
+  "t": {
+   "embed": 1077,
+   "vectorize": 201,
+   "fts": 1043,
+   "d1-text": 455,
+   "rerank": 698
+  }
+ },
+ {
+  "q": "गुरु का जीवन में क्या महत्व है?",
+  "set": "hindi_100",
+  "books": [
+   "guru_granth_sahib",
+   "shiva_purana_1",
+   "chanakya_neeti"
+  ],
+  "n": 12,
+  "ms": 10174,
+  "best": 0.9401,
+  "hinted": null,
+  "t": {
+   "embed": 1190,
+   "vectorize": 249,
+   "fts": 905,
+   "d1-text": 473,
+   "rerank": 7087
+  }
+ },
+ {
+  "q": "शिष्य के अंदर कौन से गुण होने चाहिए?",
+  "set": "hindi_100",
+  "books": [
+   "mahabharata",
+   "guru_granth_sahib",
+   "shiva_purana_2",
+   "agni_purana",
+   "chanakya_neeti"
+  ],
+  "n": 14,
+  "ms": 4605,
+  "best": 0.9997,
+  "hinted": null,
+  "t": {
+   "embed": 52,
+   "vectorize": 208,
+   "fts": 972,
+   "d1-text": 139,
+   "rerank": 828
+  }
+ },
+ {
+  "q": "ज्ञान और अनुभव में क्या अंतर है?",
+  "set": "hindi_100",
+  "books": [],
+  "n": 0,
+  "ms": 2525,
+  "best": 0.2984,
+  "hinted": null,
+  "t": {
+   "embed": 80,
+   "vectorize": 201,
+   "fts": 473,
+   "d1-text": 118,
+   "rerank": 564
+  }
+ },
+ {
+  "q": "धर्म का वास्तविक अर्थ क्या है?",
+  "set": "hindi_100",
+  "books": [
+   "mahabharata",
+   "ishadi_upanishad",
+   "chanakya_neeti"
+  ],
+  "n": 9,
+  "ms": 1841,
+  "best": 0.9402,
+  "hinted": null,
+  "t": {
+   "embed": 58,
+   "vectorize": 194,
+   "fts": 698,
+   "d1-text": 136,
+   "rerank": 456
+  }
+ },
+ {
+  "q": "सनातन धर्म की मुख्य शिक्षाएं क्या हैं?",
+  "set": "hindi_100",
+  "books": [
+   "mahabharata",
+   "garuda_purana_1",
+   "shiva_purana_1"
+  ],
+  "n": 12,
+  "ms": 2265,
+  "best": 0.9991,
+  "hinted": null,
+  "t": {
+   "embed": 58,
+   "vectorize": 196,
+   "fts": 919,
+   "d1-text": 135,
+   "rerank": 663
+  }
+ },
+ {
+  "q": "सत्य बोलने का महत्व क्या है?",
+  "set": "hindi_100",
+  "books": [
+   "mahabharata",
+   "guru_granth_sahib"
+  ],
+  "n": 10,
+  "ms": 1969,
+  "best": 0.9965,
+  "hinted": null,
+  "t": {
+   "embed": 60,
+   "vectorize": 204,
+   "fts": 716,
+   "d1-text": 119,
+   "rerank": 522
+  }
+ },
+ {
+  "q": "जीवन में संयम क्यों आवश्यक है?",
+  "set": "hindi_100",
+  "books": [
+   "mahabharata",
+   "chanakya_neeti"
+  ],
+  "n": 11,
+  "ms": 1594,
+  "best": 0.9798,
+  "hinted": null,
+  "t": {
+   "embed": 65,
+   "vectorize": 203,
+   "fts": 357,
+   "d1-text": 76,
+   "rerank": 571
+  }
+ },
+ {
+  "q": "इच्छाओं को नियंत्रित कैसे किया जा सकता है?",
+  "set": "hindi_100",
+  "books": [],
+  "n": 0,
+  "ms": 2605,
+  "best": 0.0858,
+  "hinted": null,
+  "t": {
+   "embed": 81,
+   "vectorize": 202,
+   "fts": 1109,
+   "d1-text": 139,
+   "rerank": 747
+  }
+ },
+ {
+  "q": "लोभ मनुष्य को कैसे प्रभावित करता है?",
+  "set": "hindi_100",
+  "books": [
+   "mahabharata",
+   "garuda_purana_1",
+   "chanakya_neeti"
+  ],
+  "n": 12,
+  "ms": 2209,
+  "best": 0.9839,
+  "hinted": null,
+  "t": {
+   "embed": 199,
+   "vectorize": 211,
+   "fts": 770,
+   "d1-text": 122,
+   "rerank": 563
+  }
+ },
+ {
+  "q": "ईर्ष्या से मुक्ति कैसे प्राप्त करें?",
+  "set": "hindi_100",
+  "books": [
+   "mahabharata",
+   "garuda_purana_1",
+   "chanakya_neeti",
+   "agni_purana",
+   "guru_granth_sahib",
+   "atharvaveda_1",
+   "yoga_vasishtha"
+  ],
+  "n": 18,
+  "ms": 9756,
+  "best": 0.9992,
+  "hinted": null,
+  "t": {
+   "embed": 60,
+   "vectorize": 195,
+   "fts": 1041,
+   "d1-text": 2122,
+   "rerank": 6025
+  }
+ },
+ {
+  "q": "मन की शुद्धि कैसे की जाती है?",
+  "set": "hindi_100",
+  "books": [
+   "mahabharata",
+   "nitya_karm_pooja",
+   "yoga_vasishtha"
+  ],
+  "n": 11,
+  "ms": 2078,
+  "best": 0.9988,
+  "hinted": null,
+  "t": {
+   "embed": 63,
+   "vectorize": 211,
+   "fts": 749,
+   "d1-text": 131,
+   "rerank": 565
+  }
+ },
+ {
+  "q": "आत्मज्ञान प्राप्त करने के लिए क्या करना चाहिए?",
+  "set": "hindi_100",
+  "books": [
+   "ishadi_upanishad",
+   "guru_granth_sahib",
+   "yoga_vasishtha",
+   "mahabharata"
+  ],
+  "n": 14,
+  "ms": 10365,
+  "best": 0.9972,
+  "hinted": null,
+  "t": {
+   "embed": 55,
+   "vectorize": 722,
+   "fts": 956,
+   "d1-text": 122,
+   "rerank": 8196
+  }
+ },
+ {
+  "q": "भगवान को पाने के लिए कौन सा मार्ग श्रेष्ठ है?",
+  "set": "hindi_100",
+  "books": [
+   "mahabharata",
+   "agni_purana",
+   "ishadi_upanishad",
+   "guru_granth_sahib",
+   "shiva_purana_2",
+   "ramcharitmanas",
+   "yoga_vasishtha"
+  ],
+  "n": 18,
+  "ms": 9146,
+  "best": 0.9999,
+  "hinted": null,
+  "t": {
+   "embed": 1432,
+   "vectorize": 1160,
+   "fts": 974,
+   "d1-text": 1210,
+   "rerank": 4034
+  }
+ }
+]

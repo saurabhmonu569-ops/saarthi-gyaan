@@ -487,25 +487,57 @@ export function useChat({
         : null;
       console.log(`[Aadhaar] ${_why ? "footer NAHI laga — " + _why : `footer lagega — ${groundedChunks.length} grounded chunks`}`);
 
+      // PANNA HATAO — prompt kehta hai, CODE nibhata hai (2026-08-10).
+      //
+      // SYSTEM_PROMPT me "panna kabhi mat likho" saaf likha hai. Par is app
+      // ka apna itihaas kehta hai ki model niyam todta hai — shloka gadhne
+      // aur granth ka naam gadhne par bhi pehle yahi hua tha, aur dono baar
+      // ilaaj code me lagana pada. Isliye yahan bhi wahi.
+      //
+      // Do roop pakadte hain: "(p.352)" / "(pp.12-14)" aur "(पृ. ३२)".
+      // Space aur alag-alag brackets ke saath. Baaki text ko haath nahi
+      // lagate — sirf ye tukda nikalta hai.
+      if (responseText) {
+        const before = responseText;
+        responseText = responseText
+          .replace(/\s*[（(\[]\s*(?:pp?\.?|page)\s*[\d०-९]+(?:\s*[-–,]\s*(?:p\.?\s*)?[\d०-९]+)*\s*[）)\]]/gi, "")
+          .replace(/\s*[（(\[]\s*(?:पृ\.?|पृष्ठ|पन्ना)\s*[\d०-९]+(?:\s*[-–,]\s*[\d०-९]+)*\s*[）)\]]/g, "");
+        if (before !== responseText) console.log("[Aadhaar] jawab me se panna-number hataye");
+      }
+
       if (responseText && groundedChunks.length > 0 && !responseText.includes("📚 Aadhaar") && !noGroundingDisclaimed) {
         // BUG FIX: pehle book+page se dedupe hota tha — "Agni Purana · Agni
         // Purana · Agni Purana" dikhta tha. Ab ek book EK baar, pages jud kar.
-        const byBook = new Map();
+        // ── SIRF GRANTH KA NAAM — PANNA NAHI (2026-08-10) ───────────────
+        //
+        // Pehle "अग्नि पुराण (p.520, p.521)" jaisa dikhta tha. Ab sirf
+        // "अग्नि पुराण". Teen wajah:
+        //
+        // 1. PANNA SAABIT NAHI HO SAKTA. Read section hat raha hai, yaani
+        //    user us panne par ja hi nahi sakta. Jo pramaan jaancha na ja
+        //    sake, wo pramaan nahi — sirf dikhawa hai.
+        //
+        // 2. PANNA HAMARE SANSKARAN KA HAI. "Garuda Purana p.520" ka matlab
+        //    sirf HAMARI PDF me hai. Kisi aur sanskaran me wahi baat kisi
+        //    aur panne par hogi. User agar apni kitab me dhoondhe to nahi
+        //    milegi — aur bharosa toot jaayega.
+        //
+        // 3. OCR ke panne kabhi-kabhi khiske hue hain (scan me blank/dohre
+        //    panne). Ek galat number poore jawab ko shak me daal deta hai.
+        //
+        // Granth ka naam hi asli pramaan hai — wo sthir hai, jaancha ja
+        // sakta hai, aur Indian Copyright Act §52 ki "source acknowledgement"
+        // ki maang bhi wahi poori karta hai.
+        const books = [];
         // liveChunks nahi — sirf groundedChunks. Warna woh passages bhi
         // cite ho jaate jinhe reranker ne khaarij kar diya tha.
         for (const r of groundedChunks) {
           const bt = (r.chunk && (r.chunk.book_title || r.chunk.book)) || "";
-          if (!bt) continue;
-          const pg = r.chunk?.page;
-          if (!byBook.has(bt)) byBook.set(bt, new Set());
-          if (pg != null) byBook.get(bt).add(pg);
-          if (byBook.size >= 4) break;
+          if (!bt || books.includes(bt)) continue;
+          books.push(bt);
+          if (books.length >= 4) break;
         }
-        const srcs = [...byBook.entries()].map(([bt, pages]) => {
-          const ps = [...pages].sort((a, b) => a - b).slice(0, 2);
-          return ps.length ? `${bt} (p.${ps.join(", p.")})` : bt;
-        });
-        if (srcs.length) responseText += `\n\n---\n📚 *Aadhaar: ${srcs.join(" · ")}*`;
+        if (books.length) responseText += `\n\n---\n📚 *Aadhaar: ${books.join(" · ")}*`;
       }
       // SWASTHYA CHETAVANI (2026-08-04) — CODE se, model ke bharose NAHI.
       //

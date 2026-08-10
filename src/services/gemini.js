@@ -602,6 +602,8 @@ CORPUS KI SEEMA — SACH BOLO (hallucination ke khilaf sabse bada niyam):
 - Tumhare paas KEVAL yeh ${GRANTH_COUNT} granth hain: ${GRANTH_LIST}.
 - PEHLE diye gaye passages GAUR SE PADHO: agar us granth ka KOI BHI ansh neeche diya gaya hai (chahe woh seedha, poora jawab na de raha ho — sirf us granth ka ek panna/overview ho), toh USI se apna jawab banao aur USI granth ko naam se cite karo — apne shabdon mein us ansh ke bhaav ko explain/expand karke poora, madadgaar jawab do. "Iska seedha ullekh nahi mila" sirf tab kaho jab neeche us granth ka EK BHI ansh na diya gaya ho — agar ansh diya gaya hai toh use istemal karna zaroori hai, disclaimer mat do.
 - Quran, Bible, Shrimad Bhagavatam, Tripitaka, Valmiki Ramayana — inke quote/ayat KABHI MAT GADHO. Inke baare mein poocha jaye toh saaf kaho: "Yeh granth abhi Saarthi mein nahi hain" — phir apne granthon se jawab do. Ramayan ki katha ke liye tumhare paas Shri Ramcharitmanas hai; Valmiki Ramayana ka naam kabhi mat lo.
+- PANNA / PAGE NUMBER KABHI MAT LIKHO. Na "(p.352)", na "(पृ. ३२)", na "panna 220". Sirf granth ka naam.
+  KYUN: panna HAMARE sanskaran ka hota hai. User ke paas doosra sanskaran hoga toh wahi baat kisi aur panne par milegi — aur uska bharosa tootega. App ke andar woh panna khol kar dekhne ka koi raasta bhi nahi hai, isliye woh number jaancha hi nahi ja sakta. Jo pramaan jaancha na ja sake, woh pramaan nahi.
 - Adhyaya/shloka NUMBER (jaise "2.63", "Ramayana 2.53") SIRF tab likho jab woh number diye gaye passages mein saaf likha ho. Memory se number likhna utna hi bada apradh hai jitna shloka gadhna — number ke bina "Gita ke anusaar" kehna kaafi hai.
 - ATTRIBUTION-SEEMA (sabse chalaki wala loophole — band): "X granth ke anusaar/ke hisaab se..." kehkar koi bhi baat SIRF tab kaho jab US granth ka passage upar diya gaya ho. Jis granth ka passage NAHI mila, uske naam se teaching batana bhi utna hi gadhna hai jitna shloka banana. "Sabhi 24 granthon ki tulna karo" jaise sawaal par: SIRF un granthon ki tulna karo jinke passages mile hain (aam taur par 3-6), aur shuruaat mein saaf likho: "Is samay jin granthon ke ansh mile hain, unki tulna:" — 24 naam gin kar template-jawab dena SAKHT MANA hai.
 - Jawab ke ant mein "Aadhaar:" ya sources ki line KHUD MAT BANAO — app yeh apne aap jodti hai.
@@ -716,8 +718,8 @@ export async function explainSearchTerm(term, passages = []) {
     `Shabd: "${term}"\n\n` +
     langLine +
     "PHIR neeche diye anshon mein se SABSE relevant ka EK chhota seedha uddharan do, is format mein:\n" +
-    '📜 "asli pankti" — Granth (p.X)\n' +
-    "Uddharan SIRF anshon ke asli shabdon se — apna kuch mat milao; OCR ka toota/bemaani vakya bhi mat lo — SAAF padhne-layak pankti na mile toh uddharan poora chhod do (jhootha ya kachra kabhi nahi), aur '—' ke baad Granth (p.X) likhna kabhi mat bhoolo. " +
+    '📜 "asli pankti" — Granth ka naam\n' +
+    "Uddharan SIRF anshon ke asli shabdon se — apna kuch mat milao; OCR ka toota/bemaani vakya bhi mat lo — SAAF padhne-layak pankti na mile toh uddharan poora chhod do (jhootha ya kachra kabhi nahi), aur '—' ke baad SIRF granth ka naam likho — PANNA/PAGE NUMBER KABHI MAT LIKHO (neeche 'PANNA' wala niyam dekho). " +
     "Total 5-6 line se zyada nahi. Koi heading nahi.\n\n" +
     (ctx ? "Sacred passages:\n" + ctx : "");
   return sendMessage(prompt, [], {});
@@ -865,9 +867,9 @@ export async function sendMessage(userMessage, history = [], context = {}) {
       `${chunkBlocks}\n\n` +
       `INSTRUCTIONS FOR USING THESE PASSAGES (BOOKS-FIRST RULE):\n` +
       `1. PEHLE in passages ko dhyan se padho — jawab ka aadhaar YEHI books hain, tumhari general memory nahi.\n` +
-      `2. Jawab in passages se nikalo aur source ka naam saaf batao: "Garuda Purana (p.352) ke anusaar…"\n` +
+      `2. Jawab in passages se nikalo aur source ka naam saaf batao: "Garuda Purana ke anusaar…" — SIRF granth ka naam, panna number nahi.\n` +
       `2b. PRAMAAN ANIVARYA: jawab mein kam se kam EK chhota SEEDHA UDDHARAN do — passage ke asli shabd quotes mein, is format mein:\n` +
-      `    📜 "passage ki asli pankti yahan" — Book ka naam (p.X)\n` +
+      `    📜 "passage ki asli pankti yahan" — Book ka naam (panna NAHI)\n` +
       `    Uddharan SIRF upar diye passages se copy karo — ek shabd bhi apna mat milao, aur PASSAGE KI MOOL BHASHA mein hi (Hindi passage = Hindi uddharan). Apna banaya English vakya 📜 mein daalna ("The universe is..." jaisa) SABSE BADA APRADH hai — woh uddharan nahi, jaalsaazi hai. Agar kisi passage mein sawaal se juda saaf vakya NAHI hai, toh uddharan chhodo aur saaf likho: "In anshon mein seedha uttar nahi mila". 📜 ke saath Chapter/Verse/Page number SIRF wahi jo passage ke header mein likha hai — apni yaaddasht ka (Chapter 5, Verse 12) jaisa number likhna jaalsaazi hai. OCR se toota-phoota vakya bhi quote mat karo — saaf padhne-layak pankti na ho toh uddharan chhod do.\n` +
       `3. Passages OCR se aaye hain — chhoti-moti galtiyan ho sakti hain; bhaav pakdo, toota shabd quote mat karo.\n` +
       `4. Agar in passages mein user ke sawaal ka jawab NAHI hai, toh saaf kaho: "In granthon mein iska seedha ullekh nahi mila" — phir apne saamanya shastra-gyaan se jawab do, yeh batate hue ki yeh general gyaan hai.\n` +

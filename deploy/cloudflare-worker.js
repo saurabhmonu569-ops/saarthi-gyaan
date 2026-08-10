@@ -125,6 +125,10 @@ const EMBED_MAX_CHARS = 2000;            // per text — lamba ho toh kaat do
 const RERANK_MODEL = "@cf/baai/bge-reranker-base";
 const RERANK_MAX_CONTEXTS = 20;
 const RERANK_MAX_CHARS = 1200;
+// Ek batch kitna intezaar karwa sakta hai — poora hisaab rerankAll() me
+// likha hai. Chhota mat karo bina naape: 4s beech ke samay (722ms) se
+// paanch guna hai, isliye sirf asli atkav par lagta hai.
+const RERANK_TIMEOUT_MS = 4000;
 // FIX (2026-07-23): gemini-2.0-flash Google ne 1 June 2026 ko HARD SHUTDOWN kar
 // diya — is model ko call karne par ab seedha error aata hai. Yeh Engine 2 tha,
 // isliye pichle ~7 hafton se yeh chupke se fail ho raha tha aur har baar seedha
@@ -739,11 +743,36 @@ async function rerankAll(env, query, texts) {
   }
   const res = await Promise.all(batches.map(async ({ at, t }) => {
     try {
-      const out = await env.AI.run(RERANK_MODEL, {
-        query,
-        contexts: t.map(x => ({ text: String(x).slice(0, RERANK_MAX_CHARS) })),
-        top_k: t.length,
-      });
+      // ── EK ATKA BATCH POORE SAWAAL KO ATKA DETA HAI ──────────────────
+      //
+      // NAAPA GAYA (30 sawaal, 2026-08-10):
+      //     rerank ka beech ka samay  :   722ms
+      //     rerank ka 90% par         : 7,954ms
+      // Yaani rerank aam taur par TEZ hai — kabhi-kabhi hi atakta hai.
+      //
+      // Par yahan 5 batch ek saath jaate hain aur Promise.all SABSE DHEEME
+      // ka intezaar karta hai. Agar ek batch bhi atka, poora sawaal atka.
+      // Paanch me se kisi ek ke atakne ki sambhavna akele ek se kai guna
+      // zyada hai — isiliye kul samay ka 90% (10.4s) rerank ke 8s se bharta
+      // hai, jabki uska apna beech ka samay sirf 0.7s hai.
+      //
+      // ILAAJ: har batch ko 4 second do. Us se zyada lage to us batch ko
+      // chhod do — uske ansh ka score 0 rahega aur wo gate par gir jaayenge.
+      // Yaani thodi si khoj kho sakti hai, par 8 second ka intezaar bach
+      // jaata hai. 4s isliye ki beech ka samay 722ms hai — 4s us se paanch
+      // guna hai, yaani sirf asli atkav par hi lagega, aam mamle par nahi.
+      //
+      // Ye "fail-soft" wahi soch hai jo neeche catch me pehle se hai: kam
+      // jawab theek hai, ruka hua user nahi.
+      const out = await Promise.race([
+        env.AI.run(RERANK_MODEL, {
+          query,
+          contexts: t.map(x => ({ text: String(x).slice(0, RERANK_MAX_CHARS) })),
+          top_k: t.length,
+        }),
+        new Promise((_, rej) =>
+          setTimeout(() => rej(new Error(`batch @${at} 4s me jawab nahi diya`)), RERANK_TIMEOUT_MS)),
+      ]);
       const list = out?.response || out?.result?.response || (Array.isArray(out) ? out : null);
       if (!Array.isArray(list)) return { at, s: null };
       const s = new Array(t.length).fill(0);
@@ -758,7 +787,16 @@ async function rerankAll(env, query, texts) {
     }
   }));
   const out = new Array(texts.length).fill(0);
-  for (const { at, s } of res) if (s) for (let j = 0; j < s.length; j++) out[at + j] = s[j];
+  let chhoote = 0;
+  for (const { at, s } of res) {
+    if (s) { for (let j = 0; j < s.length; j++) out[at + j] = s[j]; }
+    else chhoote++;
+  }
+  // Kitne batch chhoot gaye — ye chup-chaap nahi hona chahiye. Agar ye
+  // number baar-baar 0 se zyada aaye, to seema (4s) bahut sakht hai ya
+  // Workers AI sach me dheema pad raha hai.
+  if (chhoote) console.log(`[SAARTHI-SEARCH] ${chhoote}/${batches.length} rerank batch chhoot gaye (timeout ya fail)`);
+  out._chhoote = chhoote;
   return out;
 }
 
@@ -898,9 +936,18 @@ export default {
       if (!findQ) return jsonResponse({ error: { message: "findQ required" } }, 400, origin);
 
       const t0 = Date.now();
+      // KADAM-DAR-KADAM SAMAY (2026-08-10)
+      // Naapa gaya: 100 sawaalon par beech ka samay 2,720ms par 90% par
+      // 8,787ms aur sabse dheema 15,777ms. Yaani das me se ek user 8 second
+      // se zyada rukta hai — us par log app chhod dete hain.
+      // Par ab tak sirf KUL samay pata tha. Kis kadam me ja raha hai, ye
+      // jaane bina koi bhi sudhaar tukka hai. Ye ginti wahi batati hai.
+      const T = {}; let tk = Date.now();
+      const lap = k => { T[k] = Date.now() - tk; tk = Date.now(); };
       try {
         // ── 1. SEMANTIC — Vectorize, poore corpus par ─────────────────
         const emb = await env.AI.run(EMBED_MODEL, { text: [findQ], truncate_inputs: true });
+        lap("embed");
         const vec = (emb?.data || emb?.result?.data)?.[0];
         if (!vec) throw new Error("embed failed");
 
@@ -917,6 +964,7 @@ export default {
         // waise bhi milta hai (neeche kadam 5), aur wahi asli source hai.
         // Vectorize se sirf ID chahiye. Isse payload bhi halka rehta hai.
         const vq = await env.VECTORIZE.query(vec, { topK: SEARCH_QUOTA.semantic });
+        lap("vectorize");
         const byId = new Map();
         for (const m of (vq?.matches || [])) {
           byId.set(m.id, { id: m.id, book: "", src: "semantic", score: m.score });
@@ -935,6 +983,7 @@ export default {
              JOIN chunks c ON c.rowid = f.rowid
              WHERE chunks_fts MATCH ?1 ORDER BY rank LIMIT 250`
           ).bind(match).all();
+          lap("fts");
 
           let kw = 0;
           for (const r of (results || [])) {
@@ -1021,6 +1070,7 @@ export default {
         const { results: texts } = await env.DB.prepare(
           `SELECT rowid AS rid, id, book, page, text FROM chunks WHERE id IN (${ph})`
         ).bind(...cand.map(c => c.id)).all();
+        lap("d1-text");
         const textById = new Map((texts || []).map(r => [r.id, r]));
 
         const withText = cand
@@ -1030,6 +1080,7 @@ export default {
 
         // ── 6. RERANK — asli sawaal par, paryay ke bina ───────────────
         const scores = await rerankAll(env, rerankQ, withText.map(c => c.text));
+        lap("rerank");
         const scored = withText.map((c, i) => ({ ...c, rerank: scores[i] }));
         const usable = scored.filter(c => hasSentences(c.text) && !looksGarbled(c.text));
         const best   = usable.length ? Math.max(...usable.map(c => c.rerank)) : 0;
@@ -1191,6 +1242,10 @@ export default {
             hinted: hinted || null,
             hintedInPool: hinted ? withText.filter(c => c.book === hinted).length : null,
             hintedPassed: hinted ? passed.filter(c => c.book === hinted).length : null,
+            // kadam-dar-kadam samay — sabse bada kaun, ye saaf dikhta hai
+            t: T,
+            // kitne rerank batch chhoot gaye (timeout) — 0 hona chahiye
+            skipped: scores._chhoote || 0,
           },
         }, 200, origin);
       } catch (e) {
