@@ -1,0 +1,58 @@
+# SAARTHI — Netlify deploy configuration
+# =====================================================================
+# KYUN (2026-08-10):
+# Ab tak Netlify ki build settings SIRF dashboard mein thi. Wahi galti
+# jo Worker ke saath thi aur jiske liye wrangler.toml banana pada:
+#
+#   1. Repo dekh kar koi nahi bata sakta ki site kaise banti hai
+#   2. Settings badle to kahin likha nahi jaata — koi history nahi
+#   3. Naya clone / naya Netlify site banana = sab dobara haath se
+#
+# Aur ek asli nuksaan bhi tha: cache headers sirf `vercel.json` mein
+# likhe the. Wo file Netlify PADHTA HI NAHI. Yaani 165 MB ka knowledge
+# data har baar bina cache ke jaa raha tha. Ab wo headers yahan hain.
+
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  # Netlify ka default Node kabhi-kabhi badal jaata hai. Vite 5 ke liye
+  # 18+ chahiye; 20 par hi local test hua hai, wahi yahan bhi.
+  NODE_VERSION = "20"
+
+# ── CACHE ────────────────────────────────────────────────────────────
+# Ye teeno rule vercel.json se aaye hain (wo file Netlify ke liye bekaar
+# thi) aur ek naya jodha gaya hai.
+
+# Vite har build mein file ka naam badal deta hai (index-D_M_OaCU.js),
+# isliye ise hamesha ke liye cache karna surakshit hai.
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Knowledge data (books/, index/) ab sirf Read aur Search tab maangte
+# hain — Ask ko iski zaroorat nahi rahi (retrieval Worker par hai).
+# Phir bhi jo user Read tab kholta hai uske liye ye 258 MB hai, isliye
+# ek din ka cache aur ek hafte ka stale-while-revalidate.
+[[headers]]
+  for = "/knowledge/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400, stale-while-revalidate=604800"
+
+# PDF badalti nahi hain — ek hafta.
+[[headers]]
+  for = "/books/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+
+# ── SERVICE WORKER ───────────────────────────────────────────────────
+# sw.js KABHI cache nahi hona chahiye. Agar browser purani sw.js pakde
+# rahe, to naya deploy user tak pahunchta hi nahi — wo purana build hi
+# dekhta rehta hai. Aaj hi ye dikkat aayi thi (live site 32,032 chunks
+# wala purana build dikha raha tha).
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
