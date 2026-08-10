@@ -33,6 +33,22 @@ data/knowledge/search_manifest.json
 public/knowledge/knowledge.json
 public/knowledge/search_manifest.json
 
+# 2026-08-10 — UPLOAD KE CHECKPOINT. Ye commit karna KHATARNAK hai.
+#
+# 11_upload_vectorize.mjs aur 12_load_d1.mjs beech mein ruk jaayein to inhi
+# files se aage badhte hain. Inme likha hai {"total":57339,"done":57339}.
+#
+# Agar ye git mein rahein, to kal koi (ya khud aap, naye computer par) repo
+# clone karke `node scripts/12_load_d1.mjs --load` chalayega — aur script
+# checkpoint padh kar kahegi "sab ho chuka hai", 0 ansh bhejegi, aur
+# KHAALI D1 par "✅ ho gaya" chhaap degi. Galti tab pata chalegi jab Ask
+# har sawaal ka jawab "koi granth nahi mila" dene lagega.
+#
+# Ye checkpoint us MACHINE ka haal hai, project ka nahi.
+public/knowledge/.d1-progress.json
+public/knowledge/embeddings/.vectorize-progress.json
+public/knowledge/embeddings/.embed-progress.json
+
 # Environment (NEVER commit your API key!)
 .env
 .env.local
