@@ -319,3 +319,51 @@ describe("expandQueryWithParyay — bolchaal se granth-bhasha ka pul", () => {
     }
   });
 });
+
+describe("Ramayan ke naam — 2026-08-10 (user ne live app par pakda)", () => {
+  // ASLI GHATNA: "Bharat ji jab Ram ko wapas lane van gaye to unki Ram se
+  // kya baat hui?" — jawab MAHABHARAT (p.4103) se aaya aur Ramcharitmanas
+  // gate tak pahuncha hi nahi (gate-paar 2, best-rerank 0.526).
+  //
+  // Jad: fuzzyKey ne "bharat" ko भारत (DESH) bana diya. "भारत" ka sabse
+  // bada dher kahan hai? महा-भारत mein. Yaani transliteration khud sawaal
+  // ko galat granth ki taraf dhakel rahi thi.
+
+  it("bharat = भरत (Ram ka bhai), भारत (desh) NAHI", () => {
+    // Yehi ek line poore bug ki jad hai — ise kabhi mat badalna.
+    expect(toDevanagari("bharat")).toBe("भरत");
+    expect(toDevanagari("bharat")).not.toBe("भारत");
+    // desh wale artha ka shastriya shabd alag hai
+    expect(toDevanagari("bharatvarsh")).toBe("भारतवर्ष");
+    // aur granth ka naam abhi bhi theek hai
+    expect(toDevanagari("mahabharat")).toBe("महाभारत");
+  });
+
+  it("van = वन (jungle), 'वां' jaisa kachra nahi", () => {
+    expect(toDevanagari("van")).toBe("वन");
+  });
+
+  it("poora sawaal sahi Devanagari banta hai", () => {
+    const q = "Bharat ji jab Ram ko wapas lane van gaye to unki Ram se kya baat hui?";
+    const out = normalizeQueryForSearch(q).query;
+    expect(out).toContain("भरत");
+    expect(out).not.toContain("भारत");   // <- yahi fail hota tha
+    expect(out).toContain("वन");
+    expect(out).toContain("उनकी");
+  });
+
+  it("Ramayan ke naam Latin mein nahi bachte", () => {
+    // Jaanch par 38 mein se 19 shabd Latin mein hi ja rahe the — corpus
+    // Devanagari hai, isliye unka koi match hi nahi milta tha.
+    const naam = [
+      "ayodhya", "kaikeyi", "dashrath", "sugriv", "kumbhkaran", "chitrakoot",
+      "paduka", "jatayu", "kewat", "meghnad", "sanjeevani", "setu",
+      "agnipariksha", "mandodari", "urmila", "shatrughna", "angad",
+      "panchvati", "laxman", "ahalya", "vishwamitra", "swayamvar",
+    ];
+    for (const w of naam) {
+      const got = toDevanagari(w);
+      expect(/[a-z]/i.test(got), `"${w}" abhi bhi Latin mein hai: "${got}"`).toBe(false);
+    }
+  });
+});

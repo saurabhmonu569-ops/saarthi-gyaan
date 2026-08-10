@@ -910,12 +910,34 @@ export default {
         }
 
         // ── 4. HINTED BOOK — user ne granth ka naam liya to uska ansh pakka
-        if (hinted) {
+        //
+        // ⚠️ BUG (2026-08-10, user ne pakda — DO sawaal ise saabit karte hain):
+        // "Gita me Daivi Sampat aur Asuri Sampat ka practical difference kya
+        // hai?" ka jawab SIRF Ramcharitmanas (p.26, p.27) se aaya, jabki
+        // bhagavad_gita_shankar mein दैवी 9 aur आसुरी 10 ansh mein hai — aur
+        // Gita ka 16va adhyaya hi "दैवासुरसम्पद्विभागयोग" hai.
+        //
+        // Jad: yahan pehle likha tha
+        //     SELECT id, book FROM chunks WHERE book = ?1 LIMIT 6
+        // Bina ORDER BY, bina search. SQLite `LIMIT 6` ka matlab hai
+        // "pehle 6 rows" — yaani kitaab ke SHURU ke 6 ansh: mukhprishth,
+        // prakashak ka pata, vishay-suchi. Un par reranker ka score
+        // lagbhag 0 aata hai, wo gate par mar jaate hain, aur natija
+        // wahi hota hai jaise hinted-book path chala hi na ho.
+        //
+        // Purana client-side code ye galti nahi karta tha — wo
+        // `hybridSearch(findQ, null, { book: hintedBook }, 6)` chalata tha,
+        // yaani us kitaab ke ANDAR dhoondhta tha. P2 mein wo baat likhte
+        // waqt chhoot gayi. Ab wahi kaam FTS se, kitaab ki seema mein.
+        if (hinted && match) {
           const have = [...byId.values()].filter(r => r.book === hinted).length;
-          if (have < 2) {
+          if (have < 3) {
             const { results } = await env.DB.prepare(
-              `SELECT id, book FROM chunks WHERE book = ?1 AND length(text) > 120 LIMIT 6`
-            ).bind(hinted).all();
+              `SELECT c.id, c.book FROM chunks_fts f
+               JOIN chunks c ON c.rowid = f.rowid
+               WHERE chunks_fts MATCH ?1 AND c.book = ?2
+               ORDER BY rank LIMIT 8`
+            ).bind(match, hinted).all();
             for (const r of (results || [])) if (!byId.has(r.id)) byId.set(r.id, { id: r.id, book: r.book, src: "hinted" });
           }
         }
@@ -1038,6 +1060,22 @@ export default {
             pool: cand.length, passed: passed.length, kept: kept.length,
             padosi: out.length - kept.length,
             best: Number(best.toFixed(4)), ms: Date.now() - t0,
+            // POOL KA HISAAB — bina iske hum andhere mein hain.
+            //
+            // Aaj do sawaal galat granth se juda jawab de rahe the aur hum
+            // sirf ANDAAZA laga sakte the ki wajah kya hai: sahi ansh pool
+            // mein aaya hi nahi, ya aaya par reranker ne gira diya? Ye do
+            // bilkul alag bimariyan hain aur inka ilaaj bhi alag hai.
+            //
+            // Aur ek khaas wajah: Mahabharata akela poore corpus ka 45%
+            // hai (25,856 / 57,339 ansh). Wo har sawaal ke pool mein bhar
+            // sakta hai. Ye ginti batayegi ki aisa ho raha hai ya nahi.
+            poolByBook: Object.fromEntries(
+              Object.entries(cand.reduce((a, c) => (a[c.book] = (a[c.book] || 0) + 1, a), {}))
+                .sort((a, b) => b[1] - a[1]).slice(0, 8)
+            ),
+            hinted: hinted || null,
+            hintedInPool: hinted ? cand.filter(c => c.book === hinted).length : null,
           },
         }, 200, origin);
       } catch (e) {

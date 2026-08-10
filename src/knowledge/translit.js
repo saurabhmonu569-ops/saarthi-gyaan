@@ -291,6 +291,20 @@ const WORDS = {
   swayamvar: "स्वयंवर", swayamvara: "स्वयंवर",
   // sarvanaam jo LEXICON se chhoot rahe the
   unki: "उनकी", unke: "उनके", unko: "उनको", unhe: "उन्हें",
+
+  // ── GITA ke paribhashik shabd (usi din, usi sawaal se) ─────────────
+  // ⚠️ `sampat` aur `sampati` ALAG hain — sampati = सम्पाति (Jatayu ka
+  // bhai, upar Ramayan wale block mein). Dono ek jaise dikhte hain,
+  // isliye ye tippani.
+  // Naapa gaya: दैवी 157 ansh (gita mein 9), आसुरी 87 (gita mein 10),
+  // सम्पत्ति 769. Gita ka 16va adhyaya hi "दैवासुरसम्पद्विभागयोग" hai.
+  sampat: "सम्पत्ति", sampatti: "सम्पत्ति", sampada: "सम्पदा",
+  sampad: "सम्पद्", daivi: "दैवी", daiv: "दैव", asuri: "आसुरी",
+  daivasur: "दैवासुर", vibhag: "विभाग", vibhaag: "विभाग",
+  sthitpragya: "स्थितप्रज्ञ", nishkaam: "निष्काम",
+  swadharma: "स्वधर्म", paradharma: "परधर्म", yagya: "यज्ञ",
+  gunatit: "गुणातीत", kshetra: "क्षेत्र", kshetragya: "क्षेत्रज्ञ",
+  purushottam: "पुरुषोत्तम", vishwaroop: "विश्वरूप",
   // NOTE: angrezi shabd (depression, leadership, practical, business,
   // confusion, discipline, support, values) JAAN-BOOJH KAR nahi jode.
   // Unka Devanagari roop corpus mein hai hi nahi ("डिप्रेशन" 0 baar),
@@ -937,6 +951,19 @@ export const EN_CONCEPT = {
   atman: "आत्मा", brahman: "ब्रह्म", maya: "माया", chakra: "चक्र",
   chakras: "चक्र", kundalini: "कुण्डलिनी", pranayama: "प्राणायाम",
   mindfulness: "एकाग्रता", nishkam: "निष्काम", sthitaprajna: "स्थितप्रज्ञ",
+  // ── 2026-08-10: live app par bache hue Latin shabd ──────────────────
+  // "Gita me Daivi Sampat aur Asuri Sampat ka practical difference kya
+  // hai?" → findQ bana:
+  //     "गीता में दैवी Sampat और आसुरी Sampat का practical भेद क्या है?"
+  // Do Latin shabd beech mein pade rahe. Ye sirf "thoda shor" nahi hai —
+  // rerankQ bhi yehi hota hai, aur cross-encoder ko aadha-Latin sawaal
+  // dene se uska faisla bigadta hai. Us sawaal par best-rerank 0.3447
+  // aaya aur SIRF 1 ansh gate paar kar paya.
+  practical: "व्यावहारिक", theoretical: "सैद्धान्तिक",
+  narrative: "प्रसंग", story: "कथा", episode: "प्रसंग",
+  example: "उदाहरण", method: "विधि", process: "प्रक्रिया",
+  origin: "उत्पत्ति", role: "भूमिका", symbol: "प्रतीक",
+  quality: "गुण", rule: "नियम", type: "प्रकार",
   // 298 sawaalon par chalane ke baad bache hue aam shabd
   scriptures: "शास्त्र", scripture: "शास्त्र", control: "संयम",
   problems: "कष्ट", problem: "कष्ट", solution: "समाधान",

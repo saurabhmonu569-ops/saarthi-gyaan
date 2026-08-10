@@ -83,6 +83,17 @@ export async function serverRetrieve({ findQ, rerankQ, hintedBook = null }) {
       + ` | best=${stats?.best ?? "?"} | server ${stats?.ms ?? "?"}ms`
       + ` | kul ${Math.round(performance.now() - t0)}ms`
     );
+
+    // POOL KA HISAAB — alag line, kyunki isi se pata chalta hai ki galti
+    // KAHAN hui. Do bilkul alag bimariyan ek jaisi dikhti hain:
+    //   sahi ansh pool mein aaya hi nahi   → dhoondhne ka masla
+    //   aaya par gate paar nahi kar paya   → aankne ka masla
+    // Inka ilaaj ulta hai, isliye pehle ye jaanna zaroori hai.
+    if (stats?.poolByBook) {
+      const spread = Object.entries(stats.poolByBook).map(([b, n]) => `${b} ${n}`).join(" · ");
+      console.log(`[ServerSearch] pool ka batwara: ${spread}`
+        + (stats.hinted ? `  ||  user ne granth kaha: ${stats.hinted} (pool mein ${stats.hintedInPool} ansh)` : ""));
+    }
     return { chunks, stats };
   } catch (e) {
     console.warn("[ServerSearch] fail:", e?.message || e);
