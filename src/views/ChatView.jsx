@@ -42,12 +42,24 @@ import { normalizeQueryForSearch, expandQueryWithParyay, stripMetaFraming, isOut
 // Ise badalne se pehle DOBARA naapo:  node scripts/eval-ask.mjs --300 --full
 // Dekhna sirf ek cheez: `jhoothi cite` 0 rahi ya nahi.
 //
-// ⚠️ P2 (2026-08-10): ye gate ab WORKER mein lagta hai (SEARCH_MIN_RERANK),
-// kyunki rerank wahin hota hai. Yahan ka number ab sirf ek pehra hai — agar
-// server kabhi is se neeche ka ansh bhej de to hum use grounded nahi maanenge.
-// DONO jagah 0.30 hai; badalna ho to DONO badalna, warna ek din chup-chaap
-// alag ho jaayenge.
-const MIN_RERANK_SCORE = 0.30;
+// ⚠️ YE GATE AB SIRF WORKER MEIN HAI — client ise nahi lagata.
+//
+// P2 ke baad maine yahan bhi 0.30 ka pehra rakha tha, "do-parat suraksha"
+// kehkar. Usi din Worker mein naam liye gaye granth ke liye alag floor
+// (0.18) aaya — aur ye line 0.30 maangti rahi. Nateeja: har us sawaal par
+// jahan user ne granth ka naam liya, Aadhaar POORA GAAYAB ho gaya. Live
+// app par pakda gaya, kisi test par nahi.
+//
+// Sabak: gate ka faisla EK JAGAH rehna chahiye — wahan jahan poora
+// sandarbh ho (kaunsa granth hinted hai, kaunsa floor lagta hai). Client
+// ke paas wo sandarbh hai hi nahi. Do jagah ek hi niyam rakhna hamesha
+// aise hi tootta hai.
+//
+// Asli gate: deploy/cloudflare-worker.js mein SEARCH_MIN_RERANK (0.30)
+// aur SEARCH_HINTED_MIN_RERANK (0.18). Wahan poori tippani hai.
+//
+// Ye const yahan sirf itihaas ke liye chhoda hai — kahin istemal nahi hota.
+const MIN_RERANK_SCORE = 0.30;   // eslint-disable-line no-unused-vars
 
 /**
  * Kya is ansh mein asli VAAKYA hain, ya sirf table/suchi/mukhprishth hai?
@@ -74,7 +86,7 @@ const MIN_RERANK_SCORE = 0.30;
  * context ki tarah ja sakte hain; bas CITATION ka aadhaar nahi ban
  * sakte. Content kabhi nahi khoyega, jhoothi citation nahi lagegi.
  */
-function hasSentences(text) {
+export function hasSentences(text) {
   const t = (text || "").trim();
   if (!t) return false;
   return /।|॥|(?:है|हैं|था|थी|थे|हुआ|हुई|होता|होती|करते|करना|चाहिये|चाहिए|गया|गयी|रहता|रहती)(?=[\s।॥,.]|$)/.test(t);
@@ -418,13 +430,33 @@ export function ChatView() {
           score: c.rerank,
           rerank: c.rerank,
           match_type: c.src === "neighbour" ? "neighbour" : "server",
-          // Server gate paar kara chuka hai. Ye teen jaanchein PHIR BHI
-          // yahan lagti hain — do-parat suraksha. Agar kabhi Worker ka
-          // threshold galti se dheela ho jaye, ya table/OCR-kachra wala
-          // ansh nikal aaye, to wo AI ko sandarbh ki tarah to jayega par
-          // CITATION ka aadhaar kabhi nahi banega.
+          // ⚠️ YAHAN SE `rerank >= MIN_RERANK_SCORE` HATAYA (2026-08-10)
+          //
+          // Pehle yahan likha tha:
+          //     c.rerank >= MIN_RERANK_SCORE   // 0.30
+          // aur maine use "do-parat suraksha" kehkar rakha tha.
+          //
+          // Wo suraksha nahi, JAAL nikla. Usi din maine Worker mein naam
+          // liye gaye granth ke liye alag floor (0.18) lagaya — par ye
+          // line 0.30 hi maangti rahi. Nateeja: jis sawaal mein user ne
+          // granth ka naam liya, uske ansh server se 0.18-0.29 par aate
+          // the aur yahan CHUP-CHAAP grounded=false ho jaate the.
+          // AADHAAR POORA GAAYAB. Live app par do sawaalon par dikha:
+          //     "Ekadashi ke vrat me Dashami aur Dwadashi ka relevance?"
+          //     "Chanakya Neeti ke according secret share karna risky?"
+          // Dono ka jawab aaya, dono ka Aadhaar nahi.
+          //
+          // Jad ye hai ki GATE KA FAISLA AB SERVER KA HAI. Wahan poora
+          // sandarbh hai — hinted granth kaun hai, kaunsa floor lagta hai.
+          // Client ke paas wo sandarbh hai hi nahi, isliye uska dobara
+          // faisla lena sirf server se TAKRAA sakta hai, sudhaar nahi
+          // sakta. Do jagah ek hi niyam rakhna hamesha aisa hi tootta hai.
+          //
+          // `c.grounded` server ka faisla hai — usi par bharosa.
+          // hasSentences/looksGarbled yahan RAHNE DIYE: ye TEXT ke apne
+          // lakshan hain (table hai? OCR kachra hai?), inke liye kisi
+          // sandarbh ki zaroorat nahi, aur ye server se takraate nahi.
           grounded: c.grounded === true
-                    && c.rerank != null && c.rerank >= MIN_RERANK_SCORE
                     && hasSentences(c.text) && !looksGarbled(c.text),
         };
       });

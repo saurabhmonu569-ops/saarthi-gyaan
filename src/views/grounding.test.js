@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { looksGarbled, MAX_FRAGMENT_RATIO } from "./ChatView.jsx";
+import { looksGarbled, hasSentences, MAX_FRAGMENT_RATIO } from "./ChatView.jsx";
 
 /**
  * 2026-08-05 audit ka regression test.
@@ -53,5 +53,47 @@ describe("looksGarbled — OCR-kachre par citation nahi lagni chahiye", () => {
     // valmiki 0.50. 0.40 par valmiki ka 97.8% pakda, jhootha alarm 3.7%.
     // Ise badalne se pehle dobara naapna — andaaze se mat badalna.
     expect(MAX_FRAGMENT_RATIO).toBe(0.40);
+  });
+});
+
+describe("grounded ka faisla — client server se NAHI takraye (2026-08-10)", () => {
+  // ASLI GHATNA: Worker mein naam liye gaye granth ke liye alag floor
+  // (0.18) lagaya gaya, par ChatView mein `rerank >= 0.30` ka dobara
+  // pehra reh gaya. Nateeja: jis sawaal mein user ne granth ka naam liya,
+  // uske ansh server se 0.18-0.29 par aate the aur client unhe chup-chaap
+  // khaarij kar deta tha — AADHAAR POORA GAAYAB.
+  //
+  // Live app par pakda gaya:
+  //   "Ekadashi ke vrat me Dashami aur Dwadashi ka kya relevance hota hai?"
+  //   "Chanakya Neeti ke according secret share karna risky kyu hai?"
+  // Dono ka jawab aaya, dono ka Aadhaar nahi.
+  //
+  // Ye test us niyam ko pakadta hai: client SERVER ka `grounded` maanta
+  // hai, apna score-gate nahi lagata.
+
+  const grounded = (c) =>
+    c.grounded === true && hasSentences(c.text) && !looksGarbled(c.text);
+
+  const asliVaakya = "दान देनेसे मनुष्यको पुण्य मिलता है और उसका कल्याण होता है।";
+
+  it("0.18-0.29 wale hinted ansh grounded rehte hain", () => {
+    // Yahi wo dayra hai jo pehle chup-chaap gir jaata tha
+    for (const r of [0.18, 0.22, 0.2447, 0.29]) {
+      expect(grounded({ grounded: true, rerank: r, text: asliVaakya }),
+        `rerank ${r} par grounded hona chahiye`).toBe(true);
+    }
+  });
+
+  it("server ne khaarij kiya to client bhi khaarij karta hai", () => {
+    expect(grounded({ grounded: false, rerank: 0.95, text: asliVaakya })).toBe(false);
+  });
+
+  it("table/OCR-kachra ab bhi ruka rehta hai — ye jaanch text ki hai, score ki nahi", () => {
+    // Ye do jaanchein client par JAAN-BOOJHKAR bachi hain: inke liye kisi
+    // sandarbh ki zaroorat nahi hai, isliye ye server se takraati nahi.
+    const table = "कृतिका 0. उत्तरा फा. 9. उत्तराषाढ़ 2. रोहिणी 11. हस्त 20. श्रवण 3. मृग";
+    expect(grounded({ grounded: true, rerank: 0.99, text: table })).toBe(false);
+    const kachra = "द | चस्ति नि धा धत ॥ ३२ जी थी कह ने लगे कि, से शु क्त दन ब ड़ी क णा ध र ल्क तै";
+    expect(grounded({ grounded: true, rerank: 0.99, text: kachra })).toBe(false);
   });
 });
