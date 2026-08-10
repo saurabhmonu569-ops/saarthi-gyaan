@@ -662,6 +662,38 @@ function reminderMessage(hourUTC, lang) {
 // KYA hota hai wo nahi. Agar in numbers ko chhedna ho to pehle
 // scripts/eval-ask.mjs --300 --full chalao.
 const SEARCH_MIN_RERANK   = 0.30;
+
+/**
+ * NAAM LIYE GAYE GRANTH KE LIYE ALAG, NEECHA FLOOR (2026-08-10)
+ *
+ * KYUN: Ramcharitmanas har Ramayan ke sawaal par gate se neeche reh jaata
+ * tha, aur jawab Mahabharat ke Ramopakhyana se judta tha. Ek hi sawaal
+ * ("भरत जी जब राम को वापस लाने वन गये…") par naapa —
+ *     mahabharata (Ramopakhyana) : sabse ooncha 0.9899, 5/12 paas
+ *     ramcharitmanas             : sabse ooncha 0.2447, 0/12 paas
+ * Dono mein wahi katha hai. Farak DHAANCHE ka hai: Mahabharat mein shlok
+ * ke baad lambi lagatar Hindi gadya hai, jabki Ramcharitmanas mein Awadhi
+ * chaupai aur Hindi tika chhote-chhote tukdon mein badalte hain, beech
+ * mein panne ka shirshak (* अयोध्याकाण्ड * ५५७) aur chhand-sankhya. Ek
+ * 1200-akshar ki khidki mein lagatar prasangik gadya kam padti hai.
+ *
+ * 0.18 KAHAN SE AAYA — control se, andaaze se nahi. Ramcharitmanas par:
+ *     "कल मौसम कैसा रहेगा, पेट्रोल का रेट"  → sabse ooncha 0.0000
+ *     "बाइबिल में ईसा मसीह ने क्या कहा"     → sabse ooncha 0.0229
+ *     asli Ramayan ka sawaal                → 0.2447
+ * Beech mein 0.22 ka khaali maidan hai — global gate ke 0.12 se bhi bada.
+ * 0.18 usi maidan mein hai: control se 0.157 upar, asli se 0.065 neeche.
+ *
+ * ⚠️ YE FLOOR SIRF US GRANTH PAR LAGTA HAI JISKA NAAM LIYA GAYA HO.
+ * Baaki sab par 0.30 hi rehta hai. Jokhim ka hisaab alag hai: jab user ne
+ * khud granth (ya uska paatr) bataya ho, tab uske ansh dena "andaaza"
+ * nahi hai. Jhoothi citation ka asli khatra un sawaalon par hai jinka
+ * jawab corpus mein hai hi nahi — aur wahan koi granth hinted hota hi
+ * nahi, isliye wahan 0.30 poori tarah lagta hai.
+ *
+ * Ise badalne se pehle naapo: node scripts/13_probe_rerank.mjs
+ */
+const SEARCH_HINTED_MIN_RERANK = 0.18;
 const SEARCH_PER_BOOK_CAP = 3;
 const SEARCH_KEEP         = 12;
 const SEARCH_QUOTA        = { semantic: 45, keyword: 20, cross: 20 };
@@ -943,17 +975,44 @@ export default {
         // khaali hota hai (upar dekhein), isliye ginti kabhi bharosemand
         // thi hi nahi. Ek chhoti FTS query rozana chalane ki keemat kuch
         // bhi nahi, aur badle mein guarantee milti hai.
+        // LIMIT 8 → 30 (2026-08-10, naap ke baad badla)
+        //
+        // 8 par naapa gaya: "भरत जी जब राम को वापस लाने वन गये…" par
+        // ramcharitmanas ke 41 ansh pool mein aaye aur EK BHI 0.18 paar
+        // nahi kar paya. Par alag se naapne par (13_probe_rerank.mjs) usi
+        // granth ka p.508 — "भरतजीने जब शृङ्गवेरपुरको देखा…" — 0.2447
+        // deta hai. Yaani sahi ansh maujood hai, score bhi theek deta hai,
+        // par un 41 mein tha hi nahi.
+        //
+        // Wajah: 2,070 ansh mein se sirf 8 uthana bahut chhota jaal hai,
+        // aur bm25 un ansho ko upar rakhta hai jinme sawaal ke shabd
+        // ZYADA BAAR aayein — zaroori nahi ki jo sach me jawab dete hon.
+        // 30 par bhi ye ek hi D1 query hai; badle mein reranker ko asli
+        // ummeedwaar milte hain, aur wahi ekmatra bharosemand judge hai.
+        const hintedIds = [];
         if (hinted && match) {
           const { results } = await env.DB.prepare(
             `SELECT c.id, c.book FROM chunks_fts f
              JOIN chunks c ON c.rowid = f.rowid
              WHERE chunks_fts MATCH ?1 AND c.book = ?2
-             ORDER BY rank LIMIT 8`
+             ORDER BY rank LIMIT 30`
           ).bind(match, hinted).all();
-          for (const r of (results || [])) if (!byId.has(r.id)) byId.set(r.id, { id: r.id, book: r.book, src: "hinted" });
+          for (const r of (results || [])) {
+            if (!byId.has(r.id)) byId.set(r.id, { id: r.id, book: r.book, src: "hinted" });
+            hintedIds.push(r.id);
+          }
         }
 
-        const cand = [...byId.values()].slice(0, SEARCH_MAX_RERANK);
+        // ⚠️ NAAM LIYE GAYE GRANTH KE ANSH SABSE PEHLE.
+        // `cand` 100 par kata jaata hai (SEARCH_MAX_RERANK). byId ka kram
+        // insertion ka kram hai, aur hinted sabse AAKHIR mein jude the —
+        // yaani pool bhara hone par theek wahi ansh kat jaate jinke liye
+        // ye poora raasta banaya gaya tha. Ab wo sabse aage rehte hain.
+        const hintedSet = new Set(hintedIds);
+        const cand = [
+          ...[...byId.values()].filter(c => hintedSet.has(c.id)),
+          ...[...byId.values()].filter(c => !hintedSet.has(c.id)),
+        ].slice(0, SEARCH_MAX_RERANK);
         if (!cand.length) return jsonResponse({ chunks: [], stats: { pool: 0, ms: Date.now() - t0 } }, 200, origin);
 
         // ── 5. TEXT laao — D1 se, ek hi query mein ────────────────────
@@ -1003,8 +1062,13 @@ export default {
         // Gate abhi bhi lagta hai — hinted granth ka kachra ansh bhi 0.30
         // se neeche ho to bahar hi jaata hai. Ye "zabardasti cite karo"
         // nahi hai; ye sirf KRAM hai un ansho ka jo pehle hi paas ho chuke.
+        // Floor: naam liye gaye granth ke liye 0.18, baaki sabke liye 0.30
+        // (upar SEARCH_HINTED_MIN_RERANK ki poori tippani dekhein)
+        const floorFor = c =>
+          (hinted && c.book === hinted) ? SEARCH_HINTED_MIN_RERANK : SEARCH_MIN_RERANK;
+
         const passed = usable
-          .filter(c => c.rerank >= SEARCH_MIN_RERANK)
+          .filter(c => c.rerank >= floorFor(c))
           .sort((a, b) => {
             if (hinted) {
               const ab = a.book === hinted, bb = b.book === hinted;

@@ -40,6 +40,65 @@ export const BOOK_HINTS = {
   "kaurav": "mahabharata", "pandav": "mahabharata",
   "शांतिपर्व": "mahabharata", "शान्तिपर्व": "mahabharata",
   "अनुशासनपर्व": "mahabharata", "कुरुक्षेत्र": "mahabharata",
+  // ── RAMAYAN KE PAATR → RAMCHARITMANAS (2026-08-10) ──────────────────
+  //
+  // ⚠️ YE ENTRIES "mahabharat" KE BAAD HI RAHNI CHAHIYE. Roman "bharat"
+  // "mahabharat" ka substring hai, aur detectHintedBook pehla match jeetne
+  // deta hai — isliye "Mahabharat me…" wala sawaal upar hi pakda jaata hai
+  // aur yahan tak aata hi nahi. Kram badla to woh toot jaayega.
+  // (Devanagari mein ye khatra nahi: "महाभारत" mein "भारत" hai, "भरत" nahi.)
+  //
+  // KYUN JODA: is list mein Mahabharat ke paatr (युधिष्ठिर, भीष्म,
+  // द्रौपदी, कौरव) pehle se the, par Ramayan ka EK BHI paatr nahi tha —
+  // sirf granth ke naam. Nateeja: "Hanuman ji ko Jambavan ne kya yaad
+  // dilaya?" jaise sawaal par koi granth hinted hi nahi hota tha.
+  //
+  // Sirf ye jodna KAAFI NAHI tha — Ramcharitmanas ke ansh pool mein aane
+  // ke baad bhi gate (0.30) se neeche reh jaate the (naapa: sabse ooncha
+  // 0.2447). Isi naap se worker mein hinted-granth ke liye alag floor
+  // (0.18) bana — dono cheezein saath chalti hain, akele koi nahi.
+  //
+  // "राम" aur "ram" JAAN-BOOJHKAR NAHI hain: Roman "ram" to "program",
+  // "gram", "dharam" sabmein hai, aur "राम" "परशुराम"/"बलराम" mein bhi.
+  // Isliye sirf wo naam jo apne aap mein saaf hain.
+  "hanuman": "ramcharitmanas", "हनुमान": "ramcharitmanas", "हनूमान": "ramcharitmanas",
+  "bajrangbali": "ramcharitmanas", "बजरंगबली": "ramcharitmanas",
+  "sita": "ramcharitmanas", "सीता": "ramcharitmanas", "जानकी": "ramcharitmanas",
+  "lakshman": "ramcharitmanas", "laxman": "ramcharitmanas",
+  "लक्ष्मण": "ramcharitmanas", "लछमन": "ramcharitmanas",
+  "bharat": "ramcharitmanas", "भरत": "ramcharitmanas",
+  "shatrughna": "ramcharitmanas", "शत्रुघ्न": "ramcharitmanas",
+  "dashrath": "ramcharitmanas", "दशरथ": "ramcharitmanas",
+  "kaikeyi": "ramcharitmanas", "कैकेयी": "ramcharitmanas",
+  "kausalya": "ramcharitmanas", "कौसल्या": "ramcharitmanas",
+  "urmila": "ramcharitmanas", "उर्मिला": "ramcharitmanas",
+  "ravan": "ramcharitmanas", "ravana": "ramcharitmanas", "रावण": "ramcharitmanas",
+  "vibhishan": "ramcharitmanas", "विभीषण": "ramcharitmanas",
+  "kumbhkaran": "ramcharitmanas", "कुम्भकर्ण": "ramcharitmanas", "कुंभकर्ण": "ramcharitmanas",
+  "meghnad": "ramcharitmanas", "मेघनाद": "ramcharitmanas",
+  "mandodari": "ramcharitmanas", "मन्दोदरी": "ramcharitmanas",
+  "surpanakha": "ramcharitmanas", "शूर्पणखा": "ramcharitmanas",
+  "sugriv": "ramcharitmanas", "सुग्रीव": "ramcharitmanas",
+  "jambavan": "ramcharitmanas", "जाम्बवान": "ramcharitmanas", "जामवंत": "ramcharitmanas",
+  "angad": "ramcharitmanas", "अंगद": "ramcharitmanas",
+  "jatayu": "ramcharitmanas", "जटायु": "ramcharitmanas",
+  "kevat": "ramcharitmanas", "kewat": "ramcharitmanas", "केवट": "ramcharitmanas",
+  "shabari": "ramcharitmanas", "शबरी": "ramcharitmanas",
+  "ahalya": "ramcharitmanas", "अहल्या": "ramcharitmanas",
+  "ayodhya": "ramcharitmanas", "अयोध्या": "ramcharitmanas",
+  "lanka": "ramcharitmanas", "लंका": "ramcharitmanas", "लङ्का": "ramcharitmanas",
+  "chitrakoot": "ramcharitmanas", "चित्रकूट": "ramcharitmanas",
+  "kishkindha": "ramcharitmanas", "किष्किन्धा": "ramcharitmanas",
+  "panchvati": "ramcharitmanas", "पञ्चवटी": "ramcharitmanas", "पंचवटी": "ramcharitmanas",
+  "vanvas": "ramcharitmanas", "वनवास": "ramcharitmanas",
+  "ashok vatika": "ramcharitmanas", "अशोक वाटिका": "ramcharitmanas",
+  "अशोकवाटिका": "ramcharitmanas", "ramsetu": "ramcharitmanas", "रामसेतु": "ramcharitmanas",
+  "बालकांड": "ramcharitmanas", "बालकाण्ड": "ramcharitmanas",
+  "अयोध्याकांड": "ramcharitmanas", "अयोध्याकाण्ड": "ramcharitmanas",
+  "अरण्यकांड": "ramcharitmanas", "अरण्यकाण्ड": "ramcharitmanas",
+  "किष्किंधाकांड": "ramcharitmanas", "लंकाकांड": "ramcharitmanas",
+  "लङ्काकाण्ड": "ramcharitmanas", "उत्तरकांड": "ramcharitmanas", "उत्तरकाण्ड": "ramcharitmanas",
+
   "garud": "garuda_purana_1", "garuda": "garuda_purana_1",
   "गरुड़ पुराण": "garuda_purana_1", "गरुड पुराण": "garuda_purana_1",
   "shiv puran": "shiva_purana_1", "shiva puran": "shiva_purana_1", "शिव पुराण": "shiva_purana_1",
