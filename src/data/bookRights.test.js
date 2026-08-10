@@ -72,3 +72,50 @@ describe("bookRights — dikhane ka kram", () => {
     expect(bookRank("kuch_bhi")).toBeGreaterThan(bookRank("rashi_muhurt_vigyan"));
   });
 });
+
+describe("SYSTEM_PROMPT ki granth-soochi sach bolti hai — 2026-08-10", () => {
+  // ASLI GHATNA: Ramayan ke do sawaalon par model ne likha "yeh katha
+  // VALMIKI RAMAYANA mein varnit hai". Woh granth 7 August ko corpus se
+  // hataya ja chuka tha — par prompt ki HAATH SE LIKHI soochi mein woh
+  // abhi bhi tha. Model ne wahi kiya jo humne use bataya tha.
+  //
+  // Soochi CHAAR jagah jhoothi nikli:
+  //   likha tha par hai nahi : Valmiki Ramayana, Mantra Shakti,
+  //                            Nitya Devta Archana
+  //   hai par likha nahi     : Mahabharata, Shri Ramcharitmanas,
+  //                            Shri Yoga Vasishtha
+  //
+  // Ab soochi BOOK_META se banti hai (gemini.js ka GRANTH_NAMES). Ye test
+  // us naate ki dono taraf pakadta hai — bina gemini.js ko import kiye,
+  // kyunki wo module network/env ko chhoota hai aur test usmein nahi
+  // ulajhna chahiye.
+
+  it("hataye hue granth BOOK_META mein wapas nahi aa gaye", () => {
+    const naam = Object.values(BOOK_META).map(m => m.en || m.title).join(" | ");
+    for (const gaya of ["Valmiki", "Mantra Shakti", "Nitya Devta Archana"]) {
+      expect(naam, `"${gaya}" hataya ja chuka hai, phir bhi soochi mein hai`)
+        .not.toMatch(new RegExp(gaya, "i"));
+    }
+  });
+
+  it("teen sabse badi kitaabein soochi mein hain", () => {
+    // Ye teeno corpus ke ~60% hain (mahabharata 45%, yoga_vasishtha 11%,
+    // ramcharitmanas 3.6%) aur teeno purani soochi se GAYAB the — isi wajah
+    // se model ko pata hi nahi tha ki uske paas Ramcharitmanas hai.
+    for (const id of ["mahabharata", "ramcharitmanas", "yoga_vasishtha"]) {
+      expect(BOOK_META[id], `${id} BOOK_META mein hona chahiye`).toBeDefined();
+    }
+  });
+
+  it("har granth ka naam hai — soochi isi se banti hai", () => {
+    // Naam khaali hua to prompt mein us granth ki jagah gap aa jaayega
+    // aur model use "hai hi nahi" samjhega.
+    for (const [id, m] of Object.entries(BOOK_META)) {
+      expect(m.en || m.title, `${id} ka naam khaali hai`).toBeTruthy();
+    }
+  });
+
+  it("soochi mein poore 24 granth hain", () => {
+    expect(Object.keys(BOOK_META).length).toBe(24);
+  });
+});

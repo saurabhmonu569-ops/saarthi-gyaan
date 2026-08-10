@@ -36,7 +36,14 @@ const WORDS = {
   ek: "एक", do: "दो", teen: "तीन", char: "चार", paanch: "पाँच",
   // sawaal
   kya: "क्या", kyu: "क्यों", kyun: "क्यों", kyon: "क्यों", kaise: "कैसे", kese: "कैसे",
-  kaisa: "कैसा", kaisi: "कैसी", kab: "कब", kahan: "कहाँ", kaha: "कहाँ", kaun: "कौन",
+  kaisa: "कैसा", kaisi: "कैसी", kab: "कब", kahan: "कहाँ", kaun: "कौन",
+  // ⚠️ `kaha: "कहाँ"` YAHAN SE HATAYA (2026-08-10).
+  // Woh DOHRI chaabi thi — neeche kriya wale block mein `kaha: "कहा"`
+  // (bola/said) bhi hai. JS chup-chaap AAKHRI wali rakhta hai, koi error
+  // nahi deta, isliye kaam sahi chal raha tha... sirf ittefaq se.
+  // Do block ka kram kabhi badla, ya koi upar wala block neeche khiska,
+  // aur "Ram ne kya kaha" turant "राम ने क्या कहाँ" ban jaata — matlab hi
+  // ulta. "kahan/kahaan" (where) alag chaabi hai, wo upar maujood hai.
   kon: "कौन", kitna: "कितना", kitni: "कितनी", kitne: "कितने", konsa: "कौनसा",
   // hona
   hai: "है", hain: "हैं", tha: "था", thi: "थी", the: "थे", hoga: "होगा", hogi: "होगी",
@@ -271,7 +278,15 @@ const WORDS = {
   kaikeyi: "कैकेयी", kaikai: "कैकेयी", kausalya: "कौसल्या",
   sumitra: "सुमित्रा", urmila: "उर्मिला", mandavi: "माण्डवी",
   sugriv: "सुग्रीव", sugreev: "सुग्रीव", bali: "बालि", baali: "बालि",
-  angad: "अंगद", jambavan: "जाम्बवान्", nal: "नल", neel: "नील",
+  angad: "अंगद", nal: "नल", neel: "नील",
+  // ⚠️ HALANT MAT LAGAO. Corpus mein "जाम्बवान" hai (48 ansh), aur FTS
+  // prefix-match `"जाम्बवान्"*` uss chhote roop se KABHI match nahi karega
+  // — lamba shabd chhote ka prefix nahi ho sakta. Ye galti aankh se nahi
+  // dikhti, sirf 0 nateeje se pata chalti hai.
+  jambavan: "जाम्बवान", jambvan: "जाम्बवान", jambavant: "जाम्बवान",
+  // Tulsidas Awadhi mein likhte hain — Ramcharitmanas ke 20 ansh mein
+  // "जामवंत" hai, "जाम्बवान" nahi. Dono roop chahiye.
+  jamvant: "जामवंत", jamavant: "जामवंत", jambvant: "जामवंत",
   jatayu: "जटायु", sampati: "सम्पाति", kewat: "केवट", kevat: "केवट",
   guh: "गुह", nishad: "निषाद",
   kumbhkaran: "कुम्भकर्ण", kumbhakarna: "कुम्भकर्ण",
@@ -285,12 +300,37 @@ const WORDS = {
   chitrakoot: "चित्रकूट", panchvati: "पञ्चवटी", panchavati: "पञ्चवटी",
   dandakvan: "दण्डकवन", ashokvatika: "अशोकवाटिका",
   paduka: "पादुका", padukayen: "पादुका",
+  vatika: "वाटिका", batika: "वाटिका",
+
+  // ⚠️ anuman = हनुमान — ek soch-samajh kar liya gaya faisla.
+  //
+  // "anuman" ka asli matlab अनुमान (andaaza/inference) hai, aur wo Nyaya
+  // ka paribhashik shabd bhi hai (pramana). Par is app par sawaal aata
+  // hai "anuman ji ne Lanka me…" — yaani ye "Hanuman" ka H chhoot jaana
+  // hai, aur bahut aam hai.
+  //
+  // Bina iske kya hota tha, naapa gaya: query ban jaati thi
+  //     "अनुमान जी ने लंका में अशोक Vatika को destroy करने का निर्णय…"
+  // "अनुमान" (andaaza) poori query ka matlab hi badal deta hai. Us sawaal
+  // par 0 ansh mile aur model ne apni yaad se jawab de kar VALMIKI
+  // RAMAYANA ka naam le liya — wo granth humne corpus se hataya hua hai.
+  //
+  // Andaaze wale artha ke liye "anumaan" (do a) alag rakha hai, aur
+  // "pratyaksh/anumaan/shabd" jaise darshan ke sawaal usi roop mein
+  // likhe jaate hain.
+  anuman: "हनुमान", hanumanji: "हनुमान", hanumaan: "हनुमान",
+  anumaan: "अनुमान", pratyaksh: "प्रत्यक्ष", pramana: "प्रमाण",
+
+  // "yaad dilaya" poora toot raha tha — yaad -> यदा (jab!) aur dilaya
+  // Latin mein hi. Do aam kriya, aur dono galat.
+  yaad: "याद", yad: "याद", dilaya: "दिलाया", dilana: "दिलाना",
+  dilai: "दिलाई", yaadgar: "यादगार",
   sanjeevani: "संजीवनी", sanjivani: "संजीवनी",
   setu: "सेतु", ramsetu: "रामसेतु",
   agnipariksha: "अग्निपरीक्षा", vanvaas: "वनवास",
   swayamvar: "स्वयंवर", swayamvara: "स्वयंवर",
   // sarvanaam jo LEXICON se chhoot rahe the
-  unki: "उनकी", unke: "उनके", unko: "उनको", unhe: "उन्हें",
+  unki: "उनकी", unke: "उनके", unhe: "उन्हें",   // unko pehle se maujood
 
   // ── GITA ke paribhashik shabd (usi din, usi sawaal se) ─────────────
   // ⚠️ `sampat` aur `sampati` ALAG hain — sampati = सम्पाति (Jatayu ka
@@ -302,9 +342,9 @@ const WORDS = {
   sampad: "सम्पद्", daivi: "दैवी", daiv: "दैव", asuri: "आसुरी",
   daivasur: "दैवासुर", vibhag: "विभाग", vibhaag: "विभाग",
   sthitpragya: "स्थितप्रज्ञ", nishkaam: "निष्काम",
-  swadharma: "स्वधर्म", paradharma: "परधर्म", yagya: "यज्ञ",
+  swadharma: "स्वधर्म", paradharma: "परधर्म",   // yagya pehle se maujood
   gunatit: "गुणातीत", kshetra: "क्षेत्र", kshetragya: "क्षेत्रज्ञ",
-  purushottam: "पुरुषोत्तम", vishwaroop: "विश्वरूप",
+  vishwaroop: "विश्वरूप",   // purushottam upar "naam" block mein pehle se hai
   // NOTE: angrezi shabd (depression, leadership, practical, business,
   // confusion, discipline, support, values) JAAN-BOOJH KAR nahi jode.
   // Unka Devanagari roop corpus mein hai hi nahi ("डिप्रेशन" 0 baar),
@@ -960,7 +1000,10 @@ export const EN_CONCEPT = {
   // dene se uska faisla bigadta hai. Us sawaal par best-rerank 0.3447
   // aaya aur SIRF 1 ansh gate paar kar paya.
   practical: "व्यावहारिक", theoretical: "सैद्धान्तिक",
-  narrative: "प्रसंग", story: "कथा", episode: "प्रसंग",
+  destroy: "नाश", destruction: "विनाश", destroyed: "नष्ट",
+  promise: "प्रतिज्ञा", curse: "शाप",   // decision pehle se maujood
+  boon: "वरदान", battle: "युद्ध", army: "सेना", messenger: "दूत",
+  narrative: "प्रसंग", episode: "प्रसंग",   // story pehle se maujood
   example: "उदाहरण", method: "विधि", process: "प्रक्रिया",
   origin: "उत्पत्ति", role: "भूमिका", symbol: "प्रतीक",
   quality: "गुण", rule: "नियम", type: "प्रकार",

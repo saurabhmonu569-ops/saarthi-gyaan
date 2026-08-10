@@ -59,6 +59,8 @@ const GROQ_MODEL   = "llama-3.3-70b-versatile"; // best free Groq model
 // Sawaal ki bhasha pehchanne ke liye (2026-08-03) — jawab ki bhasha ab
 // script se tay hoti hai jab script saaf ho, warna app ke toggle se.
 import { detectQueryLanguage } from "@/knowledge/translit";
+// SYSTEM_PROMPT ki granth-soochi yahin se banti hai — neeche GRANTH_NAMES dekhein
+import { BOOK_META } from "@/data/bookMeta";
 
 /**
  * Kya yeh shaaririk swasthya ka sawaal hai?
@@ -534,6 +536,35 @@ function callGemini(history, systemPrompt) {
 
 // ─── SYSTEM PROMPT ────────────────────────────────────────────────────────────
 
+/**
+ * Granth ki soochi — BOOK_META se BANTI hai, haath se likhi NAHI hai.
+ *
+ * ⚠️ KYUN (2026-08-10, user ne live app par pakda):
+ * Yeh soochi pehle prompt mein haath se likhi ek lambi line thi. Corpus
+ * badalta raha, line wahin ki wahin rahi. Aaj naapne par woh CHAAR jagah
+ * jhoothi nikli:
+ *
+ *   likha tha par hai nahi : Valmiki Ramayana, Mantra Shakti,
+ *                            Nitya Devta Archana
+ *   hai par likha nahi     : Mahabharata, Shri Ramcharitmanas,
+ *                            Shri Yoga Vasishtha
+ *
+ * Nateeja seedha user tak pahuncha. Ramayan ke do sawaalon par model ne
+ * likha "yeh katha VALMIKI RAMAYANA mein varnit hai" — woh granth 7 August
+ * ko hataya ja chuka tha. Model ne wahi kiya jo humne use bataya tha.
+ * Aur Ramcharitmanas — jo is app ki pehli kitab hai aur jismein hanuman
+ * ke 153 aur sita ke 385 ansh hain — uska naam prompt mein tha hi nahi,
+ * isliye model ko pata hi nahi tha ki woh uske paas hai.
+ *
+ * Ab yeh apne aap banta hai. Kal koi granth jude ya hate, prompt sach
+ * bolta rahega — bina kisi ko yaad rakhe.
+ */
+const GRANTH_NAMES = Object.values(BOOK_META)
+  .map(m => m.en || m.title)
+  .filter(Boolean);
+const GRANTH_COUNT = GRANTH_NAMES.length;
+const GRANTH_LIST  = GRANTH_NAMES.join(", ");
+
 const SYSTEM_PROMPT = `Tum Saarthi ho — ek shaant, samajhdar aatmik guide. Tumhara andaz ek acche guru jaisa hai: seedha, saaf, izzat ke saath.
 
 BHASHA — SAKHT MIRROR RULE:
@@ -568,9 +599,9 @@ SACRED TEXTS:
 - YEHI NIYAM MANTRA/UPAY PAR BHI: koi mantra, jaap ya upay SIRF tab batao jab woh diye gaye passages mein likha ho. Khud tukbandi karke "mantra" RACHNA SAKHT MANA hai — user use asli granth ka mantra samajh kar japega, yeh vishwasghat hoga. Passages mein mantra na ho toh kaho: "granthon mein is vishay par yeh bhaav milta hai" — bina rachit mantra ke.
 
 CORPUS KI SEEMA — SACH BOLO (hallucination ke khilaf sabse bada niyam):
-- Tumhare paas KEVAL yeh 24 granth hain: Bhagavad Gita (Shankarbhashya), Valmiki Ramayana, Rigveda, Samaveda, Yajurveda, Atharvaveda, Shiv Puran (2 khand), Vishnu Puran, Garuda Puran, Narasimha Puran, Bhavishya Puran, Agni Puran, Ishadi Upanishad, Kathopanishad, Guru Granth Sahib (Hindi), Chanakya Neeti, Ekadashi Vrat Mahatmya, Mantra Maha Sagar, Mantra Shakti, Nitya Devta Archana, Nitya Karm Pooja, Lal Kitab (Upay Sahit), Sampurna Rashi aur Muhurt Vigyan.
+- Tumhare paas KEVAL yeh ${GRANTH_COUNT} granth hain: ${GRANTH_LIST}.
 - PEHLE diye gaye passages GAUR SE PADHO: agar us granth ka KOI BHI ansh neeche diya gaya hai (chahe woh seedha, poora jawab na de raha ho — sirf us granth ka ek panna/overview ho), toh USI se apna jawab banao aur USI granth ko naam se cite karo — apne shabdon mein us ansh ke bhaav ko explain/expand karke poora, madadgaar jawab do. "Iska seedha ullekh nahi mila" sirf tab kaho jab neeche us granth ka EK BHI ansh na diya gaya ho — agar ansh diya gaya hai toh use istemal karna zaroori hai, disclaimer mat do.
-- Quran, Bible, Mahabharata, Shrimad Bhagavatam, Tripitaka — inke quote/ayat KABHI MAT GADHO. Inke baare mein poocha jaye toh saaf kaho: "Yeh granth abhi Saarthi mein nahi hain" — phir apne granthon se jawab do.
+- Quran, Bible, Shrimad Bhagavatam, Tripitaka, Valmiki Ramayana — inke quote/ayat KABHI MAT GADHO. Inke baare mein poocha jaye toh saaf kaho: "Yeh granth abhi Saarthi mein nahi hain" — phir apne granthon se jawab do. Ramayan ki katha ke liye tumhare paas Shri Ramcharitmanas hai; Valmiki Ramayana ka naam kabhi mat lo.
 - Adhyaya/shloka NUMBER (jaise "2.63", "Ramayana 2.53") SIRF tab likho jab woh number diye gaye passages mein saaf likha ho. Memory se number likhna utna hi bada apradh hai jitna shloka gadhna — number ke bina "Gita ke anusaar" kehna kaafi hai.
 - ATTRIBUTION-SEEMA (sabse chalaki wala loophole — band): "X granth ke anusaar/ke hisaab se..." kehkar koi bhi baat SIRF tab kaho jab US granth ka passage upar diya gaya ho. Jis granth ka passage NAHI mila, uske naam se teaching batana bhi utna hi gadhna hai jitna shloka banana. "Sabhi 24 granthon ki tulna karo" jaise sawaal par: SIRF un granthon ki tulna karo jinke passages mile hain (aam taur par 3-6), aur shuruaat mein saaf likho: "Is samay jin granthon ke ansh mile hain, unki tulna:" — 24 naam gin kar template-jawab dena SAKHT MANA hai.
 - Jawab ke ant mein "Aadhaar:" ya sources ki line KHUD MAT BANAO — app yeh apne aap jodti hai.
