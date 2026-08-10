@@ -1,6 +1,19 @@
 /**
  * SAARTHI — Real semantic (meaning-based) search
  * =================================================
+ * ⚠️ APP MEIN AB ISKA KOI ISTEMAL NAHI HAI (P2, 2026-08-10).
+ *
+ * Ye file 59 MB `vectors_int8.bin` browser mein utaar kar wahin cosine
+ * search chalati thi. Ab wahi kaam Worker par Vectorize karta hai
+ * (deploy/cloudflare-worker.js ka /search), aur client par 0 MB utarta
+ * hai. Isliye kisi bhi component se ise import MAT karo — wo import
+ * karte hi 59 MB ka download wapas aa jaayega.
+ *
+ * File RAKHI isliye hai ki isme wo int8→float32 ka ganit likha hai jo
+ * scripts/11_upload_vectorize.mjs bhi istemal karta hai, aur uske saath
+ * uski poori kahani. Delete karne se wo hisaab-kitaab kho jaata.
+ *
+ * ── NEECHE PURANA ITIHAAS (ab bhi padhne layak) ──────────────────────
  * AUDIT REWRITE (2026-08-01) — item #16
  *
  * PICHLI HAALAT (kyun poora badalna pada):

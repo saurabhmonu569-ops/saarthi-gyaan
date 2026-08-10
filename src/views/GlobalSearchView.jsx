@@ -17,7 +17,7 @@ export function GlobalSearchView({ onNav }) {
   const t = useT();
   const { uiLang } = useUiLang();
   const { profile } = useAuth();
-  const { ready, hybridSearch, crossBookSearch } = useKnowledge();
+  const { ready, hybridSearch, crossBookSearch } = useKnowledge({ load: true });
   const [query,   setQuery]   = useState("");
   const [results, setResults] = useState([]); // SearchResult[]
   const [mode,    setMode]    = useState("cross"); // "cross" | "single"

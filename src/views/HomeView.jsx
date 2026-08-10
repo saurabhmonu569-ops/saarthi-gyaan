@@ -4,7 +4,6 @@
  * logic/behavior change from the original inline code.
  */
 import { useState } from "react";
-import { useKnowledge } from "@/hooks/useKnowledge";
 import { useBookProgress } from "@/context/AppContext";
 import { BOOKS, DAILY_WISDOMS } from "@/data";
 import { useT, useUiLang } from "@/i18n";
@@ -18,8 +17,19 @@ export function HomeView({ onNav }) {
   const { uiLang } = useUiLang();
   const hour    = new Date().getHours();
   const wisdom   = DAILY_WISDOMS[new Date().getDate() % DAILY_WISDOMS.length];
-  // Engine books for "Continue Reading" section (enriches static BOOKS with real indexed ones)
-  const { ready: kReady, getBooks: getEngineBooks } = useKnowledge();
+  // HATAYA (P2, 2026-08-10): yahan `const { ready: kReady, getBooks:
+  // getEngineBooks } = useKnowledge();` tha — "Continue Reading section ko
+  // enrich karne ke liye". Woh enrichment kabhi likhi hi nahi gayi: poori
+  // file mein kReady aur getEngineBooks ek baar bhi istemal nahi hote the.
+  //
+  // Par ye MARI HUI line nahi thi. HomeView app ka LANDING page hai, aur
+  // useKnowledge() mount hote hi poora corpus utaarna shuru kar deta tha —
+  // books 165 MB + keyword index 93 MB. Yaani HAR pehla visitor 258 MB
+  // utaarta tha ek aisi cheez ke liye jo screen par thi hi nahi.
+  //
+  // Ab Read aur Search tab khud maangte hain jab user wahan jaata hai
+  // (useKnowledge ka ensureFullKnowledge), aur Ask ko kuch nahi chahiye —
+  // uski retrieval Worker par hai.
   // item #15: signed-in user ka naam + janamdin ka in-app badhai banner
   // (real push notification nahi — koi backend/service-worker infra nahi,
   // sirf app kholne par dikhta hai; future upgrade ke liye note kiya gaya)

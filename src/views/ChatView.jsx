@@ -5,12 +5,12 @@
  */
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useChat } from "@/hooks/useChat";
-import { useKnowledge } from "@/hooks/useKnowledge";
 import { useBookProgress } from "@/context/AppContext";
 import { BOOKS } from "@/data";
+import { BOOK_META } from "@/data/bookMeta";
 import { useT } from "@/i18n";
 import { detectHintedBook } from "@/knowledge/bookHints";
-import { semanticSearch, preloadSemanticSearch, rerankPassages, RERANK_MAX_TOTAL } from "@/knowledge/semanticSearch";
+import { serverRetrieve, warmServerSearch } from "@/knowledge/serverSearch";
 import { normalizeQueryForSearch, expandQueryWithParyay, stripMetaFraming, isOutOfScope } from "@/knowledge/translit";
 
 // ── RELEVANCE GATE ───────────────────────────────────────────────────────
@@ -41,6 +41,12 @@ import { normalizeQueryForSearch, expandQueryWithParyay, stripMetaFraming, isOut
 //
 // Ise badalne se pehle DOBARA naapo:  node scripts/eval-ask.mjs --300 --full
 // Dekhna sirf ek cheez: `jhoothi cite` 0 rahi ya nahi.
+//
+// ⚠️ P2 (2026-08-10): ye gate ab WORKER mein lagta hai (SEARCH_MIN_RERANK),
+// kyunki rerank wahin hota hai. Yahan ka number ab sirf ek pehra hai — agar
+// server kabhi is se neeche ka ansh bhej de to hum use grounded nahi maanenge.
+// DONO jagah 0.30 hai; badalna ho to DONO badalna, warna ek din chup-chaap
+// alag ho jaayenge.
 const MIN_RERANK_SCORE = 0.30;
 
 /**
@@ -312,22 +318,39 @@ function DemoKeyEntry() {
 
 export function ChatView() {
   const t = useT();
-  const { ready: knowledgeReady, crossBookSearch, hybridSearch, getBookChunks, getChunk } = useKnowledge();
   const [sacredChunks, setSacredChunks] = useState([]);
 
-  // FIX (2026-07-26): real neural semantic search ab bhi Ask ke liye warm
-  // hona shuru ho jaata hai jab user Chat tab par aata hai — pehla asli
-  // sawaal aane tak model+vectors (background mein) load ho chuke hote
-  // hain, taaki pehla jawab bhi tez ho. Fail-soft — is call ka result
-  // istemal nahi hota, sirf warmup ke liye hai.
+  // Worker ko jagao jab user Chat tab par aaye.
+  //
+  // Pehle yahan preloadSemanticSearch() tha, jo 59 MB vectors utaarne
+  // lagta tha. Ab utarne ko kuch hai hi nahi — par cold start abhi bhi
+  // hai: /search ka pehla call 3,028 ms naapa gaya (Worker isolate +
+  // Vectorize ka pehla connection + AI model warmup). Ye chhota-sa call
+  // wo teeno pehle hi kara deta hai, taaki user ka PEHLA sawaal bhi utna
+  // hi tez lage jitna doosra. Fail-soft — result istemal nahi hota.
   useEffect(() => {
-    preloadSemanticSearch();
+    warmServerSearch();
   }, []);
 
-  // Build a stable retrieval function — called before every AI send
-  // Merges keyword + cross-book + semantic results, deduplicates by chunk ID, sorts by score
+  // ── RETRIEVAL — ab SERVER par (P2, 2026-08-10) ────────────────────────
+  //
+  // Yahan pehle ~360 line thi: keyword search, cross-book search, semantic
+  // search, source-quota merge, hinted-book guarantee, rerank, gate,
+  // per-book cap, padosi ansh. Woh SAARA logic ab Worker ke /search mein
+  // hai — ek-ek line, wahi sankhyayein (45/20/20, 0.30, cap 3, keep 12).
+  //
+  // KYUN HATAYA: woh code chalane ke liye browser ko 316 MB corpus utaarna
+  // padta tha (books 165 + keyword index 93 + vectors 59). Gzip ke baad
+  // bhi ~122 MB. Bharat mein mobile par koi itna intezaar nahi karta —
+  // yaani 298 sawaalon par naapa hua 80% ka score kisi ASLI user tak
+  // pahunchta hi nahi tha. Ab client par download 0 MB hai.
+  //
+  // JO YAHAN BACHA HAI, WO JAAN-BOOJHKAR BACHA HAI:
+  //   translit / paryay / stripMetaFraming / isOutOfScope / detectHintedBook
+  // Ye sirf CODE hain — inka lexicon KB mein hai, MB mein nahi. Client par
+  // rehne se ek round-trip bachta hai aur inke unit test bina network ke
+  // chalte rehte hain.
   const retrieveContext = useCallback(async (query) => {
-    if (!knowledgeReady) return [];
     try {
       // 0. QUERY NORMALIZATION (item #17, 2026-08-03)
       // Poora corpus Devanagari mein hai. Roman/Hinglish sawaal
@@ -335,17 +358,23 @@ export function ChatView() {
       // English — score girkar shor ke barabar aa jaata hai:
       //     gussa kaise shant karein   0.4370
       //     गुस्सा कैसे शांत करें         0.6595
-      // Lexicon-based translit (corpus ke 6,000 sabse aam shabd) se 96%
-      // faayda wapas aata hai. Keyword search ko bhi isse hi laabh hota
-      // hai — woh bhi Devanagari substring par chalti hai.
-      // Original query AI ke prompt ke liye waisa hi rehta hai; yeh sirf
-      // DHOONDHNE ke liye hai.
       const { query: searchQ } = normalizeQueryForSearch(query);
 
-      // 0.5 GRANTH-PARYAY (2026-08-07)
+      // DAAYRE SE BAHAR? (2026-08-10) — "Quran ki shiksha", "Meditation app
+      // kaunsa best" jaise sawaalon par reranker 0.9+ score deta hai kyunki
+      // wo VISHAY milata hai, sawaal nahi. Koi bhi threshold ise nahi rok
+      // sakta. Hamare paas 24 gine-chune granth hain; unse bahar ki cheez
+      // par citation lagana hi galat hai — chahe score kitna bhi ho.
+      // Jawab phir bhi jaata hai, bas bina granth ke.
       //
+      // Ye jaanch SERVER CALL SE PEHLE hai — ek bekaar round-trip aur ek
+      // bekaar AI-neuron dono bach jaate hain.
+      if (isOutOfScope(query)) {
+        console.log("[Retrieval] sawaal hamare 24 granthon ke daayre se bahar — bina aadhaar ke jawab");
+        setSacredChunks([]); return [];
+      }
+
       // Teen alag query, teen alag kaam (2026-08-07):
-      //
       //   query   = user ka asli sawaal   → AI ke PROMPT mein (achhoota)
       //   rerankQ = meta-dhaancha hataya  → RERANKER ko
       //   findQ   = rerankQ + granth-paryay → DHOONDHNE ko
@@ -354,321 +383,51 @@ export function ChatView() {
       // शास्त्र क्या कहते हैं?" par 0 ansh mile the — jabki corpus mein
       // krodh-niyantran par 464 chunks hain. Reranker cross-encoder hai;
       // "शास्त्र क्या कहते हैं" use KITAB ke baare mein sawaal lagta hai,
-      // vishay ke baare mein nahi. Wahi dhaancha hata dene se sawaal
-      // seedha ho jaata hai: "क्रोध को नियंत्रित करने के लिए".
+      // vishay ke baare mein nahi.
       //
       // KYUN findQ alag: paryay sirf UMMEEDWAAR dhoondhne ke liye hain.
-      // Reranker ko paryay dene se sawaal anaad ho jaata hai aur wahi
-      // 0.5 ka gate bigadta hai jo aaj tak 0 jhoothi citation de raha hai.
-      // DAAYRE SE BAHAR? (2026-08-10) — "Quran ki shiksha", "Meditation app
-      // kaunsa best" jaise sawaalon par reranker 0.9+ score deta hai kyunki
-      // wo VISHAY milata hai, sawaal nahi. Koi bhi threshold ise nahi rok
-      // sakta. Hamare paas 24 gine-chune granth hain; unse bahar ki cheez
-      // par citation lagana hi galat hai — chahe score kitna bhi ho.
-      // Jawab phir bhi jaata hai, bas bina granth ke.
-      if (isOutOfScope(query)) {
-        console.log("[Retrieval] sawaal hamare 24 granthon ke daayre se bahar — bina aadhaar ke jawab");
-        setSacredChunks([]); return [];
-      }
-
+      // Reranker ko paryay dene se sawaal anaad ho jaata hai aur wahi gate
+      // bigadta hai jo 32 control sawaalon par 0 jhoothi citation deta hai.
       const rerankQ = stripMetaFraming(searchQ);
       const findQ   = expandQueryWithParyay(rerankQ);
-
-      // 1. Cross-book: top 3 per book
-      const crossResults = crossBookSearch(findQ, null, 3);
-      const crossFlat = crossResults.flatMap(r => r.results);
-
-      // 2. Keyword: direct inverted-index search
-      const kwResults = hybridSearch(findQ, null, {}, 40);
-
-      // 2.5 REAL semantic search (2026-07-26 fix — see src/knowledge/
-      // semanticSearch.js for full context): keyword search sirf exact/
-      // substring text match karta hai — "family mein ego kaise kam
-      // karein" jaisa paraphrased sawaal miss ho sakta hai agar corpus
-      // "ahankar" shabd use karta ho, "ego" nahi. Yeh asli meaning se
-      // match karta hai. FAIL-SOFT: model abhi load ho raha ho ya fail
-      // ho jaaye toh khaali array — keyword+cross-book upar se hamesha
-      // kaam karte rehte hain, yeh sirf ADDITIONAL signal hai.
-      let semResults = [];
-      try {
-        const semHits = await semanticSearch(findQ, 50);
-        semResults = semHits
-          .map(h => {
-            const chunk = getChunk(h.id);
-            return chunk ? { chunk, score: h.score, match_type: "semantic" } : null;
-          })
-          .filter(Boolean);
-      } catch { /* soft-fail — keyword+cross-book results still cover us */ }
-
-      // 3. SOURCE-BALANCED MERGE (2026-08-03 fix)
-      //
-      // Pehle yahan teeno sources ko ek saath dal kar `r.score > existing.score`
-      // se chuna jaata tha. Par teeno ke paimane ALAG hain:
-      //     keyword  : (s/keywords.length) * (0.5 + 0.5*density)  — apna scale
-      //     semantic : cosine, −1..1
-      //     overview : hardcoded 0.05
-      // Inhe `>` se tolna kilo aur kilometre ki tulna hai. Isliye har source
-      // se ALAG-ALAG top-N lete hain (apne hi scale ke andar), aur asli
-      // faisla aage reranker par chhodte hain — wahi ekmatra bharosemand,
-      // aapas mein tulne-layak score deta hai.
-      // FUNNEL CHAUDA (2026-08-06) — kota 10/6/6 = ~22 tha, ab 45/20/20 = ~85.
-      //
-      // Jad: reranker hi ekmatra bharosemand judge hai (gap +0.8878 vs cosine
-      // ka +0.0059), par wo sirf UNHI par lag sakta hai jo use diye jaayein.
-      // Purane kote mein wo 32,032 chunks mein se 20 dekhta tha — 0.06%.
-      // Sahi ansh agar cosine ke top-12 mein nahi aaya to wo hamesha ke liye
-      // gaayab tha. Yahi "kabhi-kabhi galat granth aata hai" ki asli jad hai —
-      // corpus mein kami NAHI hai (36 jeevan-vishayon par 300 se 61,000 tak
-      // hits, 20-24 kitaabon mein faile hue), dhoondhne ka jaal chhota tha.
-      //
-      // rerankPassages ab 20-20 ke parallel batch bhejta hai, isliye 85
-      // candidates ka samay lagbhag 20 jitna hi hai.
-      const SRC_QUOTA = [[semResults, 45], [kwResults, 20], [crossFlat, 20]];
-      const byId = new Map();
-      for (const [arr, k] of SRC_QUOTA) {
-        const sortedSrc = [...arr].sort((a, b) => b.score - a.score).slice(0, k);
-        for (const r of sortedSrc) if (!byId.has(r.chunk.id)) byId.set(r.chunk.id, r);
-      }
-
-      // 3.5 Agar user ne kisi book ka naam liya hai, USI book ke passages pehle
-      // (2026-07-25: hint list ab src/knowledge/bookHints.js mein hai — apne
-      // aap ek testable pure function, App.jsx ke bahar unit-test ho sakta hai)
       const hintedBook = detectHintedBook(query);
 
-      // 3.6 AUTOPSY FIX (2026-07-24): "Atharvaveda ka modern use kya hai?"
-      // jaise sawaal 0 candidate laate the — keyword-search sirf Devanagari
-      // substring match karta hai, aur "Atharvaveda" jaisa Roman naam kisi
-      // Devanagari chunk mein literally kabhi nahi milta (TRANSLIT dict mein
-      // ab in Veda/Purana naamon ki entry jod di gayi hai, par phir bhi
-      // CONCEPTUAL/paraphrased sawaal (jaise "modern use") us granth ke
-      // shabdon se seedha match nahi karega). Isliye jab user ne khud granth
-      // ka naam liya ho (hintedBook), us granth se REAL ansh milna GUARANTEE
-      // karo — pehle usi granth ke andar keyword-search try karo, phir bhi
-      // kam mile toh granth ka ek spread (shuru/beech/ant) le lo. Isse AI
-      // kabhi "koi ullekh nahi mila" bol kar anjaan books cite nahi karega —
-      // hamesha us granth ka असली text milega jawab dene ke liye.
-      if (hintedBook) {
-        const already = [...byId.values()].filter(r => r.chunk.book === hintedBook).length;
-        if (already < 3) {
-          const withinBook = hybridSearch(findQ, null, { book: hintedBook }, 6);
-          for (const r of withinBook) {
-            const existing = byId.get(r.chunk.id);
-            if (!existing || r.score > existing.score) byId.set(r.chunk.id, r);
-          }
-          const nowHave = [...byId.values()].filter(r => r.chunk.book === hintedBook).length;
-          if (nowHave < 3) {
-            const allBookChunks = (getBookChunks(hintedBook) || [])
-              .filter(c => (c.text || "").trim().length > 60);
-            const step = Math.max(1, Math.floor(allBookChunks.length / 6));
-            for (let i = 0; i < allBookChunks.length; i += step) {
-              const c = allBookChunks[i];
-              if (!byId.has(c.id)) byId.set(c.id, { chunk: c, score: 0.05, match_type: "book-overview" });
-            }
-          }
-        }
-      }
+      const { chunks } = await serverRetrieve({ findQ, rerankQ, hintedBook });
+      if (!chunks.length) { setSacredChunks([]); return []; }
 
-      // 4. Candidates saaf karo aur rerank ke liye taiyaar karo.
-      //    (Purana `const sorted = ...` block yahan se hata diya — ab yehi
-      //    kaam neeche `cleaned` karta hai, ek hi jagah.)
-      // VIVIDHTA-CAP (user complaint: "har jawab same book se aata hai" —
-      // dobara cross-check ke baad aur sakht kiya gaya): ek book ke max 2
-      // ansh, ab top-8 mein se — kam se kam 4 alag granth aayenge, taaki
-      // GENERIC (bina naam liye) sawaalon mein zyada vividhta rahe.
+      // Server se aaye ansh ko wahi shakl do jo gemini.js aur useChat.js
+      // pehle se padhte hain: { chunk: {...}, score, rerank, grounded }.
       //
-      // BUG FIX (2026-07-24): jab user khud kisi granth ka naam le (e.g.
-      // "Mantra Maha Sagar se mantra bataiye"), purana cap (3 vs 2) tha —
-      // 8 mein se sirf 3 hinted-book se, baaki 5 alag-alag anjaan granthon
-      // se — AI ka jawab un anjaan granthon ko bhi "Aadhaar" mein cite kar
-      // deta tha (galat/bharamak). Ab hinted-book ka cap bahut dheela (6)
-      // — woh hi granth zyaadatar context bharega; doosre books sirf tab
-      // aayenge jab hinted-book ke paas khud itne matching ansh na hoon.
-      // SCORE-AWARE DIVERSITY FLOOR (2026-07-26 fix): purana cap sirf "max 2
-      // per book, top-8 tak bharo" tha — bhale hi 3rd/4th book ka score bahut
-      // kamzor/anrelevant ho, phir bhi 8 tak pahunchne ke liye force-include
-      // ho jaata tha. Isi wajah se ek badi, broad-topic wali kitaab (jaise
-      // Guru Granth Sahib) almost HAR generic sawaal ke Aadhaar mein aa jaati
-      // thi, chahe topic se seedha lena-dena na ho — semantic search sahi
-      // passage dhoondh leta hai, par yeh cap use bhi dilute kar deta tha.
-      // Ab (sirf generic/non-hinted sawaalon ke liye): kam se kam 3 acche
-      // (top-score) results mil chuke hon, uske baad koi bhi naya passage
-      // jo top-score ke 35% se kamzor ho, use diversity ke liye zabardasti
-      // shaamil mat karo — kam passages sahi, galat/anrelevant citation nahi.
-      // (hintedBook wale case ko chhua nahi — uska apna guaranteed-grounding
-      // logic hai, upar dekhen.)
-      // AUDIT REWRITE (2026-08-03) — purana relevance-guard yahan tha:
-      //     const MIN_RELATIVE_SCORE = 0.35;
-      //     if (!hintedBook && diverse.length >= 3 && r.score < topScore * 0.35) continue;
-      //
-      // Usme DO buniyadi kharabiyan thi:
-      //
-      // (a) Threshold RELATIVE tha. Cutoff = topScore x 0.35. Agar sabse
-      //     accha match hi kachra ho (0.12), toh cutoff 0.042 ban jaata
-      //     aur sab paar kar jaate. Aisa guard vividhta control kar sakta
-      //     hai, PRASANGIKTA kabhi nahi — theek us waqt andha hota hai jab
-      //     poora result-set hi bekaar ho.
-      //
-      // (b) `diverse.length >= 3` — pehle 3 passages ko koi jaanch hi nahi.
-      //     ISI wajah se HAR jawab ke saath granth cite hote the, chahe
-      //     sawaal ka unse koi lena-dena ho ya na ho. "OCR me error ho to
-      //     AI kya kare" par bhi Valmiki Ramayana aa jaati thi.
-      //
-      // Ab: candidates bante hain (vividhta ke saath), phir CROSS-ENCODER
-      // RERANKER faisla karta hai ki koi passage sach mein jawab deta hai
-      // ya nahi. Naapa hua farak:
-      //     cosine     sahi-min 0.4941  kachra-max 0.4882  gap +0.0059
-      //     reranker   sahi-min 0.9009  kachra-max 0.0131  gap +0.8878
-      //
-      // Reranker score bimodal hai — ya 0.90+, ya lagbhag 0 — isliye 0.5
-      // par dono taraf 0.44 ka margin milta hai.
-      // BUG FIX (2026-08-03, user ne pakda): pehle per-book cap YAHAN,
-      // rerank se PEHLE lagta tha. Nateeja — "मृत्यु के बाद आत्मा का क्या
-      // होता है" par Garuda Purana ke chunks cosine list mein rank 2, 4, 5,
-      // 6, 7... par the. Cap=2 sirf rank 2 aur 4 rakhta tha, aur rank 6
-      // wala — jiska rerank score 0.9406 tha, poore corpus mein doosra
-      // sabse achha — chhant jaata tha. Jawab mein sirf कठोपनिषद् aata tha,
-      // jabki Garuda Purana hi mrityu-ke-baad ka asli granth hai.
-      //
-      // Jad: cap ka faisla us mile-jule score par ho raha tha jo keyword
-      // aur cosine ko aapas mein tolta hai (alag paimane). Bharosemand
-      // score reranker ke baad milta hai — isliye ab kram ULTA hai:
-      // pehle rerank, phir diversity.
-      const cleaned = [...byId.values()]
-        .map(r => ({ ...r, chunk: { ...r.chunk, text: cleanOcrText(r.chunk.text || "") } }))
-        .filter(r => r.chunk.text.trim().length > 40)   // pure OCR junk hatao
-        .sort((a, b) => {
-          if (hintedBook) {
-            const ab = a.chunk.book === hintedBook, bb = b.chunk.book === hintedBook;
-            if (ab !== bb) return ab ? -1 : 1;
-          }
-          return b.score - a.score;
-        })
-        .slice(0, RERANK_MAX_TOTAL);   // rerankPassages ise 20-20 ke batch mein baantega
-
-      if (!cleaned.length) { setSacredChunks([]); return []; }
-
-      // ── RELEVANCE GATE ────────────────────────────────────────────────
-      const scores = await rerankPassages(rerankQ, cleaned.map(r => r.chunk.text.slice(0, 1200)));
-
-      let kept;
-      if (scores) {
-        const passed = cleaned
-          .map((r, i) => ({ ...r, rerank: scores[i] ?? 0 }))
-          .filter(r => r.rerank >= MIN_RERANK_SCORE)
-          .sort((a, b) => b.rerank - a.rerank);
-
-        // AB diversity — reranker ke bharosemand score ke kram par.
-        // Ek granth ke max 3 ansh, taaki ek hi kitaab poora context na
-        // bhar de, par sabse achha ansh kabhi na chhoote.
-        const perBook = new Map();
-        kept = [];
-        for (const r of passed) {
-          const c = perBook.get(r.chunk.book) || 0;
-          if (c >= 3) continue;
-          perBook.set(r.chunk.book, c + 1);
-          kept.push(r);
-        }
-        if (!kept.length) {
-          // Yeh SAFALTA hai, vifalta nahi — user ka apna niyam:
-          // "agar 1% bhi jawab nahi mila toh saada jawab dena, source ke
-          //  bina bhi chalega". Khaali lautne se AI ko koi granth nahi
-          //  milta aur useChat.js koi Aadhaar footer nahi lagata.
-          console.log(`[Retrieval] koi prasangik ansh nahi mila (best rerank ${Math.max(...scores).toFixed(3)}) — bina granth ke jawab`);
-          setSacredChunks([]);
-          return [];
-        }
-      } else {
-        // Rerank fail (network/AI down) — passages istemal karo par
-        // grounded MAT maano, taaki citation na lage. Kam bharosa theek
-        // hai; galat bharosa nahi.
-        kept = cleaned.slice(0, 6).map(r => ({ ...r, rerank: null }));
-      }
-
-      // ── PADOSI ANSH (2026-08-04) — chunk ki seema par kata jawab ─────
-      //
-      // ASLI GHATNA: "सूर्य के 12 नमस्कार" par nitya_karm_pooja p.125 mila,
-      // jisme likha tha "सूर्यके बारह नामोंके द्वारा होनेवाले बारह..." —
-      // aur wahin chunk KHATAM ho gaya. Baarah naam agle chunk (p.126)
-      // mein the. Model ke paas bhoomika thi, naam nahi — usne apni yaad
-      // se list bhar di aur 12 mein se 5 naam GALAT nikle (12 आदित्य ki
-      // alag list ghusa di).
-      //
-      // Yeh RAG ki jaani-mani samasya hai: jawab do chunks ke beech kat
-      // jaata hai. Standard ilaaj — jo ansh gate paar kare, uska AGLA
-      // ansh bhi saath bhejo. Sirf top-3 ke liye, taaki prompt na phoole.
-      //
-      // Padosi ko bhi grounded maante hain: woh usi passage ka agla hissa
-      // hai jise reranker ne pass kiya, aur uski kitaab pehle se cite ho
-      // rahi hai.
-      try {
-        const already = new Set(kept.map(r => r.chunk.id));
-        const withNeighbours = [];
-        let added = 0;
-        for (let n = 0; n < kept.length; n++) {
-          const r = kept[n];
-          withNeighbours.push(r);
-          if (n >= 3) continue;                       // sirf top-3 ke padosi
-          const all = getBookChunks(r.chunk.book) || [];
-          const idx = all.findIndex(c => c.id === r.chunk.id);
-          if (idx < 0) continue;
-          // DONO taraf dekho — pichla AUR agla.
-          //
-          // KYUN (2026-08-04, asli ghatna): "कृत्तिका नक्षत्र में जन्मे जातक"
-          // par rashi_muhurt_vigyan ka idx-13 wala ansh mila (rerank 0.78).
-          // Par jawab idx-12 mein tha — TURANT PEHLE wale ansh mein. Woh
-          // ansh search ko dikhta hi nahi kyunki OCR ne uske shirshak
-          // "कृत्तिका" ko "Gitar" padh liya hai. Sirf agla ansh uthate toh
-          // idx-14 (वृषभ राशि) milta — bilkul bekaar.
-          //
-          // Yeh OCR ki galti ka sasta ilaaj bhi hai: jab kisi ansh ka
-          // vishay-shabd bigda ho, uska padosi aksar saaf hota hai — aur
-          // padosi ke rastey woh ansh wapas mil jaata hai.
-          for (const off of [-1, 1]) {
-            const nb = all[idx + off];
-            if (!nb || already.has(nb.id) || (nb.text || "").trim().length <= 40) continue;
-            already.add(nb.id);
-            // Padosi ko TURANT uske mool ansh ke saath rakho — model dono ko
-            // ek hi behaav mein padhe.
-            withNeighbours.push({
-              chunk: { ...nb, text: cleanOcrText(nb.text || "") },
-              score: r.score, rerank: r.rerank, match_type: "neighbour",
-            });
-            added++;
-          }
-        }
-        if (added) {
-          console.log(`[Retrieval] ${added} padosi ansh jode (chunk-seema par kata jawab bachane ke liye)`);
-          kept = withNeighbours;
-        }
-      } catch { /* padosi na mile toh koi baat nahi — mool ansh kaafi hain */ }
-
-      // PRAMAAN-FIX: top-3 ansh MOTE (800) taaki AI seedha uddharan de sake,
-      // baaki patle (300) — kul tokens lagbhag wahi (TPM surakshit)
-      // NAAPA HUA (2026-08-04): padosi ansh ko 300 chars par kaatna use
-      // bekaar kar deta hai. nitya_karm_pooja p.126 mein "मित्राय" 383ve
-      // aur "भास्कराय" 624ve akshar par hai — 300 par kaato toh 12 naamon
-      // mein se EK bhi nahi dikhta, aur model phir se yaad se bhar deta
-      // hai. Padosi maujood hi isliye hai ki kata hua hissa poora ho —
-      // isliye use hamesha poora slice do.
-      // Ansh AI ko jaate hain, par CITATION sirf unhi par jinme asli vaakya
-      // hain — table/suchi/mukhprishth kabhi "aadhaar" nahi banenge.
-      const merged = kept.slice(0, 12).map((r, i) => ({
-        ...r,
-        grounded: r.rerank != null && r.rerank >= MIN_RERANK_SCORE
-                  && hasSentences(r.chunk.text) && !looksGarbled(r.chunk.text),
-        chunk: {
-          ...r.chunk,
-          text: r.chunk.text.slice(0, (i < 3 || r.match_type === "neighbour") ? 800 : 300),
-        },
-      }));
-
-      // DIAGNOSTIC (2026-08-03): retrieval ka poora hisaab ek line mein —
-      // kitne candidates aaye, kitne gate paar kiye, kaun se granth, aur
-      // grounded flag sach mein laga ya nahi.
-      console.log(`[Retrieval] candidates=${cleaned.length} → gate-paar=${kept.length} → bheje=${merged.length}`
-        + ` | grounded=${merged.filter(m => m.grounded).length}`
-        + ` | granth: ${[...new Set(merged.map(m => m.chunk.book))].join(", ") || "koi nahi"}`
-        + (scores ? ` | best-rerank=${Math.max(...scores).toFixed(3)}` : " | RERANK FAIL"));
+      // book_title SERVER SE NAHI aata — D1 mein sirf book-id hai. Wo naam
+      // BOOK_META se lagta hai, jo pehle se client par hai (chand KB). Isse
+      // bachao ye hai ki 57,339 ansh mein 57,339 baar wahi naam na ho.
+      // book_title zaroori hai: gemini.js citation usi se banata hai aur
+      // useChat.js ka verifyAnswer() usi se gadhe hue granth-naam pakadta
+      // hai.
+      const merged = chunks.map(c => {
+        const meta = BOOK_META[c.book] || {};
+        return {
+          chunk: {
+            id: c.id,
+            book: c.book,
+            book_title: meta.title || meta.en || c.book,
+            page: c.page,
+            text: cleanOcrText(c.text || ""),
+            chapter: null, chapter_title: null, verse: null,
+          },
+          score: c.rerank,
+          rerank: c.rerank,
+          match_type: c.src === "neighbour" ? "neighbour" : "server",
+          // Server gate paar kara chuka hai. Ye teen jaanchein PHIR BHI
+          // yahan lagti hain — do-parat suraksha. Agar kabhi Worker ka
+          // threshold galti se dheela ho jaye, ya table/OCR-kachra wala
+          // ansh nikal aaye, to wo AI ko sandarbh ki tarah to jayega par
+          // CITATION ka aadhaar kabhi nahi banega.
+          grounded: c.grounded === true
+                    && c.rerank != null && c.rerank >= MIN_RERANK_SCORE
+                    && hasSentences(c.text) && !looksGarbled(c.text),
+        };
+      });
 
       // Agar EK BHI ansh cite-layak nahi (sab table/suchi hain), toh unhe
       // AI ko bhejna hi galat hai — prompt unhe "RELEVANT PASSAGES FROM
@@ -686,9 +445,10 @@ export function ChatView() {
       return merged;
     } catch (e) {
       console.warn("[Retrieval] failed:", e);
+      setSacredChunks([]);
       return [];
     }
-  }, [knowledgeReady, crossBookSearch, hybridSearch, getBookChunks]);
+  }, []);
 
   const { messages, isLoading, loadPhase, countdown, apiStatus, sendUserMessage, clearMessages, retryLast } = useChat({
     mode: "chat",

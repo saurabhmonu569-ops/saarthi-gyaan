@@ -61,13 +61,48 @@ keep_vars = true
 #   rl:*   → per-IP rate-limit counters, 60s TTL
 # Isiliye cron ka list() call `prefix: "sub:"` use karta hai — bina uske
 # rl: keys bhi "failed push" mein gin jaati thi (audit fix D1).
+# ⚠️ ID DO AKSHAR GALAT THI (2026-08-10 par pakdi gayi)
+#     likha tha : dbc6d172f5f8 4 7 fc9a626c c 51ba5120a
+#     sahi hai  : dbc6d172f5f8 4 1 fc9a626c e 51ba5120a
+# Ye ID us zamane mein haath se type ki gayi thi jab worker dashboard ke
+# code-editor se deploy hota tha — wahan binding alag se set hoti hai,
+# isliye is file ki galti kabhi pakdi hi nahi gayi. Aaj pehli baar
+# `wrangler deploy` chalane par saamne aayi. Namespace ka asli naam
+# "saarthi-push-subs" hai.
 [[kv_namespaces]]
 binding = "PUSH_SUBS"
-id = "dbc6d172f5f847fc9a626cc51ba5120a"
+id = "dbc6d172f5f841fc9a626ce51ba5120a"
 
 # ── Workers AI — query embedding (bge-m3) + reranker ─────────────────
 [ai]
 binding = "AI"
+
+# ── P2 (2026-08-10): RETRIEVAL AB SERVER PAR ─────────────────────────
+# Pehle browser 316 MB utaarta tha — books 165 MB + keyword index 93 MB
+# + vectors 56 MB. Gzip ke baad bhi ~122 MB. Bharat mein mobile par wo
+# aadmi rukta hi nahi, yaani 298 sawaalon par naapa hua 80% ka score
+# kisi tak pahunchta hi nahi tha.
+#
+# Ab wo data yahan rehta hai aur /search endpoint use padhta hai.
+# Client par download: 0 MB.
+
+# Vectorize — 57,339 vector (1024-dim, cosine). Semantic search POORE
+# corpus par chalti hai, kisi filter ke peeche nahi.
+#   banaya:  npx wrangler vectorize create saarthi-chunks --dimensions=1024 --metric=cosine
+#   bhara:   node scripts/11_upload_vectorize.mjs
+[[vectorize]]
+binding = "VECTORIZE"
+index_name = "saarthi-chunks"
+
+# D1 — ansh ka text + FTS5 keyword index. Vectorize sirf ye batata hai ki
+# kaunse ansh milte-julte hain; unka TEXT yahan se aata hai. Keyword
+# search bhi yahin — 85 ummeedwaaron mein se 20 usi raaste se aate hain.
+#   banaya:  npx wrangler d1 create saarthi-knowledge
+#   bhara:   node scripts/12_load_d1.mjs --schema && --load
+[[d1_databases]]
+binding = "DB"
+database_name = "saarthi-knowledge"
+database_id = "05623cc2-f803-43ee-b145-3c5854903c80"
 
 # ── Cron: 02:30, 08:30, 13:30 UTC = 08:00, 14:00, 19:00 IST ──────────
 # Ek hi cron dono kaam karta hai — health-check aur daily reminders.

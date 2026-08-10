@@ -36,7 +36,27 @@ function notifyAll() {
   _subscribers.forEach(fn => fn());
 }
 
-async function ensureLoaded() {
+/**
+ * Poora corpus utaaro — 258 MB (books 165 + keyword index 93).
+ *
+ * ⚠️ P2 (2026-08-10): ye ab APNE AAP NAHI chalta. Pehle useKnowledge() ke
+ * har mount par chal jaata tha, aur HomeView — app ka landing page — usse
+ * bina wajah bulata tha. Nateeja: HAR pehla visitor 258 MB utaarta tha
+ * pehle hi screen par, aur kai to wahin chhod dete the.
+ *
+ * Ab sirf DO jagah ise maangti hain, aur tabhi jab user sach mein wahan
+ * jaata hai:
+ *     Read tab   (BooksView)        — panne padhne ke liye chunks chahiye
+ *     Search tab (GlobalSearchView) — keyword index chahiye
+ *
+ * Ask (ChatView) ise BILKUL nahi maangta — uski poori retrieval ab Worker
+ * ke /search par hai (Vectorize + D1). Wahi sabse zyada istemal hone wala
+ * hissa hai, aur ab wo 0 MB par chalta hai.
+ *
+ * Aage (P3): Read aur Search ko bhi server-side endpoint mil jaayein to ye
+ * function poora hat sakta hai.
+ */
+export async function ensureFullKnowledge() {
   if (_globalLoaded) return true;
   if (_globalLoading) return _globalLoading;
 
@@ -56,7 +76,17 @@ async function ensureLoaded() {
   return _globalLoading;
 }
 
-export function useKnowledge() {
+/**
+ * @param {{ load?: boolean }} opts
+ *   load: true  → mount par poora corpus (258 MB) utaarna shuru karo.
+ *                 SIRF BooksView aur GlobalSearchView ye dete hain.
+ *   load: false → sirf state dekho, kuch utaaro mat (default).
+ *
+ * Default `false` jaan-boojhkar hai. Purana vyavhaar ulta tha — koi bhi
+ * component galti se useKnowledge() likh de aur 258 MB chal pade, bina
+ * kisi ko pata chale. HomeView ke saath theek yahi hua tha.
+ */
+export function useKnowledge({ load = false } = {}) {
   const [ready, setReady]   = useState(_globalLoaded);
   const [error, setError]   = useState(_globalError);
   const mountedRef = useRef(true);
@@ -72,9 +102,9 @@ export function useKnowledge() {
     };
     _subscribers.add(update);
 
-    // Trigger load if not already loaded
-    if (!_globalLoaded && !_globalLoading) {
-      ensureLoaded();
+    // Load SIRF tab jab caller ne saaf-saaf maanga ho (upar dekhein)
+    if (load && !_globalLoaded && !_globalLoading) {
+      ensureFullKnowledge();
     } else if (_globalLoaded) {
       setReady(true);
     }
@@ -83,7 +113,7 @@ export function useKnowledge() {
       mountedRef.current = false;
       _subscribers.delete(update);
     };
-  }, []);
+  }, [load]);
 
   // Stable wrappers — these are pure functions from engine.js
   const getBooks         = useCallback(() => _getBooks(), []);

@@ -640,6 +640,96 @@ function reminderMessage(hourUTC, lang) {
   return { title: m.title, body: m.body, url: "/", tag: "saarthi-daily" };
 }
 
+// ═══════════════════════════════════════════════════════════════════════
+// P2 — POORA RETRIEVAL SERVER PAR (2026-08-10)
+// ═══════════════════════════════════════════════════════════════════════
+//
+// KYUN: abhi tak retrieval BROWSER mein chalti thi, isliye har naye
+// visitor ko 316 MB utaarna padta tha (books 165 + keyword index 93 +
+// vectors 56). Gzip ke baad bhi ~122 MB. Bharat mein mobile par wo aadmi
+// rukta hi nahi — yaani 298 sawaalon par naapa hua 80% ka score kisi
+// user tak pahunchta hi nahi tha.
+//
+// Ab wahi kaam yahan hota hai:
+//     VECTORIZE  → 57,339 vector, semantic search poore corpus par
+//     D1         → ansh ka text + FTS5 keyword index
+//     yahan      → dono ko jodo, rerank karo, gate lagao
+// Client par download: 316 MB → 0 MB.
+//
+// ⚠️ YE SAB WAHI SANKHYAYEIN HAIN JO 298 SAWAALON PAR NAAPI GAYI THI —
+// MIN_RERANK 0.30, PER_BOOK_CAP 3, KEEP 12, quota 45/20/20. Inhe badalna
+// matlab score badalna. P2 sirf ye badalta hai ki kaam KAHAN hota hai,
+// KYA hota hai wo nahi. Agar in numbers ko chhedna ho to pehle
+// scripts/eval-ask.mjs --300 --full chalao.
+const SEARCH_MIN_RERANK   = 0.30;
+const SEARCH_PER_BOOK_CAP = 3;
+const SEARCH_KEEP         = 12;
+const SEARCH_QUOTA        = { semantic: 45, keyword: 20, cross: 20 };
+const SEARCH_MAX_RERANK   = 100;
+
+/** ChatView.jsx ka hasSentences() — bilkul wahi regex */
+function hasSentences(text) {
+  const t = (text || "").trim();
+  if (!t) return false;
+  return /।|॥|(?:है|हैं|था|थी|थे|हुआ|हुई|होता|होती|करते|करना|चाहिये|चाहिए|गया|गयी|रहता|रहती)(?=[\s।॥,.]|$)/.test(t);
+}
+
+/** ChatView.jsx ka looksGarbled() — 32,032 chunks par naapa hua 0.40 */
+function looksGarbled(text) {
+  const w = String(text || "").match(/[ऀ-ॿ]+/g);
+  if (!w || w.length < 12) return false;
+  return w.filter(x => x.length <= 2).length / w.length > 0.40;
+}
+
+/**
+ * Query se FTS5 ka MATCH banao.
+ *
+ * engine.js ki queryKeywords() jaisa hi: Devanagari 2+ akshar, Latin 3+,
+ * stopwords bahar. Har shabd par PREFIX (`भय*`) isliye ki corpus mein
+ * shabd jude hue roop mein hain — "भयसे", "भयके", "भयभीत". Bina prefix
+ * ke "भय" akela kabhi match nahi karta.
+ */
+function ftsQuery(q) {
+  const STOP = new Set("का के की को कि में से और पर यह जो है ने भी एक था the and for with".split(" "));
+  const words = [...String(q || "").toLowerCase().matchAll(/[ऀ-ॿ]{2,}|[a-z]{3,}/g)]
+    .map(m => m[0]).filter(w => !STOP.has(w));
+  const uniq = [...new Set(words)].slice(0, 12);
+  if (!uniq.length) return null;
+  // FTS5 mein " aur * khaas hain — shabd ko quote karke * bahar rakho
+  return uniq.map(w => `"${w.replace(/"/g, "")}"*`).join(" OR ");
+}
+
+/** 20-20 ke parallel batch — semanticSearch.js ke rerankPassages jaisa */
+async function rerankAll(env, query, texts) {
+  const batches = [];
+  for (let i = 0; i < texts.length; i += RERANK_MAX_CONTEXTS) {
+    batches.push({ at: i, t: texts.slice(i, i + RERANK_MAX_CONTEXTS) });
+  }
+  const res = await Promise.all(batches.map(async ({ at, t }) => {
+    try {
+      const out = await env.AI.run(RERANK_MODEL, {
+        query,
+        contexts: t.map(x => ({ text: String(x).slice(0, RERANK_MAX_CHARS) })),
+        top_k: t.length,
+      });
+      const list = out?.response || out?.result?.response || (Array.isArray(out) ? out : null);
+      if (!Array.isArray(list)) return { at, s: null };
+      const s = new Array(t.length).fill(0);
+      for (const it of list) {
+        const i = it?.id ?? it?.index, v = it?.score ?? it?.relevance_score;
+        if (Number.isInteger(i) && i >= 0 && i < s.length && typeof v === "number") s[i] = v;
+      }
+      return { at, s };
+    } catch (e) {
+      console.log("[SAARTHI-SEARCH] rerank batch fail @" + at + " — " + (e?.message || e));
+      return { at, s: null };
+    }
+  }));
+  const out = new Array(texts.length).fill(0);
+  for (const { at, s } of res) if (s) for (let j = 0; j < s.length; j++) out[at + j] = s[j];
+  return out;
+}
+
 export default {
   async fetch(request, env) {
     const origin  = request.headers.get("Origin") || "";
@@ -748,6 +838,214 @@ export default {
     // (kabhi score ke hisaab se sorted). Hum use wapas input-order mein
     // rakh kar lautate hain, taaki client seedha apne chunks se joda kar
     // sake — index ghalat hua toh galat passage cite ho jayega.
+    // ── /search — POORA RETRIEVAL (P2, 2026-08-10) ────────────────────
+    //
+    // Client bhejta hai:
+    //   findQ      — dhoondhne ki query (translit + granth-paryay lagi hui)
+    //   rerankQ    — aankne ki query (meta-dhaancha hataya hua)
+    //   hintedBook — agar user ne granth ka naam liya ho
+    //
+    // Client YE SAB PEHLE HI kar chuka hota hai kyunki wo sirf code hai,
+    // data 0 MB — translit, paryay, aur daayre-se-bahar wali jaanch. Yahan
+    // sirf wo kaam hai jiske liye 316 MB data chahiye tha.
+    //
+    // Lautata hai: 12 tak ansh, har ek ke saath `grounded` — yaani kya ye
+    // citation ka aadhaar ban sakta hai. `grounded: false` waale AI ko
+    // sandarbh ki tarah jaate hain par unka naam kabhi cite nahi hota.
+    if (request.method === "POST" && url.pathname === "/search") {
+      if (!env.AI)         return jsonResponse({ error: { message: "AI binding not configured" } }, 500, origin);
+      if (!env.VECTORIZE)  return jsonResponse({ error: { message: "VECTORIZE binding not configured" } }, 500, origin);
+      if (!env.DB)         return jsonResponse({ error: { message: "D1 (DB) binding not configured" } }, 500, origin);
+
+      let b;
+      try { b = JSON.parse(await request.text()); } catch { return jsonResponse({ error: { message: "Bad JSON" } }, 400, origin); }
+
+      const findQ   = typeof b?.findQ   === "string" ? b.findQ.trim().slice(0, EMBED_MAX_CHARS)   : "";
+      const rerankQ = typeof b?.rerankQ === "string" ? b.rerankQ.trim().slice(0, EMBED_MAX_CHARS) : findQ;
+      const hinted  = typeof b?.hintedBook === "string" ? b.hintedBook.slice(0, 64) : null;
+      if (!findQ) return jsonResponse({ error: { message: "findQ required" } }, 400, origin);
+
+      const t0 = Date.now();
+      try {
+        // ── 1. SEMANTIC — Vectorize, poore corpus par ─────────────────
+        const emb = await env.AI.run(EMBED_MODEL, { text: [findQ], truncate_inputs: true });
+        const vec = (emb?.data || emb?.result?.data)?.[0];
+        if (!vec) throw new Error("embed failed");
+
+        const vq = await env.VECTORIZE.query(vec, {
+          topK: SEARCH_QUOTA.semantic, returnMetadata: "indexed",
+        });
+        const byId = new Map();
+        for (const m of (vq?.matches || [])) {
+          byId.set(m.id, { id: m.id, book: m.metadata?.book || "", src: "semantic", score: m.score });
+        }
+
+        // ── 2 + 3. KEYWORD aur CROSS-BOOK — ek hi D1 query se ─────────
+        // Ek hi FTS query se 250 ansh uthate hain, phir JS mein baant
+        // dete hain: pehle 20 seedhe (keyword), aur alag-alag kitaabon
+        // se 3-3 karke 20 aur (cross-book). Do alag SQL se ye tez hai,
+        // aur nateeja wahi — cross-book ka poora maqsad yehi hai ki har
+        // granth ko mauka mile.
+        const match = ftsQuery(findQ);
+        if (match) {
+          const { results } = await env.DB.prepare(
+            `SELECT c.id, c.book FROM chunks_fts f
+             JOIN chunks c ON c.rowid = f.rowid
+             WHERE chunks_fts MATCH ?1 ORDER BY rank LIMIT 250`
+          ).bind(match).all();
+
+          let kw = 0;
+          for (const r of (results || [])) {
+            if (kw >= SEARCH_QUOTA.keyword) break;
+            if (!byId.has(r.id)) { byId.set(r.id, { id: r.id, book: r.book, src: "keyword" }); kw++; }
+          }
+          const perBook = new Map(); let cb = 0;
+          for (const r of (results || [])) {
+            if (cb >= SEARCH_QUOTA.cross) break;
+            const n = perBook.get(r.book) || 0;
+            if (n >= 3 || byId.has(r.id)) continue;
+            perBook.set(r.book, n + 1);
+            byId.set(r.id, { id: r.id, book: r.book, src: "cross" }); cb++;
+          }
+        }
+
+        // ── 4. HINTED BOOK — user ne granth ka naam liya to uska ansh pakka
+        if (hinted) {
+          const have = [...byId.values()].filter(r => r.book === hinted).length;
+          if (have < 2) {
+            const { results } = await env.DB.prepare(
+              `SELECT id, book FROM chunks WHERE book = ?1 AND length(text) > 120 LIMIT 6`
+            ).bind(hinted).all();
+            for (const r of (results || [])) if (!byId.has(r.id)) byId.set(r.id, { id: r.id, book: r.book, src: "hinted" });
+          }
+        }
+
+        const cand = [...byId.values()].slice(0, SEARCH_MAX_RERANK);
+        if (!cand.length) return jsonResponse({ chunks: [], stats: { pool: 0, ms: Date.now() - t0 } }, 200, origin);
+
+        // ── 5. TEXT laao — D1 se, ek hi query mein ────────────────────
+        // rowid bhi le rahe hain — padosi ansh usi se milte hain (neeche 6.5)
+        const ph = cand.map((_, i) => `?${i + 1}`).join(",");
+        const { results: texts } = await env.DB.prepare(
+          `SELECT rowid AS rid, id, book, page, text FROM chunks WHERE id IN (${ph})`
+        ).bind(...cand.map(c => c.id)).all();
+        const textById = new Map((texts || []).map(r => [r.id, r]));
+
+        const withText = cand
+          .map(c => ({ ...c, ...(textById.get(c.id) || {}) }))
+          .filter(c => (c.text || "").trim());
+        if (!withText.length) return jsonResponse({ chunks: [], stats: { pool: cand.length, ms: Date.now() - t0 } }, 200, origin);
+
+        // ── 6. RERANK — asli sawaal par, paryay ke bina ───────────────
+        const scores = await rerankAll(env, rerankQ, withText.map(c => c.text));
+        const scored = withText.map((c, i) => ({ ...c, rerank: scores[i] }));
+        const usable = scored.filter(c => hasSentences(c.text) && !looksGarbled(c.text));
+        const best   = usable.length ? Math.max(...usable.map(c => c.rerank)) : 0;
+
+        // ── 7. GATE + per-book cap + KEEP ─────────────────────────────
+        const passed = usable.filter(c => c.rerank >= SEARCH_MIN_RERANK).sort((a, b) => b.rerank - a.rerank);
+        const perBook = new Map(); const kept = [];
+        for (const r of passed) {
+          const n = perBook.get(r.book) || 0;
+          if (n >= SEARCH_PER_BOOK_CAP) continue;
+          perBook.set(r.book, n + 1);
+          kept.push(r);
+          if (kept.length >= SEARCH_KEEP) break;
+        }
+
+        // ── 7.5 PADOSI ANSH — chunk ki seema par kata jawab (2026-08-10)
+        //
+        // Ye ChatView.jsx ka wahi ilaaj hai, ab server par. ASLI GHATNA:
+        // "सूर्य के 12 नमस्कार" par nitya_karm_pooja p.125 mila jisme sirf
+        // bhoomika thi — 12 naam AGLE ansh mein the. Model ne yaad se bhar
+        // diya aur 12 mein se 5 naam GALAT nikle.
+        //
+        // DONO taraf dekhte hain, sirf agla nahi: "कृत्तिका नक्षत्र" wale
+        // case mein jawab PICHLE ansh mein tha, kyunki OCR ne uske shirshak
+        // "कृत्तिका" ko "Gitar" padh liya tha — wo ansh search ko dikhta hi
+        // nahi. Padosi OCR ki galti ka sasta ilaaj bhi hai.
+        //
+        // KYUN rowid: 12_load_d1.mjs ne kitaabein sorted kram mein, aur har
+        // kitaab ke chunks unke apne array-kram mein daale the. Isliye ek hi
+        // book ke andar rowid ka kram = padhne ka kram — bilkul wahi jo
+        // engine.js ke getBookChunks() ka array-index tha. (Naapa gaya:
+        // 57,339 mein se sirf Mahabharata ke 533 page ulte hain, aur wo
+        // 6 volumes ke page-number restart hain, kram nahi.)
+        //
+        // Padosi ko bhi grounded maante hain: wo usi ansh ka agla/pichla
+        // hissa hai jise reranker ne pass kiya, aur uski kitaab pehle se
+        // cite ho rahi hai.
+        let out = kept;
+        try {
+          const want = [];               // [rowid, book] jo chahiye
+          const have = new Set(kept.map(c => c.id));
+          for (let i = 0; i < Math.min(3, kept.length); i++) {
+            const r = kept[i];
+            if (!r.rid) continue;
+            want.push([r.rid - 1, r.book, r.rid], [r.rid + 1, r.book, r.rid]);
+          }
+          if (want.length) {
+            const p2 = want.map((_, i) => `?${i + 1}`).join(",");
+            const { results: nb } = await env.DB.prepare(
+              `SELECT rowid AS rid, id, book, page, text FROM chunks WHERE rowid IN (${p2})`
+            ).bind(...want.map(w => w[0])).all();
+            const nbById = new Map((nb || []).map(r => [r.rid, r]));
+            const merged = [];
+            for (let i = 0; i < kept.length; i++) {
+              const r = kept[i];
+              // Apna DARJA saath le kar chalo, array-index nahi.
+              // BUG (isi din pakda): neeche text kaatne ka faisla array ke
+              // index par tha — `i < 3 ? 800 : 300`. Par padosi beech mein
+              // ghus jaate hain, toh kept[1] array mein index 3 par pahunch
+              // sakta hai aur 800 ki jagah 300 par kat jaata. Yaani jis
+              // ansh ko reranker ne DOOSRA sabse achha kaha, uska aadha
+              // text model tak pahunchta hi nahi.
+              merged.push({ ...r, rank: i });
+              const pair = want.filter(w => w[2] === r.rid);
+              for (const [rid, book] of pair) {
+                const n = nbById.get(rid);
+                // ALAG KITAAB KA PADOSI NAHI — kitaab ki seema par rowid+1
+                // agli kitaab ka pehla ansh hota hai, jiska is sawaal se
+                // koi lena-dena nahi. Ye check hi use rokta hai.
+                if (!n || n.book !== book) continue;
+                if (have.has(n.id) || String(n.text || "").trim().length <= 40) continue;
+                have.add(n.id);
+                merged.push({ ...n, rerank: r.rerank, src: "neighbour", rank: i });
+              }
+            }
+            out = merged;
+          }
+        } catch (e) {
+          console.log("[SAARTHI-SEARCH] padosi skip — " + (e?.message || e));
+        }
+
+        return jsonResponse({
+          chunks: out.slice(0, SEARCH_KEEP + 6).map((c, i) => ({
+            id: c.id, book: c.book, page: c.page ?? null,
+            // NAAPA HUA (2026-08-04): padosi ko 300 par kaatna use bekaar
+            // kar deta hai — nitya_karm_pooja p.126 mein "मित्राय" 383ve aur
+            // "भास्कराय" 624ve akshar par hai. Padosi maujood hi isliye hai
+            // ki kata hua hissa poora ho, isliye use hamesha poora slice.
+            //
+            // `rank` (asli darja) istemal hota hai, `i` (array-index) nahi —
+            // upar wala comment dekhein.
+            text: String(c.text).slice(0, ((c.rank ?? i) < 3 || c.src === "neighbour") ? 800 : 300),
+            rerank: c.rerank,
+            grounded: true,   // gate paar kar chuke hain (padosi bhi — upar dekhein)
+            src: c.src || "",
+          })),
+          stats: {
+            pool: cand.length, passed: passed.length, kept: kept.length,
+            padosi: out.length - kept.length,
+            best: Number(best.toFixed(4)), ms: Date.now() - t0,
+          },
+        }, 200, origin);
+      } catch (e) {
+        console.log("[SAARTHI-SEARCH] FAIL — " + (e?.message || e));
+        return jsonResponse({ error: { message: "search failed" } }, 502, origin);
+      }
+    }
+
     if (request.method === "POST" && url.pathname === "/rerank") {
       if (!env.AI) return jsonResponse({ error: { message: "AI binding not configured" } }, 500, origin);
       let b;
