@@ -872,12 +872,22 @@ export default {
         const vec = (emb?.data || emb?.result?.data)?.[0];
         if (!vec) throw new Error("embed failed");
 
-        const vq = await env.VECTORIZE.query(vec, {
-          topK: SEARCH_QUOTA.semantic, returnMetadata: "indexed",
-        });
+        // returnMetadata NAHI maangte — aur ye jaan-boojhkar hai.
+        //
+        // Pehle `returnMetadata: "indexed"` tha, aur uska nateeja diagnostic
+        // mein saaf dikha: poolByBook mein `"": 45` — yaani Vectorize se
+        // aaye SAARE 45 ansh ka `book` khaali tha. Vectorize `"indexed"`
+        // par sirf wo metadata lautata hai jiska alag metadata-index banaya
+        // gaya ho (wrangler vectorize create-metadata-index) — humne banaya
+        // hi nahi tha.
+        //
+        // Par ise theek karne ki zaroorat hi nahi: `book` hamein D1 se
+        // waise bhi milta hai (neeche kadam 5), aur wahi asli source hai.
+        // Vectorize se sirf ID chahiye. Isse payload bhi halka rehta hai.
+        const vq = await env.VECTORIZE.query(vec, { topK: SEARCH_QUOTA.semantic });
         const byId = new Map();
         for (const m of (vq?.matches || [])) {
-          byId.set(m.id, { id: m.id, book: m.metadata?.book || "", src: "semantic", score: m.score });
+          byId.set(m.id, { id: m.id, book: "", src: "semantic", score: m.score });
         }
 
         // ── 2 + 3. KEYWORD aur CROSS-BOOK — ek hi D1 query se ─────────
@@ -929,17 +939,18 @@ export default {
         // `hybridSearch(findQ, null, { book: hintedBook }, 6)` chalata tha,
         // yaani us kitaab ke ANDAR dhoondhta tha. P2 mein wo baat likhte
         // waqt chhoot gayi. Ab wahi kaam FTS se, kitaab ki seema mein.
+        // `have < 3` waali shart HATA di: is jagah semantic ansh ka book
+        // khaali hota hai (upar dekhein), isliye ginti kabhi bharosemand
+        // thi hi nahi. Ek chhoti FTS query rozana chalane ki keemat kuch
+        // bhi nahi, aur badle mein guarantee milti hai.
         if (hinted && match) {
-          const have = [...byId.values()].filter(r => r.book === hinted).length;
-          if (have < 3) {
-            const { results } = await env.DB.prepare(
-              `SELECT c.id, c.book FROM chunks_fts f
-               JOIN chunks c ON c.rowid = f.rowid
-               WHERE chunks_fts MATCH ?1 AND c.book = ?2
-               ORDER BY rank LIMIT 8`
-            ).bind(match, hinted).all();
-            for (const r of (results || [])) if (!byId.has(r.id)) byId.set(r.id, { id: r.id, book: r.book, src: "hinted" });
-          }
+          const { results } = await env.DB.prepare(
+            `SELECT c.id, c.book FROM chunks_fts f
+             JOIN chunks c ON c.rowid = f.rowid
+             WHERE chunks_fts MATCH ?1 AND c.book = ?2
+             ORDER BY rank LIMIT 8`
+          ).bind(match, hinted).all();
+          for (const r of (results || [])) if (!byId.has(r.id)) byId.set(r.id, { id: r.id, book: r.book, src: "hinted" });
         }
 
         const cand = [...byId.values()].slice(0, SEARCH_MAX_RERANK);
@@ -965,7 +976,42 @@ export default {
         const best   = usable.length ? Math.max(...usable.map(c => c.rerank)) : 0;
 
         // ── 7. GATE + per-book cap + KEEP ─────────────────────────────
-        const passed = usable.filter(c => c.rerank >= SEARCH_MIN_RERANK).sort((a, b) => b.rerank - a.rerank);
+        //
+        // ⚠️ NAAM LIYE GAYE GRANTH KO PEHLA HAQ (2026-08-10, user ne pakda)
+        //
+        // ASLI GHATNA: "Gita me Daivi Sampat aur Asuri Sampat ka practical
+        // difference kya hai?" par naapa gaya —
+        //     agni_purana p.520          rerank 0.9313  ← sabse upar
+        //     bhagavad_gita_shankar p.391 rerank 0.7646  ← ASLI JAWAB
+        //
+        // Agni Purana ka wo panna धन-विभाजन ka hai — pita ki सम्पत्ति ka
+        // batwara, uttaradhikar ke niyam. Sawaal se koi lena-dena nahi.
+        // Par usme "सम्पत्ति" aur "विभाग" shabd bhare pade hain, aur
+        // sawaal mein bhi "सम्पत्ति" hai. Cross-encoder shabd milata hai,
+        // niyat nahi — isliye wo 0.93 de baithta hai.
+        //
+        // Aisa hamesha hota rahega. Koi threshold ise nahi rok sakta,
+        // kyunki 0.93 asli lagta hai. Par jab user ne KHUD granth ka naam
+        // le liya ho, tab hamein andaaza lagane ki zaroorat hi nahi —
+        // usne bata diya hai ki kahan se jawab chahiye.
+        //
+        // Purana client-side code yahi karta tha:
+        //     if (hintedBook) { const ab = a.chunk.book === hintedBook …
+        //                       if (ab !== bb) return ab ? -1 : 1; }
+        // P2 mein likhte waqt ye chhoot gaya tha. Ab wapas.
+        //
+        // Gate abhi bhi lagta hai — hinted granth ka kachra ansh bhi 0.30
+        // se neeche ho to bahar hi jaata hai. Ye "zabardasti cite karo"
+        // nahi hai; ye sirf KRAM hai un ansho ka jo pehle hi paas ho chuke.
+        const passed = usable
+          .filter(c => c.rerank >= SEARCH_MIN_RERANK)
+          .sort((a, b) => {
+            if (hinted) {
+              const ab = a.book === hinted, bb = b.book === hinted;
+              if (ab !== bb) return ab ? -1 : 1;
+            }
+            return b.rerank - a.rerank;
+          });
         const perBook = new Map(); const kept = [];
         for (const r of passed) {
           const n = perBook.get(r.book) || 0;
@@ -1070,12 +1116,17 @@ export default {
             // Aur ek khaas wajah: Mahabharata akela poore corpus ka 45%
             // hai (25,856 / 57,339 ansh). Wo har sawaal ke pool mein bhar
             // sakta hai. Ye ginti batayegi ki aisa ho raha hai ya nahi.
+            // `withText` se ginte hain, `cand` se NAHI — cand mein semantic
+            // ansh ka book khaali hota hai (Vectorize sirf ID deta hai),
+            // aur usi wajah se pehli baar ye ginti `"": 45` dikha rahi thi.
+            // Asli book D1 ke join ke baad milti hai.
             poolByBook: Object.fromEntries(
-              Object.entries(cand.reduce((a, c) => (a[c.book] = (a[c.book] || 0) + 1, a), {}))
+              Object.entries(withText.reduce((a, c) => (a[c.book] = (a[c.book] || 0) + 1, a), {}))
                 .sort((a, b) => b[1] - a[1]).slice(0, 8)
             ),
             hinted: hinted || null,
-            hintedInPool: hinted ? cand.filter(c => c.book === hinted).length : null,
+            hintedInPool: hinted ? withText.filter(c => c.book === hinted).length : null,
+            hintedPassed: hinted ? passed.filter(c => c.book === hinted).length : null,
           },
         }, 200, origin);
       } catch (e) {

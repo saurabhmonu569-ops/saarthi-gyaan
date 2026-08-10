@@ -92,7 +92,10 @@ export async function serverRetrieve({ findQ, rerankQ, hintedBook = null }) {
     if (stats?.poolByBook) {
       const spread = Object.entries(stats.poolByBook).map(([b, n]) => `${b} ${n}`).join(" · ");
       console.log(`[ServerSearch] pool ka batwara: ${spread}`
-        + (stats.hinted ? `  ||  user ne granth kaha: ${stats.hinted} (pool mein ${stats.hintedInPool} ansh)` : ""));
+        + (stats.hinted
+            ? `  ||  user ne granth kaha: ${stats.hinted}`
+              + ` — pool mein ${stats.hintedInPool}, gate paar ${stats.hintedPassed}`
+            : ""));
     }
     return { chunks, stats };
   } catch (e) {
