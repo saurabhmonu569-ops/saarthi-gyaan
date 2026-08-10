@@ -76,7 +76,7 @@ const ROOT  = join(dirname(fileURLToPath(import.meta.url)), "..");
 const EMB   = join(ROOT, "public", "knowledge", "embeddings");
 const BOOKS = join(ROOT, "public", "knowledge", "books");
 const DIM = 1024, ROW = 1028;
-const MIN_RERANK = 0.5;          // ChatView.jsx ka MIN_RERANK_SCORE
+const MIN_RERANK = 0.30;         // ChatView.jsx ka MIN_RERANK_SCORE (2026-08-10: 0.5 se ghataya)
 const MAX_FRAG   = 0.40;         // ChatView.jsx ka MAX_FRAGMENT_RATIO
 const PER_BOOK_CAP = 3;          // ChatView.jsx — ek granth ke max 3 ansh
 const KEEP = 12;                 // ChatView.jsx — kul kitne ansh AI ko jaate hain
@@ -123,7 +123,7 @@ const ALL  = QFILE[SET];
 const QUESTIONS = ALL.filter(x => !x.meta);
 const META      = ALL.filter(x =>  x.meta);
 const COMPARE   = new Set(ALL.filter(x => x.compare).map(x => x.q));
-const CONTROL   = QFILE.control;
+const CONTROL   = QFILE.control.filter(q => !q.startsWith("_"));
 
 // ── setup ─────────────────────────────────────────────────────────────
 function loadEnv() {

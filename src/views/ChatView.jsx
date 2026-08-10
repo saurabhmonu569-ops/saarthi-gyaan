@@ -13,15 +13,35 @@ import { detectHintedBook } from "@/knowledge/bookHints";
 import { semanticSearch, preloadSemanticSearch, rerankPassages, RERANK_MAX_TOTAL } from "@/knowledge/semanticSearch";
 import { normalizeQueryForSearch, expandQueryWithParyay, stripMetaFraming } from "@/knowledge/translit";
 
-// ── RELEVANCE GATE (item #17, 2026-08-03) ────────────────────────────────
-// 13 sawaalon par naapa gaya. Reranker ka score bimodal nikla:
-//     sahi sawaal   0.9009 – 0.9995
-//     kachre sawaal 0.0000 – 0.0131
-// Beech mein kuch nahi. 0.5 par dono taraf ~0.44 ka margin — itna chauda
-// ki koi ek sawaal ise hila nahi sakta.
+// ── RELEVANCE GATE ───────────────────────────────────────────────────────
 //
-// Ise badalna ho toh pehle naapo:  node scripts/test-reranker.mjs
-const MIN_RERANK_SCORE = 0.5;
+// 2026-08-03 (13 sawaal): reranker ka score bimodal laga — sahi 0.90+,
+// kachra 0.01 se neeche. Us chhote namoone par 0.5 surakshit tha.
+//
+// 2026-08-10 (298 sawaal + 32 control): asli tasveer alag nikli. 78 fail
+// sawaalon mein se 33 ka best-rerank 0.30–0.50 ke beech tha — yaani unka
+// jawab MIL gaya tha, gate ne rok diya. Score bimodal nahi hai; beech
+// mein kaafi kuch hai.
+//
+// Toh gate kahan rakhein? Faisla CONTROL sawaalon se hua — wo sawaal
+// jinka jawab hamari kitaabon mein hai HI NAHI ("kal ka mausam", "petrol
+// ka rate", "Bible mein kya likha hai"). Unpar koi bhi citation JHOOTHI
+// citation hai. Naapa:
+//     control ka sabse ooncha score : 0.177
+//     control ke top-3              : 0.177, 0.166, 0.113
+//     asli sawaalon ka atka hua dher: 0.30 – 0.50
+// Beech mein 0.12 ka khaali maidan hai. 0.30 usi maidan ke doosre kinare
+// par hai — poora atka dher andar aata hai, aur sabse ooncha control
+// 0.123 neeche rehta hai.
+//
+// 0.23 bhi ganit ke hisaab se "surakshit" tha (+41 sawaal), par wahan
+// margin sirf 0.05 bachta — aur ye ek hi run ka namoona hai. Jhoothi
+// citation is app ki sabse badi haar hai; uske saamne 8 sawaal ka laalach
+// kuch nahi.
+//
+// Ise badalne se pehle DOBARA naapo:  node scripts/eval-ask.mjs --300 --full
+// Dekhna sirf ek cheez: `jhoothi cite` 0 rahi ya nahi.
+const MIN_RERANK_SCORE = 0.30;
 
 /**
  * Kya is ansh mein asli VAAKYA hain, ya sirf table/suchi/mukhprishth hai?
