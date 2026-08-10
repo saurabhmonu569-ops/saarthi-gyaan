@@ -38,7 +38,7 @@
 import { readFileSync, existsSync, readdirSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { toDevanagari, expandQueryWithParyay, stripMetaFraming } from "../src/knowledge/translit.js";
+import { toDevanagari, expandQueryWithParyay, stripMetaFraming, isOutOfScope } from "../src/knowledge/translit.js";
 import { detectHintedBook } from "../src/knowledge/bookHints.js";
 
 // ── ENGINE KA ASLI CODE, DOBARA LIKHE BINA (2026-08-07) ──────────────
@@ -240,6 +240,8 @@ async function rerank(query, texts) {
 
 /** Ek sawaal ka poora raasta — grounded passages lautata hai */
 async function run(query, cfg) {
+  // ChatView.jsx jaisa hi — daayre se bahar ka sawaal, koi citation nahi
+  if (isOutOfScope(query)) { const e = []; e.best = 0; e.pool = 0; e.oos = true; return e; }
   const dev = toDevanagari(query);
   // ChatView.jsx ka wahi teen-query wala tark:
   //   rerankQ = meta-dhaancha hataya   → reranker ko

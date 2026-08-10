@@ -11,7 +11,7 @@ import { BOOKS } from "@/data";
 import { useT } from "@/i18n";
 import { detectHintedBook } from "@/knowledge/bookHints";
 import { semanticSearch, preloadSemanticSearch, rerankPassages, RERANK_MAX_TOTAL } from "@/knowledge/semanticSearch";
-import { normalizeQueryForSearch, expandQueryWithParyay, stripMetaFraming } from "@/knowledge/translit";
+import { normalizeQueryForSearch, expandQueryWithParyay, stripMetaFraming, isOutOfScope } from "@/knowledge/translit";
 
 // ── RELEVANCE GATE ───────────────────────────────────────────────────────
 //
@@ -360,6 +360,17 @@ export function ChatView() {
       // KYUN findQ alag: paryay sirf UMMEEDWAAR dhoondhne ke liye hain.
       // Reranker ko paryay dene se sawaal anaad ho jaata hai aur wahi
       // 0.5 ka gate bigadta hai jo aaj tak 0 jhoothi citation de raha hai.
+      // DAAYRE SE BAHAR? (2026-08-10) — "Quran ki shiksha", "Meditation app
+      // kaunsa best" jaise sawaalon par reranker 0.9+ score deta hai kyunki
+      // wo VISHAY milata hai, sawaal nahi. Koi bhi threshold ise nahi rok
+      // sakta. Hamare paas 24 gine-chune granth hain; unse bahar ki cheez
+      // par citation lagana hi galat hai — chahe score kitna bhi ho.
+      // Jawab phir bhi jaata hai, bas bina granth ke.
+      if (isOutOfScope(query)) {
+        console.log("[Retrieval] sawaal hamare 24 granthon ke daayre se bahar — bina aadhaar ke jawab");
+        setSacredChunks([]); return [];
+      }
+
       const rerankQ = stripMetaFraming(searchQ);
       const findQ   = expandQueryWithParyay(rerankQ);
 

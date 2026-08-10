@@ -757,6 +757,66 @@ const EN_NOISE = new RegExp(
   + "view|point|simple|basic|proper|exact|complete|full)\\b",
   "gi");
 
+/**
+ * DAAYRE SE BAHAR (2026-08-10)
+ * =====================================================================
+ * ASLI GHATNA: 32 control sawaalon par 4 JHOOTHI citation mili —
+ *     "Quran ki mukhya shiksha kya hai"        rerank 0.926
+ *     "Meditation app kaunsa best hai"         rerank 0.907
+ *     "Gautam Buddha ne dukh ke bare me kaha"  rerank 0.802
+ *     "Ayurveda me vata pitta kapha"           rerank 0.430
+ * Teen ka score 0.8 se upar tha — yaani purane 0.5 ke gate par BHI ye
+ * jhoothi citation dete. Pehle ye pakde nahi gaye kyunki purane 17
+ * control bahut aasan the (petrol ka rate, IPL kaun jeeta).
+ *
+ * JAD: reranker VISHAY milata hai, SAWAAL nahi. "Meditation app kaunsa
+ * best hai" par dhyan waala ansh 0.907 paata hai — ansh dhyan ke BAARE
+ * mein hai, par sawaal phone ke app ka tha. Koi bhi threshold ise nahi
+ * pakad sakta, kyunki score sach mein ooncha hai.
+ *
+ * ILAAJ: hamare paas 24 GINE-CHUNE granth hain — Ved, Puran, Upanishad,
+ * Gita, Ramcharitmanas, Mahabharat, Guru Granth Sahib, Chanakya Niti,
+ * jyotish. Bas. Agar user KISI AUR parampara ya aadhunik cheez ka naam
+ * leta hai, to uska jawab in granthon mein hai HI NAHI — chahe reranker
+ * kitna bhi ooncha score de. Aise sawaal par citation lagana hi galat
+ * hai.
+ *
+ * Yeh soochi SIRF citation rokti hai. AI phir bhi jawab deta hai, bas
+ * "granth ke anusaar" kehkar nahi — jo bilkul sahi bartaav hai.
+ *
+ * ⚠️ Yahan wo naam JAAN-BOOJH KAR nahi hain jo hamare granthon mein
+ * sach mein aate hain (बुद्ध/बौद्ध Puranon mein avatar ke roop mein aate
+ * hain, आयुर्वेद Atharvaveda se juda hai). Ginti ki gayi: "बुद्ध" ke
+ * naam par sawaal ka matlab Gautam Buddha ki shiksha hai, jo hamare
+ * paas nahi — isliye wo yahan hai. Faisla shabd se nahi, SAWAAL KE
+ * IRAADE se hua hai.
+ */
+const OUT_OF_SCOPE = [
+  // anya parampara — inke apne granth hain, hamare paas nahi
+  /\b(?:quran|qur'?an|koran|bible|injeel|torah|hadith|sunnah)\b/i,
+  /\bgautam\s*buddha\b|\bbuddha\s*(?:ne|ki|ke|kaa?)\b|\bbuddhis[mt]\b|\bbaudh\s*dharm\b/i,
+  /\bjain\s*(?:dharma?|dharm|mat|granth|agam)\b|\bmahavir\b|\btirthankar\b/i,
+  /\b(?:confucius|socrates|plato|aristotle|nietzsche|freud|jung)\b/i,
+  /\b(?:christian|islam|muslim|sikh\s*history|zoroastrian|taoism|tao\s*te)\b/i,
+  // aadhunik vidhaayein — hamare granthon ka vishay nahi
+  /\b(?:tarot|numerolog|reiki|feng\s*shui|crystal\s*healing|astral|aura\s*read)/i,
+  /\bayurved/i,
+  // aadhunik gurus / sanstha
+  /\b(?:sadhguru|isha\s*foundation|osho|rajneesh|art\s*of\s*living|brahma\s*kumari)/i,
+  // takneek / utpaad — sawaal granth ka nahi, bazaar ka hai
+  /\b(?:app|application|website|online|download|youtube|google|whatsapp|instagram)\b/i,
+  /\b(?:weight\s*loss|gym|diet\s*plan|calorie|fitness)\b/i,
+];
+
+/**
+ * Kya ye sawaal hamare 24 granthon ke daayre se bahar hai?
+ * `true` = citation mat lagao (jawab phir bhi do, bas granth ka naam na lo).
+ */
+export function isOutOfScope(text) {
+  const s = String(text || "");
+  return OUT_OF_SCOPE.some(re => re.test(s));
+}
+
 export function stripMetaFraming(text) {
   let s = String(text || "");
   for (const re of META_FRAMES) s = s.replace(re, " ");

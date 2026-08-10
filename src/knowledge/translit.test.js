@@ -11,7 +11,8 @@
 
 import { describe, it, expect } from "vitest";
 import { toDevanagari, detectQueryLanguage, devanagariRatio, stripCyrillic,
-         normalizeQueryForSearch, expandQueryWithParyay, GRANTH_PARYAY } from "./translit.js";
+         normalizeQueryForSearch, expandQueryWithParyay, GRANTH_PARYAY,
+         isOutOfScope } from "./translit.js";
 
 describe("toDevanagari — Hinglish se Devanagari", () => {
   it("pehle se Devanagari text ko chhoota nahi", () => {
@@ -191,6 +192,68 @@ describe("normalizeQueryForSearch — teeno bhashaon ka sahi bartaav", () => {
   it("original hamesha bacha rehta hai (AI ke prompt ke liye)", () => {
     const q = "dost ne dhokha diya";
     expect(normalizeQueryForSearch(q).original).toBe(q);
+  });
+});
+
+/**
+ * 2026-08-10: 32 control sawaalon par 4 JHOOTHI citation mili. Teen ka
+ * rerank score 0.8 se upar tha — yaani purane 0.5 ke gate par BHI ye
+ * galat hote. Pehle pakde nahi gaye kyunki purane control bahut aasan
+ * the (petrol ka rate, IPL kaun jeeta).
+ *
+ * Jad: reranker VISHAY milata hai, SAWAAL nahi —
+ *     "Meditation app kaunsa best hai" → dhyan waala ansh, score 0.907
+ * Koi threshold ise nahi rok sakta kyunki score sach mein ooncha hai.
+ * Ilaaj: hamare 24 granthon ke daayre se bahar ka sawaal ho to citation
+ * hi mat lagao (jawab phir bhi do, bas granth ka naam na lo).
+ */
+describe("isOutOfScope — 24 granthon ke daayre se bahar", () => {
+  it("wahi 4 sawaal pakadta hai jinpar jhoothi citation lagi thi", () => {
+    for (const q of [
+      "Quran ki mukhya shiksha kya hai",           // tha 0.926
+      "Meditation app kaunsa best hai",            // tha 0.907
+      "Gautam Buddha ne dukh ke bare me kya kaha", // tha 0.802
+      "Ayurveda me vata pitta kapha kya hote hain",// tha 0.430
+    ]) expect(isOutOfScope(q), q).toBe(true);
+  });
+
+  it("anya paramparaon ke granth pakadta hai", () => {
+    for (const q of ["Bible me jeevan ke bare me kya likha hai",
+                     "Jain dharma me ahimsa ka kya sthan hai",
+                     "Confucius ki neeti kya sikhati hai",
+                     "Socrates ke according atma kya hai"])
+      expect(isOutOfScope(q), q).toBe(true);
+  });
+
+  it("aadhunik vidhaayein aur gurus pakadta hai", () => {
+    for (const q of ["Tarot card reading kaise ki jati hai",
+                     "Numerology me 7 number ka kya matlab hai",
+                     "Reiki healing kaise kaam karti hai",
+                     "Feng shui ke according ghar kaisa hona chahiye",
+                     "Isha Foundation ke Sadhguru kya kehte hain"])
+      expect(isOutOfScope(q), q).toBe(true);
+  });
+
+  it("HAMARE granthon ke sawaal KABHI nahi pakadta — ye sabse zaroori hai", () => {
+    // Ek bhi jhootha alarm matlab asli sawaal ka jawab chhin jaayega.
+    // 298 asli sawaalon par jaancha gaya: 0 jhootha alarm.
+    for (const q of [
+      "Bhagavad Gita ke according life ka real purpose kya hai?",
+      "Yoga ka actual purpose kya hai?",
+      "Meditation karne ka sahi tarika kya hai?",
+      "Dhyana Yoga kya explain karta hai?",
+      "Atharvaveda me health aur life ke bare me kya knowledge hai?",
+      "Guru Granth Sahib ka main message kya hai?",
+      "Sikh Dharma me Naam Simran kya hota hai?",
+      "Krishna consciousness kya hoti hai?",
+      "Chakras kya hote hain?",
+      "Patanjali Yoga Sutra kya sikhata hai?",
+    ]) expect(isOutOfScope(q), q).toBe(false);
+  });
+
+  it("khaali/undefined par crash nahi karta", () => {
+    expect(isOutOfScope("")).toBe(false);
+    expect(isOutOfScope(undefined)).toBe(false);
   });
 });
 
