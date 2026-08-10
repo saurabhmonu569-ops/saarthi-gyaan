@@ -348,6 +348,7 @@ for (const name of only) {
   const bookHits = new Map();   // kaun si kitab kitne ansh mein aayi
   const distinct = [];          // har sawaal mein kitni alag kitaabein
   const failBest = [];          // fail sawaalon ka sabse achha rerank score
+  const ctrlBest = [];          // control sawaalon ka sabse achha score
   console.log(`  ${"sawaal".padEnd(38)}${"aadhaar".padStart(6)}${"vishay".padStart(6)}  #  granth`);
   console.log("  " + "-".repeat(84));
   for (const { q, any } of QUESTIONS) {
@@ -393,7 +394,9 @@ for (const name of only) {
     let g = [];
     try { g = await run(q, cfg); } catch { continue; }
     if (g.length) falseCite++;
-    console.log(`  [control] ${q.slice(0, 32).padEnd(34)}${(g.length ? "⚠ JHOOTHI" : "✅ chup").padStart(12)}   ${g[0]?.book || ""}`);
+    ctrlBest.push(g.best ?? 0);
+    console.log(`  [control] ${q.slice(0, 30).padEnd(32)}${(g.length ? "⚠ JHOOTHI" : "✅ chup").padStart(11)}`
+      + `   best-rerank ${(g.best ?? 0).toFixed(3)}`);
   }
   summary[name] = { hit, grounded, falseCite, metaOk, cmpHit, cmpTotal };
   console.log("  " + "-".repeat(78));
@@ -416,6 +419,28 @@ for (const name of only) {
     console.log(`    best-rerank 0.10-0.30 : ${String(mid).padStart(3)}  ← kuch mila, par kamzor`);
     console.log(`    best-rerank 0.00-0.10 : ${String(none).padStart(3)}  ← corpus mein sach mein nahi`);
     console.log(`    (gate abhi ${MIN_RERANK} par hai)`);
+
+    // ── GATE GIRANA SURAKSHIT HAI YA NAHI ──────────────────────────
+    // 33 sawaal 0.30-0.50 par atke hain. Gate girane se wo mil sakte
+    // hain — par tabhi, jab CONTROL sawaal (jinka jawab hai hi nahi)
+    // us line se saaf neeche hon. Warna gate girate hi jhoothi
+    // citation shuru ho jayegi, aur wahi is app ki sabse keemti cheez
+    // hai. Isliye faisla andaaze se nahi, is number se hoga.
+    if (ctrlBest.length) {
+      const cMax = Math.max(...ctrlBest);
+      const cSort = [...ctrlBest].sort((a, b) => b - a);
+      console.log(`\n  GATE KA FAISLA`);
+      console.log(`    control ka sabse ooncha score : ${cMax.toFixed(3)}`);
+      console.log(`    control ke top-3             : ${cSort.slice(0, 3).map(x => x.toFixed(3)).join(", ")}`);
+      const safe = cMax + 0.05;
+      if (safe < MIN_RERANK) {
+        const gain = failBest.filter(x => x >= safe && x < MIN_RERANK).length;
+        console.log(`    → gate ${safe.toFixed(2)} tak girana SURAKSHIT lagta hai (+${gain} sawaal mil sakte hain)`);
+        console.log(`      par ye ek hi run ka namoona hai — badalne se pehle dobara jaanchna.`);
+      } else {
+        console.log(`    → gate girana KHATARNAK — control isi daayre mein aa rahe hain`);
+      }
+    }
   }
 
   // ── GRANTH-VITARAN ─────────────────────────────────────────────────

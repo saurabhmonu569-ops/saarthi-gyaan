@@ -180,6 +180,17 @@ const WORDS = {
   // "kaha gaya hai" bahut aam vaakya hai; uska matlab "kahan chala gaya"
   // ban raha tha. Inke saath kehna/kehte/kehti ke roop bhi jode.
   shastra: "शास्त्र", shastron: "शास्त्रों", shaastra: "शास्त्र",
+
+  // Ye do angrezi shabd yahan JAAN-BOOJH KAR hain, EN_CONCEPT mein nahi.
+  // Kram maayne rakhta hai: toDevanagari PEHLE chalta hai, EN_CONCEPT
+  // uske BAAD. Toh lexicon inhe pehle hi bigaad deta tha aur EN_CONCEPT
+  // ko mauka hi nahi milta:
+  //     war   → वर      (dulha/vardaan!)  — "Kurukshetra war" barbaad
+  //     atman → आत्मानं (vibhakti-roop)
+  // WORDS lexicon se pehle dekha jaata hai, isliye yahan likhne se hi
+  // ye theek hote hain. Baaki 6 aise shabd bhi mile par unke dono roop
+  // corpus mein maujood hain (मंत्र/मन्त्र, सत्व/सत्त्व) — unhe chhoda.
+  war: "युद्ध", atman: "आत्मा",
   kaha: "कहा", kahe: "कहे", kahi: "कही", kahin: "कहीं",
   kehte: "कहते", kehta: "कहता", kehti: "कहती", kehna: "कहना",
   karne: "करने", karke: "करके", karta: "करता", karti: "करती",
@@ -817,7 +828,56 @@ export const EN_CONCEPT = {
   emotions: "भाव", healing: "आरोग्य", disease: "रोग", health: "आरोग्य",
   journey: "यात्रा", practice: "अभ्यास", teachings: "शिक्षा",
   summary: "सार", story: "कथा", king: "राजा", warrior: "योद्धा",
-  equality: "समानता", surrender: "शरण", sacrifice_tyag: "त्याग",
+  equality: "समानता", surrender: "शरण",
+
+  // ── SANSKRIT/HINDI KE NAAM (2026-08-10) ───────────────────────────
+  //
+  // ASLI GHATNA: 298 sawaalon ke poore run mein 114 fail hue. Unme se
+  // 61 par best-rerank 0.10 se bhi kam tha — yaani reranker ko dene ko
+  // kuch tha hi nahi. Pehle laga corpus ki kami hai. Par jaanch par:
+  //     "Draupadi ke life lessons"  → "Draupadi के जीवन lessons"
+  //     "Prarabdha Karma kya hota"  → "Prarabdha कर्म क्या होता है?"
+  //     "Kaurav aur Pandav conflict"→ "Kaurav और Pandav conflict"
+  // NAAM Latin mein hi reh gaye the. Aur jahan mukhya shabd Latin tha,
+  // wahan ummeedwaaron mein 0 prasangik ansh mile — jabki corpus mein
+  // द्रौपदी 1,503 baar, अर्जुन 8,949 baar, मुहूर्त 726 baar hai.
+  //
+  // Ye wahi kism ki galti hai jo ab tak teen baar mil chuki hai. Naam
+  // sabse zyada nuksan karte hain kyunki wahi sawaal ka asli vishay
+  // hote hain — unka Latin reh jaana poori query bekaar kar deta hai.
+  draupadi: "द्रौपदी", yudhishthir: "युधिष्ठिर", yudhisthir: "युधिष्ठिर",
+  dronacharya: "द्रोणाचार्य", drona: "द्रोण", yamraj: "यमराज",
+  kaurav: "कौरव", kaurava: "कौरव", kauravas: "कौरव",
+  pandav: "पाण्डव", pandava: "पाण्डव", pandavo: "पाण्डव", pandavas: "पाण्डव",
+  kurukshetra: "कुरुक्षेत्र", vashisht: "वसिष्ठ", vasishtha: "वसिष्ठ",
+  patanjali: "पतंजलि", ashtanga: "अष्टांग", vedic: "वैदिक",
+  punarjanam: "पुनर्जन्म", prarabdha: "प्रारब्ध", kriyamana: "क्रियमाण",
+  sanchit: "संचित", nirodha: "निरोध", vishad: "विषाद",
+  brahmasmi: "ब्रह्मास्मि", nasadiya: "नासदीय", mahabhuta: "महाभूत",
+  muladhara: "मूलाधार", sahasrara: "सहस्रार", ajna: "आज्ञा",
+  kena: "केन", mandukya: "माण्डूक्य", taittiriya: "तैत्तिरीय",
+  navadha: "नवधा", namah: "नमः", mahamrityunjaya: "महामृत्युंजय",
+  chiranjeevi: "चिरंजीवी", kalki: "कल्कि", kundli: "कुण्डली",
+  navgraha: "नवग्रह", muhurat: "मुहूर्त", muhurta: "मुहूर्त",
+  bhagwat: "भागवत", bhagavat: "भागवत", dharman: "धर्मान्",
+
+  // Hindi ke wo shabd jo abhi bhi Latin mein bach rahe the
+  insaan: "मनुष्य", tarika: "तरीका", fayda: "लाभ", kareeb: "निकट",
+  achhe: "अच्छे", milte: "मिलते", milegi: "मिलेगी", padhne: "पढ़ने",
+  bolti: "बोलती", humari: "हमारी", sabki: "सबकी", chhode: "छोड़े",
+  sikhate: "सिखाते", jiye: "जिए", badhaye: "बढ़ाए", nikle: "निकले",
+
+  // aam angrezi jinka saaf Devanagari joda hai
+  change: "परिवर्तन", person: "व्यक्ति", develop: "विकास",
+  inner: "अन्तर", daily: "नित्य", power: "शक्ति", reality: "सत्य",
+  philosophy: "दर्शन", ideal: "आदर्श", energy: "तेज", love: "प्रेम",
+  trust: "विश्वास", voice: "वाणी", time: "समय", steps: "चरण",
+  forms: "प्रकार", friend: "मित्र", strength: "बल", strategy: "नीति",
+  source: "मूल", astrology: "ज्योतिष", human: "मनुष्य", music: "संगीत",
+  childhood: "बाल्य", lessons: "शिक्षा", concepts: "स्वरूप",
+  chapters: "अध्याय", chapter: "अध्याय", desires: "काम",
+  enemies: "शत्रु", root: "मूल", cause: "कारण", future: "भविष्य",
+  eye: "नेत्र", important: "महत्व", overcome: "जीत",
 };
 
 export function normalizeQueryForSearch(text) {
