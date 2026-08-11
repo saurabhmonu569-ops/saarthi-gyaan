@@ -942,7 +942,7 @@
       "title": "Nitya Karm Pooja Prakash",
       "tradition": "pooja",
       "language": "sa+hi",
-      "chunk_count": 423,
+      "chunk_count": 408,
       "chapters": [
         4,
         5
@@ -1152,6 +1152,22 @@
         420
       ],
       "chapter_count": 7
+    },
+    {
+      "book_id": "yoga_sutra",
+      "title": "Patanjali Yoga Sutra (Hindi)",
+      "tradition": "yoga",
+      "language": "sa+hi",
+      "chunk_count": 160,
+      "chapters": [
+        4,
+        7
+      ],
+      "page_range": [
+        4,
+        84
+      ],
+      "chapter_count": 2
     },
     {
       "book_id": "yoga_vasishtha",

@@ -37,9 +37,29 @@ import { fileURLToPath } from "node:url";
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const BOOKS_DIR = join(ROOT, "public", "knowledge", "books");
 const OUT_DIR   = join(ROOT, "public", "knowledge", "embeddings");
-const BIN_PATH  = join(OUT_DIR, "vectors_int8.bin");
-const IDX_PATH  = join(OUT_DIR, "chunk_index.json");
-const PROG_PATH = join(OUT_DIR, ".embed-progress.json");
+
+/**
+ * --books <id,id>  — SIRF in granthon ke ansh embed karo.  (2026-08-11)
+ *
+ * KYUN: 24va granth (Yogasutra) jodte waqt sirf 160 naye ansh the, par ye
+ * script poore 57,499 chalati. Do ghante aur hazaaron neuron us kaam par
+ * jo pehle se ho chuka hai.
+ *
+ * ALAG FILE kyun: bin file me har vector apni jagah par likha jaata hai —
+ * (i * rowBytes). Chhanni lagane se i badal jaata hai, to agar usi purani
+ * file me likhte to poora corpus gadbada jaata. Isliye chhanni wale roop
+ * ki apni file:  vectors_int8.yoga_sutra.bin
+ *
+ * Vectorize aur D1 dono upsert (INSERT OR REPLACE) hain, isliye alag se
+ * chadhane par bhi kuch tootta nahi.
+ */
+const bArg  = process.argv.indexOf("--books");
+const ONLY  = bArg > -1 ? (process.argv[bArg + 1] || "").split(",").map(x => x.trim()).filter(Boolean) : null;
+const SUFF  = ONLY ? "." + ONLY.join("_") : "";
+
+const BIN_PATH  = join(OUT_DIR, `vectors_int8${SUFF}.bin`);
+const IDX_PATH  = join(OUT_DIR, `chunk_index${SUFF}.json`);
+const PROG_PATH = join(OUT_DIR, `.embed-progress${SUFF}.json`);
 
 const MODEL = "@cf/baai/bge-m3";
 const DIM = 1024;
@@ -87,7 +107,14 @@ const API_URL = `https://api.cloudflare.com/client/v4/accounts/${ACCOUNT_ID}/ai/
 
 // ── corpus padho (deterministic order — checkpoint isi par tika hai) ──
 function loadChunks() {
-  const files = readdirSync(BOOKS_DIR).filter(f => f.endsWith(".json")).sort();
+  let files = readdirSync(BOOKS_DIR).filter(f => f.endsWith(".json")).sort();
+  if (ONLY) {
+    files = files.filter(f => ONLY.includes(f.replace(/\.json$/, "")));
+    if (!files.length) {
+      console.error(`❌ --books "${ONLY.join(",")}" — koi file nahi mili ${BOOKS_DIR} me`);
+      process.exit(1);
+    }
+  }
   const rows = [];
   for (const f of files) {
     const b = JSON.parse(readFileSync(join(BOOKS_DIR, f), "utf8"));
@@ -162,7 +189,8 @@ const t0 = Date.now();
 if (!existsSync(OUT_DIR)) mkdirSync(OUT_DIR, { recursive: true });
 
 const chunks = loadChunks();
-console.log(`\n📚 corpus: ${chunks.length.toLocaleString()} chunks (24 books)`);
+console.log(`\n📚 corpus: ${chunks.length.toLocaleString()} chunks`
+  + (ONLY ? `  — sirf ${ONLY.join(", ")}` : ""));
 
 // checkpoint
 let done = 0;

@@ -6,10 +6,11 @@
  * "sahi vyavhaar" alag hai:
  *
  *   1. GRANTH  — jinka jawab hamari 24 kitaabon mein hona chahiye.
+ *                (Yogasutra 11 Aug ko 24va granth ban gaya.)
  *                Sahi = Aadhaar mile. Fail = asli galti.
  *
  *   2. BAHAR   — jinme aise granth ka naam hai jo hamare paas HAI HI
- *                NAHI (Srimad Bhagavatam, Yoga Sutras, Dhammapada, Tao
+ *                NAHI (Srimad Bhagavatam, Dhammapada, Tao
  *                Te Ching, aur wo teen jo hataye ja chuke hain — Mantra
  *                Shakti, Nitya Devta Archana, Valmiki Ramayan).
  *                Sahi = KOI Aadhaar na mile. Aadhaar mila = JHOOTHI
@@ -65,7 +66,10 @@ const NAHI_HAI = [
   [/nitya\s*devta\s*archana/i,                       "Nitya Devta Archana (hataya ja chuka)"],
   // kabhi ingest hi nahi hue
   [/bhagavatam|bhagwatam|श्रीमद्भागवत|bhagavat\s*tradition|uddhava\s*gita/i, "Srimad Bhagavatam"],
-  [/yoga\s*sutra|patanjali|पतंजलि|kleshas?\b|abhyasa\s*aur\s*vairagya|asmita/i, "Yoga Sutras (Patanjali)"],
+  // ⚠️ Yoga Sutras yahan SE HATA DIYA (2026-08-11) — ab wo hamara 24va
+  // granth hai (82 panne OCR, 160 ansh). Iske sawaal ab naye_granth me
+  // jaate hain, aur unka Aadhaar MILNA CHAHIYE. Pehle ye ulta tha: unka
+  // Aadhaar milna "jhoothi citation" gina jaata.
   [/dasam\s*granth/i,                                "Dasam Granth"],
   [/dhammapada/i,                                    "Dhammapada"],
   [/majjhima\s*nikaya/i,                             "Majjhima Nikaya"],

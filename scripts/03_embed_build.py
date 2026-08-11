@@ -86,15 +86,59 @@ def embed_text(text: str) -> list[float] | None:
 
 
 def load_all_chunks() -> list[dict]:
+    """Har granth ke ansh padho — book_chunk_index.json ke hisab se.
+
+    PEHLE: `book_dir.glob("chunk_*.json")` — jo bhi file disk par mili, le li.
+    Wo galat tha. 02_chunk.py dobara chalne par purani files mitata nahi tha,
+    isliye baasi files bhi is soochi me aa jaati thi.
+
+    NAAPA GAYA (11 Aug): nitya_karm_pooja ki 15 baasi files — chunk_000408
+    se chunk_000422 — us granth ke 423 ginne gaye jabki asli 408 the. Un
+    baasi ansh ke panne (383-396) aaj ke ansh se takra gaye, aur D1 ke
+    `INSERT OR REPLACE` ne baasi paath rakh kar 14 sahi ansh mita diye.
+
+    Ab index hi sach hai. 02_chunk.py bhi purani files mitata hai, par ye
+    doosri parat isliye rakhi hai ki agar kabhi koi file haath se copy ho
+    jaaye ya aadha chala hua run kuch chhod jaaye, to wo chupchaap corpus
+    me na ghus jaaye. Index na mile to purana tareeka chalta hai (taaki
+    koi bhi granth chupchaap gaayab na ho) — par chetavni chhapti hai.
+    """
     chunks = []
     for book_dir in sorted(CHUNK_DIR.iterdir()):
         if not book_dir.is_dir(): continue
-        for cf in sorted(book_dir.glob("chunk_*.json")):
+
+        idx_file = book_dir / "book_chunk_index.json"
+        names = None
+        if idx_file.exists():
+            try:
+                idx = json.loads(idx_file.read_text(encoding="utf-8"))
+                n = len(idx.get("chunks", []))
+                if n:
+                    names = [f"chunk_{i:06d}.json" for i in range(n)]
+            except Exception:
+                names = None
+
+        if names is None:
+            print(f"    ⚠️  {book_dir.name}: book_chunk_index.json nahi mila/padha "
+                  f"— disk ki saari files le raha hoon (baasi bhi ho sakti hain)")
+            files = sorted(book_dir.glob("chunk_[0-9]*.json"))
+        else:
+            files = [book_dir / nm for nm in names]
+            on_disk = len(list(book_dir.glob("chunk_[0-9]*.json")))
+            if on_disk != len(files):
+                print(f"    ⚠️  {book_dir.name}: disk par {on_disk:,} files, "
+                      f"index me {len(files):,} — {on_disk - len(files):,} baasi chhod raha hoon")
+
+        for cf in files:
+            if not cf.exists():
+                print(f"    ⚠️  {book_dir.name}: {cf.name} index me hai par disk par nahi")
+                continue
             try:
                 c = json.loads(cf.read_text(encoding="utf-8"))
                 c["_file"] = str(cf)
                 chunks.append(c)
-            except: pass
+            except Exception as ex:
+                print(f"    ⚠️  {cf.name} padhi nahi gayi: {ex}")
     return chunks
 
 

@@ -53,8 +53,26 @@ export const BOOK_RIGHTS = {
   // roop se uplabdh hain.
   yoga_vasishtha:   { access: "open" },
 
+
   // ── BAND ───────────────────────────────────────────────────────────
   // Gita Press (12) — prakashak zinda aur sakriya hai
+  // Patanjali Yogasutra — BAND (2026-08-11).
+  //
+  // Pehle maine ise "open" likha tha, is tark par ki mool sutra 2,000 saal
+  // purane hain. Wo tark GALAT hai: khula hona mool paath par nahi, ISS
+  // SANSKARAN par tay hota hai — jo Hindi bhashya, uske aasan-chitra aur
+  // sampadan sab aaj ke hain. Un par kisi ka haq ho sakta hai.
+  //
+  // Is PDF me "निदेशक की कलम से" hai aur 24% hissa aasan ki hidayat ka —
+  // yaani kisi sanstha ka aaj ka prakashan hai, purana bhashya nahi.
+  // Prakashak ka naam nahi pata, isliye `pub` nahi de raha; wo line user
+  // ko tabhi dikhegi jab hume sach me pata ho.
+  //
+  // Unit test ne ye pakda ("sirf public-domain sanskaran khule hain") aur
+  // wo theek tha. Adhikar ke maamle me shak ho to BAND — yahi is soochi
+  // ka niyam hai (anjaan kitab bhi default se band hai).
+  yoga_sutra:            { access: "restricted" },
+
   bhagavad_gita_shankar: { access: "restricted", pub: "गीता प्रेस" },
   ramcharitmanas:        { access: "restricted", pub: "गीता प्रेस" },
   mahabharata:           { access: "restricted", pub: "गीता प्रेस" },
@@ -110,6 +128,10 @@ export const BOOK_ORDER = [
   "bhagavad_gita_shankar",
   "mahabharata",
   "yoga_vasishtha",
+  // Yogasutra yahan — Gita/Mahabharat ke baad, Ved se pehle. Wajah: ye
+  // "kaise karein" wale sawaalon ka granth hai, aur wahi sawaal sabse
+  // zyada aate hain.
+  "yoga_sutra",
   // Ved
   "rigveda_1", "samaveda", "yajurveda", "atharvaveda_1",
   // Puran

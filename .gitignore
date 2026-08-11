@@ -66,3 +66,13 @@ Thumbs.db
 # Editor
 .vscode/
 *.swp
+book-check.json
+
+# Pipeline ke beech ke checkpoint aur --books wali alag files (2026-08-11).
+# Ye chalne ke dauran bante hain aur sirf ek machine ke liye matlab rakhte
+# hain — inhe git me rakhne se dobara chalane par bemani conflict aate hain.
+public/knowledge/.d1-progress*.json
+public/knowledge/embeddings/.embed-progress*.json
+public/knowledge/embeddings/.vectorize-progress*.json
+public/knowledge/embeddings/chunk_index.*.json
+public/knowledge/embeddings/vectors_int8.*.bin

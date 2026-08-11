@@ -108,7 +108,16 @@ export const BOOK_HINTS = {
   "jyotirlinga": "shiva_purana_2", "ज्योतिर्लिंग": "shiva_purana_2",
   "shiv puran": "shiva_purana_1", "shiva puran": "shiva_purana_1", "शिव पुराण": "shiva_purana_1",
   "vishnu puran": "vishnu_purana_1", "विष्णु पुराण": "vishnu_purana_1",
-  "agni": "agni_purana", "अग्नि पुराण": "agni_purana",
+  // ⚠️ "agni" AKELA JAAN-BOOJHKAR NAHI HAI (2026-08-11).
+  // Wo pehle tha, aur naapne par ye nikla:
+  //     "Rigveda me Agni ko itna important kyu mana gaya hai" → agni_purana
+  // Agni Rigveda ka pehla aur sabse bada devta hai; Yajurveda ka poora
+  // yajna-vidhan usi par tika hai. Us ek shabd ne charon Ved ke sawaal
+  // Agni Puran par bhej diye — aur kyunki hinted granth score-gate se
+  // chhoot jaata hai (HINTED_PAKKA=2), galat Aadhaar PAKKA aata tha.
+  // Granth ka poora naam chahiye, tabhi hint lage.
+  "agni puran": "agni_purana", "agni purana": "agni_purana",
+  "अग्नि पुराण": "agni_purana", "अग्निपुराण": "agni_purana",
   "narsimha": "narasimha_purana", "narasimha": "narasimha_purana", "नरसिंह पुराण": "narasimha_purana",
   // "Narshim Puran" — user ki apni PDF ka naam yahi hai, aur is spelling
   // par pehle koi hint nahi lagta tha.
@@ -126,15 +135,64 @@ export const BOOK_HINTS = {
   "katha upanishad": "kathopanishad", "kath upanishad": "kathopanishad",
   "yamraj": "kathopanishad", "shreyas": "kathopanishad", "preyas": "kathopanishad",
   "कठोपनिषद": "kathopanishad", "नचिकेता": "kathopanishad",
-  "upanishad": "ishadi_upanishad", "upnishad": "ishadi_upanishad", "उपनिषद": "ishadi_upanishad", "ईशादि": "ishadi_upanishad",
+  // ⚠️ AKELA "upanishad"/"उपनिषद" HATAYA (2026-08-11).
+  //
+  // Upanishad 108 hain; hamare paas DO hain — Ishadi aur Katho. Generic
+  // "upanishad" ko Ishadi par bhejna maanta hai ki jo bhi Upanishad ka
+  // naam le, use Ishadi hi chahiye. Naapne par galat nikla:
+  //     "Chandogya Upanishad me Shvetaketu ko kya sikhaya gaya"
+  //         → hinted=ishadi_upanishad → 6 ansh Ishadi se
+  // Shvetaketu aur "tat tvam asi" CHANDOGYA me hai, Ishadi me hai hi
+  // nahi. Aur kyunki hinted granth score-gate se chhoot jaata hai
+  // (HINTED_PAKKA=2), wo galat Aadhaar PAKKA aata tha.
+  //
+  // Ab poora naam chahiye. Bina naam wale sawaal ("Upanishad me aatma ka
+  // varnan") par koi hint nahi lagega — aur wo theek hai: dono Upanishad
+  // barabari se pool me aayenge, aur reranker chunega.
+  "ishadi upanishad": "ishadi_upanishad", "ishaadi upanishad": "ishadi_upanishad",
+  "ishavasya": "ishadi_upanishad", "ishopanishad": "ishadi_upanishad",
+  "ishawasya": "ishadi_upanishad", "isha upanishad": "ishadi_upanishad",
+  "ईशादि": "ishadi_upanishad", "ईशावास्य": "ishadi_upanishad", "ईशोपनिषद": "ishadi_upanishad",
   "granth sahib": "guru_granth_sahib", "gurbani": "guru_granth_sahib", "guru nanak": "guru_granth_sahib",
   "ग्रंथ साहिब": "guru_granth_sahib", "गुरबाणी": "guru_granth_sahib", "गुरु नानक": "guru_granth_sahib",
   "chanakya": "chanakya_neeti", "चाणक्य": "chanakya_neeti",
   "ekadashi": "ekadashi_mahatmya", "एकादशी": "ekadashi_mahatmya",
-  "lal kitab": "lal_kitab", "upay": "lal_kitab", "jyotish": "lal_kitab",
+  // ⚠️ AKELA "upay" HATAYA (2026-08-11) — 17 aam sawaalon par naapa,
+  // 7 seedhe jyotish ki kitab par chale gaye:
+  //     "krodh ko jeetne ka upay kya hai"  → lal_kitab
+  //     "tanav door karne ka upay"         → lal_kitab
+  //     "shanti pane ka upay kya hai"      → lal_kitab
+  // "उपाय" rozmarra ka Hindi shabd hai — "hal", "tareeka". Lal Kitab ke
+  // apne "upay" mashhoor zaroor hain, par us naate har dukhi user ka
+  // sawaal jyotish par bhej dena galat hai. Yahi wo shikayat thi jab
+  // "seva aur paropkar" ka jawab jyotish ki kitab se aaya tha.
+  "lal kitab": "lal_kitab", "jyotish": "lal_kitab",
   "लाल किताब": "lal_kitab", "ज्योतिष": "lal_kitab",
   "rashi": "rashi_muhurt_vigyan", "muhurt": "rashi_muhurt_vigyan", "muhurat": "rashi_muhurt_vigyan",
   "राशि": "rashi_muhurt_vigyan", "मुहूर्त": "rashi_muhurt_vigyan",
+  // ── PATANJALI YOGASUTRA (2026-08-11) ────────────────────────────────
+  //
+  // ⚠️ Sirf granth ka NAAM yahan hai, uske paribhashik shabd NAHI.
+  //
+  // Pehle maine "vairagya", "samadhi", "dharana" jaise shabd bhi jode the.
+  // Naapne par galat nikla: "Yoga Vasishtha me vairagya prakaran" seedha
+  // yoga_sutra par chala gaya. Wajah saaf hai — ye shabd Yogasutra ke apne
+  // nahi hain; Gita, Yoga Vasishtha aur Upanishad sab inhe barabar
+  // istemaal karte hain. Aise saanjhe shabd ko kisi ek granth se baandhna
+  // baaki teen granth ka darwaza band kar deta hai.
+  //
+  // Jo bache hain wo sach me sirf Yogasutra ke hain — क्लेश (5 klesh),
+  // चित्तवृत्ति (sutra 1.2), अस्मिता/अभिनिवेश (klesh ke naam), अष्टाङ्ग
+  // (8 ang ka dhaancha). Inka koi doosra ghar nahi hai.
+  "yoga sutra": "yoga_sutra", "yogasutra": "yoga_sutra", "yog sutra": "yoga_sutra",
+  "patanjali": "yoga_sutra", "patanjal": "yoga_sutra",
+  "योगसूत्र": "yoga_sutra", "योग सूत्र": "yoga_sutra",
+  "पतंजलि": "yoga_sutra", "पातञ्जल": "yoga_sutra",
+  "klesha": "yoga_sutra", "kleshas": "yoga_sutra", "क्लेश": "yoga_sutra",
+  "chittavritti": "yoga_sutra", "chitta vritti": "yoga_sutra", "चित्तवृत्ति": "yoga_sutra",
+  "asmita": "yoga_sutra", "अस्मिता": "yoga_sutra",
+  "abhinivesh": "yoga_sutra", "अभिनिवेश": "yoga_sutra",
+  "ashtanga yoga": "yoga_sutra", "अष्टांग योग": "yoga_sutra", "अष्टाङ्ग योग": "yoga_sutra",
   "yoga vasishtha": "yoga_vasishtha", "yog vashisth": "yoga_vasishtha",
   "योगवासिष्ठ": "yoga_vasishtha", "योग वासिष्ठ": "yoga_vasishtha",
   "योगवाशिष्ठ": "yoga_vasishtha", "वसिष्ठ": "yoga_vasishtha", "वशिष्ठ": "yoga_vasishtha",
@@ -151,7 +209,16 @@ export const BOOK_HINTS = {
   "रामचरितमानस": "ramcharitmanas", "रामचरित मानस": "ramcharitmanas",
   "मानस": "ramcharitmanas", "तुलसीदास": "ramcharitmanas", "tulsidas": "ramcharitmanas",
   "चौपाई": "ramcharitmanas", "सुंदरकांड": "ramcharitmanas", "सुन्दरकाण्ड": "ramcharitmanas",
-  "mantra": "mantra_maha_sagar", "मंत्र": "mantra_maha_sagar", "मन्त्र": "mantra_maha_sagar",
+  // ⚠️ AKELA "mantra"/"मंत्र" HATAYA (2026-08-11).
+  // Is granth ke paas naam wala EK BHI hint nahi tha — sirf ye aam shabd.
+  // "मंत्र" charon Ved ka mool shabd hai (Samaveda to hai hi mantron ka
+  // gaayan), aur Guru Granth Sahib me bhi baar-baar aata hai. Nateeja:
+  //     "Samaveda ke mantron ka purpose"     → mantra_maha_sagar
+  //     "Atharvaveda me raksha ke mantra"    → mantra_maha_sagar
+  // Ab poora naam chahiye. Wo naam pehle kahin tha hi nahi, isliye jod
+  // raha hoon — warna is granth par kabhi hint lagta hi nahi.
+  "mantra maha sagar": "mantra_maha_sagar", "mantra mahasagar": "mantra_maha_sagar",
+  "मंत्र महासागर": "mantra_maha_sagar", "मन्त्र महासागर": "mantra_maha_sagar",
 };
 
 /**

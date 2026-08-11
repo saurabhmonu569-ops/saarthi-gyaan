@@ -69,6 +69,14 @@ export const BOOK_META = {
   // Yoga Vasishtha advaita vedanta ka granth hai — मन, वैराग्य, मोक्ष,
   // संसार ka swaroop. Yahi wo vishay hain jinpe log SAARTHI se sabse zyada
   // poochte hain, aur inka koi samarpit granth pehle tha hi nahi.
+  // ── 24va GRANTH (2026-08-11) ─────────────────────────────────────
+  // KYUN JODA: 298 sawaalon mein jo 12 fail hue, wo lagbhag saare MAN aur
+  // VICHAAR ke the — "thoughts ko observe kaise kare", "mindfulness kya
+  // hai", "ego kya hota hai", "comparison chhodna". Baaki 23 granth KYA
+  // KARNA CHAHIYE batate hain; ye KAISE KARNA HAI batata hai.
+  // OCR: 82 panne, tootna 0.313, Latin kachra 0 (force_ocr se — text-layer
+  // Kruti-Dev jaisa kachra tha, tootna 0.56).
+  yoga_sutra:            { icon:"🧘", title:"पातञ्जल योगसूत्र", en:"Patanjali Yoga Sutra", sub:"चित्तवृत्तिनिरोध — मन, क्लेश और साधना का शास्त्र", src:"पातञ्जल योगसूत्र (हिंदी भाष्य सहित)", srcEn:"Patanjali Yoga Sutra (with Hindi commentary)" },
   yoga_vasishtha:        { icon:"🪞", title:"श्रीयोगवासिष्ठ महारामायण", en:"Shri Yoga Vasishtha", sub:"वसिष्ठ-राम संवाद — मन, वैराग्य और मोक्ष का दर्शन", src:"श्रीयोगवासिष्ठ महारामायण (हिंदी अनुवाद) · 4 भाग", srcEn:"Shri Yoga Vasishtha Maharamayana (Hindi translation) · 4 parts" },
   // nitya_devta_archana ki jagah (2026-08-04) — wo kitab hatai gayi kyunki
   // uska vishay nitya_karm_pooja pehle se behtar cover karta tha, aur uska

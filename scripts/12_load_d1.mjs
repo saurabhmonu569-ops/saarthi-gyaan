@@ -37,7 +37,7 @@ import { execFileSync } from "node:child_process";
 const ROOT  = join(dirname(fileURLToPath(import.meta.url)), "..");
 const BOOKS = join(ROOT, "public", "knowledge", "books");
 const DB    = "saarthi-knowledge";
-const PROG  = join(ROOT, "public", "knowledge", ".d1-progress.json");
+const PROG  = join(ROOT, "public", "knowledge", `.d1-progress${process.argv.includes("--books") ? "." + process.argv[process.argv.indexOf("--books") + 1] : ""}.json`);
 
 // Ek SQL file mein kitne ansh.
 const BATCH = 300;
@@ -121,9 +121,18 @@ if (!process.argv.includes("--load")) {
   process.exit(0);
 }
 
-console.log("corpus load ho raha…");
+// --books <id,id> — sirf in granthon ki rows bhejo.  (2026-08-11)
+// INSERT OR REPLACE hai, isliye alag se chadhane par duplicate nahi banega.
+// ⚠️ --schema is ke saath MAT chalao — wo tables DROP karta hai.
+const bArg = process.argv.indexOf("--books");
+const ONLY = bArg > -1 ? (process.argv[bArg + 1] || "").split(",").map(x => x.trim()).filter(Boolean) : null;
+
+console.log("corpus load ho raha…" + (ONLY ? `  (sirf ${ONLY.join(", ")})` : ""));
 const rows = [];
-for (const f of readdirSync(BOOKS).filter(x => x.endsWith(".json")).sort()) {
+let files = readdirSync(BOOKS).filter(x => x.endsWith(".json")).sort();
+if (ONLY) files = files.filter(f => ONLY.includes(f.replace(/\.json$/, "")));
+if (ONLY && !files.length) { console.error(`❌ --books "${ONLY.join(",")}" — koi file nahi mili`); process.exit(1); }
+for (const f of files) {
   const b = JSON.parse(readFileSync(join(BOOKS, f), "utf8"));
   for (const c of (b.chunks || [])) {
     const t = (c.text || "").trim();

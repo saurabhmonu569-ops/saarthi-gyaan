@@ -152,11 +152,36 @@ def split_into_chunks(text: str) -> list[str]:
 
 # ─── CHUNK ID ─────────────────────────────────────────────────────────────────
 
-def make_chunk_id(book_id: str, page: int, chunk_idx: int) -> str:
-    """Deterministic chunk ID — stable across re-runs."""
+def make_chunk_id(book_id: str, page: int, chunk_idx: int, seen: set = None) -> str:
+    """Deterministic chunk ID — stable across re-runs.
+
+    JAAL (2026-08-11)
+    -----------------
+    Id (granth, panna, kram) se banti hai — paath se NAHI. Yaani agar do
+    ansh ka panna aur kram ek ho, unki id bhi ek hogi, chahe paath alag ho.
+
+    Aisa ek baar hua bhi: nitya_karm_pooja me 14 id takra gayin. Us waqt ki
+    asli wajah upar chunk_book() me likhi hai (baasi files) aur wahi theek
+    ki gayi hai. Ye `seen` wali jaanch uska ilaaj NAHI — ye doosri parat ki
+    suraksha hai, taaki bhavishya me kisi aur wajah se takraav ho to wo
+    chupchaap ansh mitane ke bajay saaf dikhe.
+
+    Takraav hone par hi peeche `#2`, `#3` lagta hai. Isliye jitni bhi id
+    pehle se hain, wo BILKUL WAISI KI WAISI rehti hain — poore corpus ko
+    dobara embed karne ki zaroorat kabhi nahi padegi (wo 2 ghante aur
+    ~27,000 neuron hai).
+    """
     raw = f"{book_id}::{page:04d}::{chunk_idx:04d}"
-    h   = hashlib.sha256(raw.encode()).hexdigest()[:12]
-    return f"ck_{h}"
+    if seen is not None:
+        n = 1
+        while True:
+            h = hashlib.sha256(raw.encode()).hexdigest()[:12]
+            if h not in seen:
+                seen.add(h)
+                return f"ck_{h}"
+            n += 1
+            raw = f"{book_id}::{page:04d}::{chunk_idx:04d}#{n}"
+    return f"ck_{hashlib.sha256(raw.encode()).hexdigest()[:12]}"
 
 # ─── MAIN CHUNKER ─────────────────────────────────────────────────────────────
 
@@ -164,6 +189,25 @@ def chunk_book(book_id: str, book_info: dict) -> dict:
     raw_dir   = RAW_DIR / book_id
     chunk_out = CHUNK_DIR / book_id
     chunk_out.mkdir(parents=True, exist_ok=True)
+
+    # BAASI FILES MITAO — 2026-08-11
+    # ------------------------------
+    # Ye script har ansh ko alag file me likhti hai: chunk_000000.json,
+    # chunk_000001.json … Purani files kabhi mitati nahi thi. Maanyata yeh
+    # thi ki dobara chunk karne par utni hi files banengi, to purani upar
+    # se likhi jaayengi. Wo maanyata galat nikli.
+    #
+    # NAAPA GAYA: nitya_karm_pooja pehle 423 ansh me chunk hui thi, baad me
+    # 408 me. Files chunk_000408 se chunk_000422 tak — 15 baasi — disk par
+    # padi rah gayin. 03_embed_build directory ko glob karta hai (index ko
+    # nahi padhta), isliye wo un 15 ko bhi uthata raha.
+    #
+    # Nateeja aur bhi bura tha: un baasi ansh ke panne (383-396) aaj ke
+    # ansh se takra gaye, aur D1 ke `INSERT OR REPLACE` ne BAAD WALE ko
+    # rakha — yaani BAASI paath ko — aur 14 sahi ansh mita diye. Kahin koi
+    # error nahi aaya; sirf ginti me 14 ka antar dikha.
+    for old in chunk_out.glob("chunk_[0-9]*.json"):
+        old.unlink()
 
     page_files = sorted(raw_dir.glob("page_*.json"))
     if not page_files:
@@ -175,6 +219,7 @@ def chunk_book(book_id: str, book_info: dict) -> dict:
                    "chapter_title": None, "kanda": None}
     all_chunks  = []
     chunk_global_idx = 0
+    ids_seen    = set()   # id-takraav pakadne ke liye — upar make_chunk_id dekho
     chapters_seen    = set()
     sections_seen    = set()
 
@@ -212,7 +257,7 @@ def chunk_book(book_id: str, book_info: dict) -> dict:
         page_chunks = split_into_chunks(text)
 
         for ci, chunk_text in enumerate(page_chunks):
-            chunk_id = make_chunk_id(book_id, pg_no, ci)
+            chunk_id = make_chunk_id(book_id, pg_no, ci, ids_seen)
 
             chunk = {
                 # ── Identity ────────────────────────────────────────────

@@ -559,9 +559,25 @@ function callGemini(history, systemPrompt) {
  * Ab yeh apne aap banta hai. Kal koi granth jude ya hate, prompt sach
  * bolta rahega — bina kisi ko yaad rakhe.
  */
-const GRANTH_NAMES = Object.values(BOOK_META)
-  .map(m => m.en || m.title)
-  .filter(Boolean);
+/**
+ * KHAND EK GRANTH GINE JAATE HAIN (2026-08-11).
+ *
+ * BOOK_META me 25 chaabiyan hain, par granth 24 hain — Shiv Puran do
+ * khand me hai, aur dono ki alag entry hai (unki PDF hi alag hain).
+ *
+ * Bina ise sambhale prompt me likha jaata: "Tumhare paas KEVAL yeh 25
+ * granth hain: …, Shiva Purana Khand 1, Shiva Purana Khand 2, …".
+ * Do dikkatein: ginti galat, aur ek hi granth do naam se dikhta —
+ * jisse jawab me kabhi "Khand 1" to kabhi "Khand 2" ka hawala aata,
+ * jabki user ke liye wo ek hi kitab hai.
+ *
+ * Aage koi granth khand me bata to yahi niyam apne aap laagu ho jaayega.
+ */
+const GRANTH_NAMES = [...new Set(
+  Object.values(BOOK_META)
+    .map(m => (m.en || m.title || "").replace(/\s*(Khand|खण्ड|खंड)\s*[0-9०-९]+\s*$/i, "").trim())
+    .filter(Boolean)
+)];
 const GRANTH_COUNT = GRANTH_NAMES.length;
 const GRANTH_LIST  = GRANTH_NAMES.join(", ");
 

@@ -36,7 +36,7 @@ const INDEX = "saarthi-chunks";
 // Vectorize ek call mein max 1000 vector leta hai; 1024 float ka JSON
 // bada hota hai isliye 200 rakha — payload ~3 MB prati call.
 const BATCH = 200;
-const PROG = join(EMB, ".vectorize-progress.json");
+const PROG = join(EMB, `.vectorize-progress${process.argv.includes("--books") ? "." + process.argv[process.argv.indexOf("--books") + 1] : ""}.json`);
 
 function loadEnv() {
   const out = { ...process.env };
@@ -57,8 +57,15 @@ if (!ACC || !TOK) {
 }
 
 console.log("corpus load ho raha…");
-const idx = JSON.parse(readFileSync(join(EMB, "chunk_index.json"), "utf8"));
-const buf = readFileSync(join(EMB, "vectors_int8.bin"));
+// --books <id> — embed-corpus.mjs ne jo alag file banayi thi, wahi padho.
+// Vectorize upsert hai, isliye baaki 57,339 vector chhoona zaroori nahi.
+const bArg = process.argv.indexOf("--books");
+const ONLY = bArg > -1 ? (process.argv[bArg + 1] || "").split(",").map(x => x.trim()).filter(Boolean) : null;
+const SUFF = ONLY ? "." + ONLY.join("_") : "";
+if (ONLY) console.log(`  chhanni: ${ONLY.join(", ")}`);
+
+const idx = JSON.parse(readFileSync(join(EMB, `chunk_index${SUFF}.json`), "utf8"));
+const buf = readFileSync(join(EMB, `vectors_int8${SUFF}.bin`));
 const n = idx.count;
 if (buf.length !== n * ROW) {
   console.error(`❌ vectors_int8.bin ka aakaar mel nahi khata: ${buf.length} vs ${n * ROW}`);

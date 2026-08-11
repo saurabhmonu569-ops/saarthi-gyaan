@@ -3,7 +3,7 @@
  "schema": "saarthi-knowledge-v2",
  "embed_model": "models/text-embedding-004",
  "embed_dim": 768,
- "total_chunks": 57339,
+ "total_chunks": 57484,
  "books": [
   "agni_purana",
   "atharvaveda_1",
@@ -28,6 +28,7 @@
   "shiva_purana_2",
   "vishnu_purana_1",
   "yajurveda",
+  "yoga_sutra",
   "yoga_vasishtha"
  ],
  "index_shards": 8,

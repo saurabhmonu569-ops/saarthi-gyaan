@@ -90,6 +90,31 @@ NEW_BOOKS = [
                     "Mahabharata Volume 5.pdf", "Mahabharata Volume 6.pdf"],
      "title":"Mahabharata (Gita Press)", "short":"Mahabharata",
      "tradition":"itihasa", "language":"sa+hi", "force_ocr":True},
+    # ── 24va GRANTH (2026-08-11) ────────────────────────────────────────
+    # KYUN YEH KITAB: 298 sawaalon mein jo 12 fail hue, wo lagbhag saare MAN
+    # aur VICHAAR ke the — "thoughts ko observe kaise kare", "mindfulness kya
+    # hai", "ego kya hota hai", "comparison chhodna". Hamare 23 granth KYA
+    # KARNA CHAHIYE batate hain; Yogasutra KAISE KARNA HAI batata hai:
+    #     चित्तवृत्तिनिरोध · पाँच क्लेश (अविद्या/अस्मिता/राग/द्वेष/अभिनिवेश)
+    #     अभ्यास-वैराग्य · धारणा-ध्यान-समाधि
+    # Aur user ke apne 500 sawaalon mein 11 baar maanga gaya.
+    #
+    # Doosra ummeedwaar Srimad Bhagavatam tha (13 baar maanga gaya), par
+    # uski Prahlad/Dhruva/Ajamil ki kathayein Vishnu Puran aur Narsimha
+    # Puran mein PEHLE SE hain — yaani aadha kaam dohra hota. Yogasutra ka
+    # ek bhi ansh dohra nahi hai.
+    #
+    # ⚠️ force_ocr ZAROORI — bilkul Mahabharat/Chanakya Neeti jaisa mamla.
+    # 10_probe_pdf.py se dono tarah naapa (20 page):
+    #     text-layer  → tootna 0.56, Latin 0.16%  ❌
+    #                   "चेतना का ÊвÊथ होना मैĉीकƧणामुिदतोपेƒाणां…"
+    #     force OCR   → tootna 0.31, Latin 0.00%  ✅
+    #                   "चेतना का स्वस्थ होना मैत्रीकरुणामुदितोपेक्षाणां…"
+    # 84 page hi hain — OCR ~6 minute.
+    {"book_id":"yoga_sutra",
+     "source_pdf":"Patanjali Yog Sutra (Hindi).pdf",
+     "title":"Patanjali Yoga Sutra (Hindi)", "short":"Yoga Sutra",
+     "tradition":"yoga", "language":"sa+hi", "force_ocr":True},
     {"book_id":"nitya_karm_pooja",   "source_pdf":"NITYA KARM POOJA FULL BOOK.pdf",  "title":"Nitya Karm Pooja Prakash","short":"Nitya Pooja",    "tradition":"pooja",    "language":"sa+hi"},
     # amit_kalrekha HATAYA (copyright-shak) | positive_mindset HATAYA (copyright)
     {"book_id":"rashi_muhurt_vigyan","source_pdf":"SAMPURNA RASHI AUR MUHURT VIGYAN FULL BOOK.pdf","title":"Sampurna Rashi aur Muhurt Vigyan","short":"Rashi-Muhurt","tradition":"jyotish","language":"hi"},

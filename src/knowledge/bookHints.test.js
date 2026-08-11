@@ -36,6 +36,49 @@ describe("bookHints.js — Roman + Devanagari book detection", () => {
     expect(detectHintedBook("गीता में कर्म योग क्या है?")).toBe("bhagavad_gita_shankar");
   });
 
+  // ── AAM SHABD PAR HINT NAHI LAGNA CHAHIYE (2026-08-11) ──────────────
+  //
+  // Pehle chaar hint aise the jo granth ka naam nahi, rozmarra ke shabd
+  // the: "upay", "agni", "mantra"/"मंत्र", "upanishad". Naapne par nateeja:
+  //
+  //   "krodh ko jeetne ka upay kya hai"       → lal_kitab   (jyotish!)
+  //   "Rigveda me Agni ko itna mahatva kyun"  → agni_purana (Rigveda nahi!)
+  //   "Samaveda ke mantron ka purpose"        → mantra_maha_sagar
+  //   "Chandogya me Shvetaketu ko kya sikhaya"→ ishadi_upanishad
+  //
+  // Ye sirf "thoda galat granth" wali baat nahi thi. Worker hinted granth
+  // ko score-gate se CHHOOT deta hai (HINTED_PAKKA=2), isliye galat granth
+  // ke 2 ansh PAKKE Aadhaar me chadh jaate the — bhale mel bilkul na ho.
+  //
+  // Ye test isliye hai ki wo chaaron hint galti se wapas na aa jaayein.
+  it("aam shabd par hint NAHI lagta — sirf granth ka naam par", () => {
+    for (const q of [
+      "krodh ko jeetne ka upay kya hai",
+      "tanav door karne ka upay",
+      "shanti pane ka upay kya hai",
+      "ghar me mantra jaap kaise karein",
+      "Upanishad me aatma ka varnan",
+      "yagya me agni ka kya mahatva hai",
+    ]) {
+      expect(detectHintedBook(q)).toBeNull();
+    }
+  });
+
+  it("granth ka naam ho to hint LAGTA hai — upar wali kaant-chhaant se toota nahi", () => {
+    expect(detectHintedBook("Rigveda me Agni sukt ka varnan")).toBe("rigveda_1");
+    expect(detectHintedBook("Agni Puran me vastu")).toBe("agni_purana");
+    expect(detectHintedBook("अग्नि पुराण में आयुर्वेद")).toBe("agni_purana");
+    expect(detectHintedBook("Lal Kitab ke upay kya hain")).toBe("lal_kitab");
+    expect(detectHintedBook("Samaveda ke mantron ka purpose")).toBe("samaveda");
+    expect(detectHintedBook("Atharvaveda me raksha ke mantra")).toBe("atharvaveda_1");
+    expect(detectHintedBook("Ishavasya Upanishad ka pehla mantra")).toBe("ishadi_upanishad");
+    expect(detectHintedBook("Kathopanishad me Nachiketa")).toBe("kathopanishad");
+    // hamare paas nahi hain — hint bilkul nahi lagna chahiye
+    expect(detectHintedBook("Chandogya Upanishad me Shvetaketu")).toBeNull();
+    expect(detectHintedBook("Brihadaranyaka Upanishad me Yajnavalkya")).toBeNull();
+    expect(detectHintedBook("Mandukya Upanishad ke chaar avastha")).toBeNull();
+  });
+
   it("returns null when no book is named", () => {
     expect(detectHintedBook("I feel anxious about the future")).toBeNull();
     expect(detectHintedBook("मुझे डर लगता है")).toBeNull();
@@ -52,8 +95,12 @@ describe("bookHints.js — Roman + Devanagari book detection", () => {
     expect(detectHintedBook("योगवासिष्ठ में वैराग्य क्या है?")).toBe("yoga_vasishtha");
     expect(detectHintedBook("yoga vasishtha ke baare mein bataiye")).toBe("yoga_vasishtha");
     expect(detectHintedBook("रामचरितमानस की चौपाई बताइए")).toBe("ramcharitmanas");
-    // Generic "mantra" ab bhi mantra_maha_sagar par jaata hai
-    expect(detectHintedBook("mantra ke baare mein bataiye")).toBe("mantra_maha_sagar");
+    // Granth ka POORA NAAM ho to hint lagta hai
+    expect(detectHintedBook("Mantra Maha Sagar me Gayatri mantra")).toBe("mantra_maha_sagar");
+    expect(detectHintedBook("मंत्र महासागर में क्या है")).toBe("mantra_maha_sagar");
+    // Naya 24va granth
+    expect(detectHintedBook("Yoga Sutra me kleshas kitne hain")).toBe("yoga_sutra");
+    expect(detectHintedBook("पतंजलि का चित्तवृत्ति निरोध")).toBe("yoga_sutra");
   });
 
   it("every book_id in the hint map is a plausible non-empty slug", () => {

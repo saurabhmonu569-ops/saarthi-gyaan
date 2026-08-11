@@ -115,7 +115,23 @@ describe("SYSTEM_PROMPT ki granth-soochi sach bolti hai — 2026-08-10", () => {
     }
   });
 
-  it("soochi mein poore 24 granth hain", () => {
-    expect(Object.keys(BOOK_META).length).toBe(24);
+  it("soochi mein poore 24 granth hain — chahe chaabiyan 25 hon", () => {
+    // 25 chaabi, 24 granth. Shiv Puran do khand me hai aur dono ki PDF
+    // alag hai, isliye BOOK_META me uski do entry hain. User ke liye wo
+    // EK kitab hai.
+    //
+    // Isiliye do alag baatein alag-alag jaanchi jaati hain: chaabiyan
+    // kitni (ingestion ki ginti), aur granth kitne (user ki ginti).
+    // gemini.js ka SYSTEM_PROMPT doosri wali istemaal karta hai — warna
+    // prompt me "25 granth … Shiva Purana Khand 1, Shiva Purana Khand 2"
+    // likha jaata, jo user ke liye ek hi kitab do naam se hai.
+    expect(Object.keys(BOOK_META).length).toBe(25);
+
+    const granth = new Set(
+      Object.values(BOOK_META)
+        .map(m => (m.en || m.title || "").replace(/\s*(Khand|खण्ड|खंड)\s*[0-9०-९]+\s*$/i, "").trim())
+        .filter(Boolean)
+    );
+    expect(granth.size).toBe(24);
   });
 });
