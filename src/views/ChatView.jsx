@@ -426,7 +426,44 @@ export function ChatView() {
       // book_title zaroori hai: gemini.js citation usi se banata hai aur
       // useChat.js ka verifyAnswer() usi se gadhe hue granth-naam pakadta
       // hai.
-      const merged = chunks.map(c => {
+      // ── PROMPT KA AAKAAR — 413 ka ilaaj (2026-08-11) ────────────────
+      //
+      // ASLI GHATNA: "Bhagavad Gita ke according life ka real purpose kya
+      // hai?" par retrieval bahut achhi chali — Gita ke 11 ansh gate paar
+      // kar gaye, best 0.9978. Par phir /chat ne 413 (Content Too Large)
+      // de diya aur user ko jawab MILA HI NAHI. Yaani achhi retrieval ne
+      // hi jawab maar diya.
+      //
+      // JAD MERI HAI. Purane code mein `kept.slice(0, 12)` tha. P2 mein
+      // retrieval server par le jaate waqt maine wo line hata di, aur
+      // server ab 12 ansh + 6 padosi = 18 bhejta hai — jinme padosi ko
+      // POORE 800 akshar milte hain (jaan-boojhkar, taaki kata hua jawab
+      // poora ho). Hisaab: 3x800 + 9x300 + 6x800 = 9,900 akshar sirf
+      // anshon ka, aur uske upar poora SYSTEM_PROMPT aur baat-cheet ka
+      // itihaas. Groq ne mana kar diya.
+      //
+      // Ab do pehre: ansh ki GINTI (12) aur kul AAKSHARON ki seema.
+      // Aakshar wali seema zyada zaroori hai — ginti se aakaar ka pata
+      // nahi chalta, kyunki har ansh ka naap alag hota hai.
+      const MAX_ANSH  = 12;
+      const MAX_AKSHAR = 7000;   // ~2,300 token — Groq ki seema se kaafi neeche
+      let kulAkshar = 0;
+      const chune = [];
+      for (const c of chunks) {
+        if (chune.length >= MAX_ANSH) break;
+        const len = (c.text || "").length;
+        // Pehla ansh hamesha lo — chahe wo akela hi seema bhar de. Bina
+        // iske ek bahut lambe ansh par jawab BILKUL khaali chala jaata.
+        if (chune.length && kulAkshar + len > MAX_AKSHAR) break;
+        kulAkshar += len;
+        chune.push(c);
+      }
+      if (chune.length < chunks.length) {
+        console.log(`[Retrieval] ${chunks.length} me se ${chune.length} ansh bheje `
+          + `(${kulAkshar} akshar) — prompt ki seema`);
+      }
+
+      const merged = chune.map(c => {
         const meta = BOOK_META[c.book] || {};
         return {
           chunk: {

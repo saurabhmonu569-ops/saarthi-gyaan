@@ -535,7 +535,12 @@ export function useChat({
           const bt = (r.chunk && (r.chunk.book_title || r.chunk.book)) || "";
           if (!bt || books.includes(bt)) continue;
           books.push(bt);
-          if (books.length >= 4) break;
+          // 4 → 5 (2026-08-11). Jawab 12 ansh se banta hai jo aksar 5-6
+          // granthon se aate hain; sirf 4 dikhana un granthon ko chhupa
+          // deta hai jinse jawab sach mein bana. User ne "Atma aur body"
+          // wale sawaal par yahi poochha tha ki paanchvi kitab kahan gayi.
+          // 5 se aage nahi ja rahe — footer padhne layak rehna chahiye.
+          if (books.length >= 5) break;
         }
         if (books.length) responseText += `\n\n---\n📚 *Aadhaar: ${books.join(" · ")}*`;
       }
