@@ -44,7 +44,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
 // Client ka query-prep — WAHI code jo ChatView chalata hai. Ye zaroori hai:
 // agar yahan alag query banegi to naap asli app ka naap nahi rahega.
-const { normalizeQueryForSearch, expandQueryWithParyay, stripMetaFraming, isOutOfScope }
+const { normalizeQueryForSearch, expandQueryWithParyay, stripMetaFraming, questionToTopic, isOutOfScope }
   = await import("../src/knowledge/translit.js");
 const { detectHintedBook } = await import("../src/knowledge/bookHints.js");
 const { BOOK_META } = await import("../src/data/bookMeta.js");
@@ -171,8 +171,10 @@ async function ask(question) {
     return { chunks: [], stats: null, skipped: "daayre-se-bahar", ms: 0 };
   }
   const { query: searchQ } = normalizeQueryForSearch(question);
-  const rerankQ = stripMetaFraming(searchQ);
-  const findQ   = expandQueryWithParyay(rerankQ);
+  // ChatView jaisa hi — prashn sirf rerankQ par vishay-vaakya banta hai
+  const baseQ   = stripMetaFraming(searchQ);
+  const rerankQ = questionToTopic(baseQ);
+  const findQ   = expandQueryWithParyay(baseQ);
   const hintedBook = detectHintedBook(question);
 
   const t0 = Date.now();

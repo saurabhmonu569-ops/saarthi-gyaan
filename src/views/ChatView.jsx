@@ -11,7 +11,7 @@ import { BOOK_META } from "@/data/bookMeta";
 import { useT } from "@/i18n";
 import { detectHintedBook } from "@/knowledge/bookHints";
 import { serverRetrieve, warmServerSearch } from "@/knowledge/serverSearch";
-import { normalizeQueryForSearch, expandQueryWithParyay, stripMetaFraming, isOutOfScope } from "@/knowledge/translit";
+import { normalizeQueryForSearch, expandQueryWithParyay, stripMetaFraming, questionToTopic, isOutOfScope } from "@/knowledge/translit";
 
 // ── RELEVANCE GATE ───────────────────────────────────────────────────────
 //
@@ -400,8 +400,18 @@ export function ChatView() {
       // KYUN findQ alag: paryay sirf UMMEEDWAAR dhoondhne ke liye hain.
       // Reranker ko paryay dene se sawaal anaad ho jaata hai aur wahi gate
       // bigadta hai jo 32 control sawaalon par 0 jhoothi citation deta hai.
-      const rerankQ = stripMetaFraming(searchQ);
-      const findQ   = expandQueryWithParyay(rerankQ);
+      // PRASHN → VISHAY-VAAKYA, sirf aankne wali query par (2026-08-11).
+      // Naapa gaya: "चेतना क्या होती है?" → 0.0023, par
+      //             "चेतना का स्वरूप और उसका वर्णन" → 0.6831 (300 guna).
+      // Granth prashn-uttar ki shaili mein likhe hi nahi hain; wo vishay
+      // ka VARNAN karte hain. Isliye reranker ko prashn nahi, vishay do.
+      //
+      // findQ ko JAAN-BOOJHKAR nahi badla — wo FTS/Vectorize ko jaati hai
+      // jahan "क्या/कैसे" stopword hain aur asli sawaal ke shabd hi pool
+      // banate hain. Do query, do alag kaam.
+      const baseQ   = stripMetaFraming(searchQ);
+      const rerankQ = questionToTopic(baseQ);
+      const findQ   = expandQueryWithParyay(baseQ);
       const hintedBook = detectHintedBook(query);
 
       const { chunks } = await serverRetrieve({ findQ, rerankQ, hintedBook });

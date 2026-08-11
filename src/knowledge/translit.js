@@ -110,7 +110,7 @@ const WORDS = {
   pariksha: "परीक्षा", safal: "सफल", asafal: "असफल", fail: "असफल",
   vidyarthi: "विद्यार्थी", chhatra: "छात्र", jyotish: "ज्योतिष", grah: "ग्रह",
   shani: "शनि", upay: "उपाय", totka: "टोटका", shlok: "श्लोक", shloka: "श्लोक",
-  granth: "ग्रंथ", ved: "वेद", puran: "पुराण", gita: "गीता", ramayan: "रामायण",
+  ved: "वेद", puran: "पुराण", gita: "गीता", ramayan: "रामायण",   // granth neeche
 
   // ── BOLCHAAL KE SHABD (2026-08-06) ────────────────────────────────────
   //
@@ -225,7 +225,7 @@ const WORDS = {
   prarabdh: "प्रारब्ध", vanvas: "वनवास", visheshta: "विशेषता",
   visheshtayein: "विशेषताएँ", safalta: "सफलता", niyantrit: "नियंत्रित",
   rajdharma: "राजधर्म", rajneeti: "राजनीति", aadat: "आदत", aadatein: "आदतें",
-  barbaad: "बर्बाद", upyog: "उपयोग", simran: "सिमरन", parmatma: "परमात्मा",
+  barbaad: "बर्बाद", upyog: "उपयोग", parmatma: "परमात्मा",   // simran neeche
   paramatma: "परमात्मा", adhura: "अधूरा", langar: "लंगर", zaruri: "ज़रूरी",
   zaroori: "ज़रूरी", sujhav: "सुझाव", uttar: "उत्तर", prashn: "प्रश्न",
   tattva: "तत्त्व", lakshan: "लक्षण", sarvottam: "सर्वोत्तम",
@@ -337,6 +337,51 @@ const WORDS = {
   paran: "पारण", parana: "पारण", vrat: "व्रत", upvas: "उपवास",
   shukla: "शुक्ल", krishna_paksh: "कृष्ण", paksh: "पक्ष",
 
+  // ⚠️ YE WORDS MEIN HAIN, EN_CONCEPT MEIN NAHI — aur wajah kram hai.
+  // toDevanagari() PEHLE chalta hai (WORDS → LEXICON), mapEnglishConcepts
+  // BAAD mein. Isliye "way" ko LEXICON pehle hi pakad kar "वयो" bana
+  // deta tha (bekaar shabd) aur EN_CONCEPT ka "मार्ग" kabhi laga hi nahi.
+  // Naapa gaya: "Overthinking ko kaise kam kare spiritual way se?"
+  //   → "चिन्ता को कैसे कम करे वयो से?"   ← "वयो" kahin nahi hai
+  // WORDS LEXICON se pehle dekha jaata hai, isliye ilaaj yahan lagta hai.
+  way: "मार्ग", ways: "मार्ग", path: "मार्ग",
+  // "free will" DO shabd hai; alag-alag aate hain. Shastron mein iska
+  // jodaa "पुरुषार्थ बनाम प्रारब्ध" hai (पुरुषार्थ 624, प्रारब्ध 348) —
+  // "स्वतन्त्र इच्छा" ka seedha anuvaad us parampara ka shabd nahi hai.
+  free: "पुरुषार्थ", will: "इच्छा",
+  // ⚠️ "sankhya" LEXICON se "संख्या" (ginti!) ban raha tha — Gita ka
+  // doosra adhyaya "सांख्ययोग" hai, ginti se koi lena-dena nahi.
+  sankhya: "सांख्य", saankhya: "सांख्य", sankhyayog: "सांख्ययोग",
+  books: "ग्रन्थ", book: "ग्रन्थ", granth: "ग्रन्थ",
+  // 298 sawaalon ke DOOSRE daur se bache hue Latin shabd.
+  // Sab corpus se chune — jahan seedha anuvaad corpus me nahi tha,
+  // wahan uska nikat-shabd liya (jaise lifestyle -> आचार, 1,677 ansh;
+  // "जीवनशैली" corpus me 0 baar hai).
+  help: "सहायता", helps: "सहायता",          // सहायता 938
+  decided: "निश्चित", decide: "निश्चय", fixed: "नियत",   // निश्चित 1,283
+  improve: "उन्नति", improvement: "उन्नति", better: "श्रेष्ठ",  // उन्नति 306
+  awakening: "जागरण", awaken: "जाग्रत", awake: "जाग्रत",  // जागरण 120 · जाग्रत 506
+  third: "तृतीय", second: "द्वितीय", first: "प्रथम",       // तृतीय 991
+  lifestyle: "आचार", habit: "आचार", routine: "नित्यकर्म",  // आचार 1,677 (जीवनशैली 0!)
+  strong: "दृढ़", strength: "बल", weak: "दुर्बल",         // दृढ़ 983
+  leadership: "नेतृत्व", leader: "नेता",                   // नेतृत्व 41
+  energy: "शक्ति", power: "शक्ति",                        // शक्ति 5,593 — "तेज" galat lagta tha
+  practice: "अभ्यास", daily: "नित्य", seeker: "साधक",
+  advanced: "उन्नत", beginner: "नवीन", expert: "निपुण",
+  analysis: "विवेचन", character: "चरित्र", judge: "न्यायाधीश",
+  // ⚠️ Ye DOHRI chaabiyan thi — upar "granth: ग्रंथ" aur "simran: सिमरन"
+  // bhi likha tha. JS chup-chaap AAKHRI rakhta hai, isliye kaam sahi chal
+  // raha tha... sirf ittefaq se. Block ka kram badalte hi matlab palat
+  // jaata. Corpus ne faisla diya:
+  //     ग्रन्थ 455  vs  ग्रंथ 88
+  //     स्मरण 1,873 vs  सिमरन 13 (sirf guru_granth_sahib mein)
+  // Purani wali hata di; ab ek hi jagah hai.
+  simran: "स्मरण", naam: "नाम",                            // स्मरण 1,873
+  thinking: "विचार", thought: "विचार", thoughts: "विचार",
+
+  // Do-akshar ke Hindi shabd — LEXICON inhe pehchanta hi nahi (bahut
+  // chhote hain), isliye ye Latin me hi ja rahe the.
+  ja: "जा", ho: "हो", le: "ले", de: "दे", kar: "कर", na: "ना",
   yaad: "याद", yad: "याद", dilaya: "दिलाया", dilana: "दिलाना",
   dilai: "दिलाई", yaadgar: "यादगार",
   sanjeevani: "संजीवनी", sanjivani: "संजीवनी",
@@ -879,8 +924,26 @@ const META_FRAMES = [
  * importance→महत्व/माहात्म्य). Yahan sirf wahi bache hain jinka koi
  * Devanagari joda hai hi nahi aur jo query mein kuch nahi jodte.
  */
+/*
+ * ⚠️ WAHI GALTI DOBARA — "spiritual" YAHAN SE HATAYA (2026-08-11).
+ *
+ * 7 August ko upar likha gaya tha ki "meaning/importance" ko shor maanna
+ * galti thi. Par usi list mein "spiritual(ly|ity)" bhi baitha raha, aur
+ * wo bhi wahi galti thi. 298 sawaalon ke naap se dikha:
+ *     "Kya spirituality se stress kam ho sakta hai?"
+ *              → "क्या से क्लेश कम हो सकता है?"   ← vishay hi gaayab
+ *     "Spiritual growth kya hoti hai?"  · "Spiritual books ka benefit?"
+ * In sabpar best-rerank 0.02 se neeche tha.
+ *
+ * "spiritual" khaali shabd nahi hai — is app mein wahi to VISHAY hai.
+ * Corpus mein आध्यात्मिक 181 aur अध्यात्म maujood hai. Ab wo EN_CONCEPT
+ * mein badalta hai, hatta nahi.
+ *
+ * SABAK: is list mein sirf wo shabd rahne chahiye jinka koi Devanagari
+ * joda HAI HI NAHI. Agar shabd ka koi arth hai, to use BADLO — hatao mat.
+ */
 const EN_NOISE = new RegExp(
-  "\\b(?:spiritual(?:ly|ity)?|actual(?:ly)?|real(?:ly)?|according|"
+  "\\b(?:actual(?:ly)?|real(?:ly)?|according|"
   + "view|point|simple|basic|proper|exact|complete|full)\\b",
   "gi");
 
@@ -933,6 +996,24 @@ const OUT_OF_SCOPE = [
   // takneek / utpaad — sawaal granth ka nahi, bazaar ka hai
   /\b(?:app|application|website|online|download|youtube|google|whatsapp|instagram)\b/i,
   /\b(?:weight\s*loss|gym|diet\s*plan|calorie|fitness)\b/i,
+
+  // ── KHUD SAARTHI KE BAARE MEIN SAWAAL (2026-08-11) ──────────────────
+  // "SAARTHI GYAAN AI ek spiritual guide ki tarah meri daily life mein
+  // kaise help kar sakta hai?" — ye sawaal APP ke baare mein hai, kisi
+  // granth ke baare mein nahi. Iska jawab hamari kitaabon mein hai hi
+  // nahi, isliye ispar koi bhi citation JHOOTHI citation hai.
+  //
+  // Pehle ye chup-chaap bach jaata tha kyunki uska score gate se neeche
+  // rehta tha — yaani hum sahi jagah nahi, ITTEFAQ se bache hue the.
+  // Jaise hi questionToTopic ne sawaal ko vishay-vaakya banaya, uska
+  // score 0.4905 ho gaya aur Yoga Vasishtha cite ho gayi. Jhoothi
+  // citation 0 se 1 par pahunch gayi.
+  //
+  // Sabak: "score kam hai" suraksha nahi hai. Jo sawaal daayre se bahar
+  // hai, use NAAM SE rokna chahiye — score ke bharose nahi chhodna.
+  /\b(?:saarthi|सारथी)\b/i,
+  /\b(?:ye|yeh|is|this)\s*(?:ai|app|chatbot|bot|tool|platform)\b/i,
+  /\b(?:chatgpt|gemini|claude|openai|artificial\s*intelligence)\b/i,
 ];
 
 /**
@@ -953,6 +1034,93 @@ export function stripMetaFraming(text) {
   s = s.replace(/\s+([?,.])/g, "$1").replace(/\s+/g, " ").trim();
   s = s.replace(/^[\s?,.]+|[\s,.]+$/g, "");
   return s || String(text || "");
+}
+
+/**
+ * PRASHN ko VISHAY-VAAKYA banao — sirf RERANKER ke liye (2026-08-11)
+ * =====================================================================
+ * YE AB TAK KA SABSE BADA EK BADLAV HAI. Naap (ek hi granth, ek hi ansh,
+ * sirf sawaal ki shakl badli):
+ *
+ *     "चेतना क्या होती है?"                sabse ooncha  0.0023
+ *     "चेतना"                              sabse ooncha  0.1813
+ *     "चेतना का स्वरूप और उसका वर्णन"      sabse ooncha  0.6831
+ *
+ * TEEN SAU GUNA ka farak — na kitab badli, na ansh, na koi setting.
+ *
+ * KYUN: cross-encoder ka sawaal hota hai "kya ye ansh IS PRASHN KA UTTAR
+ * deta hai?" Granth prashn-uttar ki shaili mein likhe hi nahi gaye. Wo
+ * vishay ka VARNAN karte hain — "चेतना सर्वत्र व्याप्त है…", "अहंकार ही
+ * बन्धन का मूल है…". Aise ansh ke saamne "क्या होती है?" rakho to model
+ * ko koi uttar-dhaancha dikhta hi nahi, aur wo lagbhag shoonya deta hai.
+ * Wahi ansh vishay-vaakya ke saamne khul jaata hai.
+ *
+ * ⚠️ SIRF rerankQ PAR — findQ par NAHI.
+ * findQ FTS aur Vectorize ko jaati hai. Wahan "क्या/कैसे" stopword hain,
+ * koi nuksaan nahi karte, aur wahan asli sawaal ke shabd rehne se hi
+ * pool banta hai. Isliye ye badlaav sirf aankne wali query par lagta hai.
+ *
+ * ⚠️ JO PEHLE SE PRASHN NAHI HAI, USE CHHOOTA NAHI. Har niyam ka apna
+ * saaf dhaancha hai; mel na khaye to query jyon ki tyon lautti hai. 298
+ * sawaalon mein 281 pehle se paas ho rahe the — unhe bigadna sabse bada
+ * khatra tha, isliye har niyam sirf VAAKYA KE ANT par lagta hai.
+ */
+// Wo sanjnaayein jo KHUD hi vishay bata deti hain. Inke aage kuch jodna
+// nahi hai — "दान का महत्व क्या है" ka jawab "दान का महत्व" hai, na ki
+// "दान का महत्व का स्वरूप और वर्णन" (pehli koshish mein yahi ban raha tha).
+const VISHAY_SANJNA = "महत्व|माहात्म्य|अर्थ|लाभ|भेद|अन्तर|कारण|फल|स्वरूप|उपाय|विधि|प्रभाव|रहस्य|वर्णन|प्रक्रिया|भूमिका|सम्बन्ध|प्रकार|गुण|लक्षण|नियम|कर्तव्य|शिक्षा|सन्देश|उद्देश्य";
+
+const PRASHN_NIYAM = [
+  // 1. "X का महत्व क्या है"  →  "X का महत्व"   (sirf prashn hatao)
+  [new RegExp(`^(.{2,}?\\s*(?:का|की|के)\\s*(?:\\S+\\s+)?(?:${VISHAY_SANJNA}))\\s*क्या\\s*(?:है|हैं|होता\\s*है|होती\\s*है)\\s*\\??$`),
+   "$1"],
+
+  // 2. "X में क्या भेद है"  →  "X का भेद"   (shabd-kram ulta hota hai)
+  [new RegExp(`^(.{2,}?)\\s*(?:में|मे)?\\s*क्या\\s*(${VISHAY_SANJNA})\\s*(?:है|हैं)\\s*\\??$`),
+   "$1 का $2"],
+
+  // 3. "X क्या है / क्या होती है"  →  "X का स्वरूप और वर्णन"
+  //    ⚠️ SIRF CHHOTE VISHAY PAR (4 shabd tak). "मृत्यु के बाद आत्मा का
+  //    क्या होता है" jaise lambe, khaas sawaal PEHLE SE paas ho rahe hain
+  //    — unhe chhoona sabse bada khatra tha. 4 ya zyada shabd = chhodo.
+  //    (Pehle {0,3} tha aur "मृत्यु के बाद आत्मा का क्या होता है" pakda
+  //     ja raha tha — wahi sawaal jo pehle se theek chal raha hai.)
+  [/^([^\s?]+(?:\s+[^\s?]+){0,2})\s*क्या\s*(?:है|हैं|होता\s*है|होती\s*है|होते\s*हैं)\s*\??$/,
+   "$1 का स्वरूप और वर्णन"],
+
+  // 4. "X कैसे करे / छोड़े / रोके"  →  "X का उपाय और विधि"
+  [/^(.{2,}?)\s*कैसे\s*(?:करे|करें|छोड़े|छोड़ें|त्यागें|रोके|रोकें|बचें|पाएं|पायें|करना\s*चाहिए|कर\s*सकते\s*हैं|किया\s*जा\s*सकता\s*है)\s*\??$/,
+   "$1 का उपाय और विधि"],
+
+  // 5. "X कैसे होता है"  →  "X की प्रक्रिया"
+  [/^(.{2,}?)\s*कैसे\s*(?:होता\s*है|होती\s*है|होते\s*हैं)\s*\??$/,
+   "$1 की प्रक्रिया और वर्णन"],
+
+  // 6. "X क्यों होता है / क्यों कहा जाता है"  →  "X का कारण"
+  [/^(.{2,}?)\s*क्यों\s*(?:है|हैं|होता\s*है|होती\s*है|कहा\s*जाता\s*है|माना\s*जाता\s*है|लेते\s*हैं|हुआ\s*था|बनता\s*है)\s*\??$/,
+   "$1 का कारण"],
+
+  // 7. "क्या X ... है?"  — haan/naa wala prashn; shuru ka "क्या" bekaar hai.
+  //    Ant ke "होता/होती/सकता" jaise sahayak kriya bhi hata dete hain.
+  [/^क्या\s+(.{2,}?)\s*(?:होता|होती|होते)?\s*(?:है|हैं|हो\s*सकता\s*है|हो\s*सकती\s*है|सकते\s*हैं|जा\s*सकता\s*है|सकता\s*है|सकती\s*है)\s*\??$/,
+   "$1"],
+];
+
+export function questionToTopic(text) {
+  const s = String(text || "").trim();
+  if (!s) return s;
+
+  // JODA HUA SAWAAL CHHODO. "कृतज्ञता क्या होता है और इसका लाभ क्या है?"
+  // — ismein DO sawaal hain. Koi bhi ek niyam lagane se aadha vaakya
+  // bigadta hai (pehli koshish mein "…और इसका लाभ का स्वरूप और वर्णन"
+  // ban raha tha). Aise sawaal jyon ke tyon behtar hain.
+  if (/\sऔर\s.*(?:क्या|कैसे|क्यों)/.test(s)) return s;
+
+  for (const [re, rep] of PRASHN_NIYAM) {
+    const out = s.replace(re, rep).replace(/\s+/g, " ").trim();
+    if (out !== s && out.replace(/[\s?,.]/g, "").length >= 2) return out;
+  }
+  return s;
 }
 
 /**
@@ -1024,6 +1192,44 @@ export const EN_CONCEPT = {
   // aur "रहस्य" 865 mein hai. Isliye "risky" ko "जोखिम" mat bhejo; jo
   // shabd granthon mein sach mein likha hai, wahi bhejo. Yahi soch
   // GRANTH_PARYAY ke peeche bhi hai.
+  // ── AAJ KE SELF-HELP SHABD (2026-08-11, 298 sawaal ke naap se) ──────
+  //
+  // 298 sawaalon mein 41 par koi granth nahi mila. Unmein se 30 — yaani
+  // TEEN-CHAUTHAI — ek hi kism ke the: aaj ki self-help wali bhasha.
+  //     Overthinking, Negative thoughts, Comparison, Free will,
+  //     Positive thinking, Mindfulness, Inner voice, balance, stress
+  // In par best-rerank 0.003 se 0.14 tak tha, yaani reranker ko kuch
+  // mila hi nahi. Wajah saaf: ye shabd Latin mein hi ja rahe the aur
+  // corpus poora Devanagari hai.
+  //
+  // ⚠️ CHUNAAV CORPUS SE. Shabdkosh "overthinking" ka "अतिचिन्तन" deta
+  // hai — corpus mein wo shabd 0 baar hai. "चिन्ता" 993 baar hai. Isi
+  // tarah "negative" ka seedha "नकारात्मक" sirf 20 mein hai, par uska
+  // asli bhaav "दुर्भावना/कुविचार" bhi kam hai — isliye "बुरे विचार"
+  // (do aam shabd) behtar hai.
+  //
+  // ⚠️ AUR EK: "free will" ka anuvaad "स्वतन्त्र इच्छा" nahi, PURUSHARTH
+  // hai. Shastron mein yehi wo shabd hai jo प्रारब्ध (destiny) ke saamne
+  // rakha jaata hai — पुरुषार्थ 624 ansh, प्रारब्ध 348. Ye anuvaad nahi,
+  // us paramparaa ka apna shabd-jodaa hai. Isi tarah Arjun ka
+  // "confusion" = मोह (3,430) — Gita ka pehla adhyaya hi
+  // "अर्जुनविषादयोग" hai.
+  overthinking: "चिन्ता",                      // चिन्ता 993 (अतिचिन्तन 0)
+  negative: "बुरे", positive: "शुभ",
+  comparison: "तुलना", compare: "तुलना",        // तुलना 128
+  destiny: "प्रारब्ध", freewill: "पुरुषार्थ",   // पुरुषार्थ 624
+  balance: "समता", maintain: "बनाए",            // समता 290 (सन्तुलन 0!)
+  test: "परीक्षा", exam: "परीक्षा",             // परीक्षा 369
+  confusion: "मोह", confused: "मोह", doubt: "संशय",  // मोह 3,430 · संशय 1,654
+  remove: "दूर", reduce: "कम", overcome: "जीत",  // दूर 4,176
+  spiritual: "आध्यात्मिक", spirituality: "अध्यात्म",
+  way: "मार्ग", path: "मार्ग", ways: "मार्ग",   // मार्ग 3,260 — "way" pehle "वयो" ban raha tha!
+  observe: "देखना", observation: "साक्षी",
+  competition: "स्पर्धा",
+  intuition: "अन्तरात्मा", conscience: "अन्तरात्मा",  // अन्तरात्मा 148
+  discrimination: "विवेक", discernment: "विवेक",      // विवेक 1,068
+  benefit: "लाभ", growth: "उन्नति", role: "भूमिका",
+
   direction: "दिशा",            // दिशा 2,741
   matter: "महत्व", matters: "महत्व", relevance: "महत्व",   // महत्व 157
   share: "बाँटना", sharing: "बाँटना",                       // बाँट 111

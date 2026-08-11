@@ -49,6 +49,10 @@ public/knowledge/.d1-progress.json
 public/knowledge/embeddings/.vectorize-progress.json
 public/knowledge/embeddings/.embed-progress.json
 
+# Naap ke nateeje — ye ek RUN ka haal hain, project ka nahi. Har baar
+# badalte hain aur inki tulna sirf ek hi machine par matlab rakhti hai.
+eval-*.json
+
 # Environment (NEVER commit your API key!)
 .env
 .env.local
