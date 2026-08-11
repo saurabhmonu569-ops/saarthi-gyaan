@@ -993,6 +993,44 @@ const OUT_OF_SCOPE = [
   /\bayurved/i,
   // aadhunik gurus / sanstha
   /\b(?:sadhguru|isha\s*foundation|osho|rajneesh|art\s*of\s*living|brahma\s*kumari)/i,
+
+  // ── AISE GRANTH JINKA HAMARE PAAS KOI JAWAB NAHI (2026-08-11) ───────
+  //
+  // 78 aise sawaal naape gaye jinme aisi kitab ka naam tha jo hamare paas
+  // nahi hai. 44 par koi na koi Aadhaar jud gaya — yaani JHOOTHI citation.
+  // Do kism nikli:
+  //
+  //   A) content hamare paas HAI, bas kitab ka naam alag tha —
+  //      "Bhagavatam me Govardhan"  → विष्णु पुराण (wahan hai HI)
+  //      "Mantra Shakti me mantra siddhi" → मन्त्र महासागर
+  //      Ye poori tarah galat nahi. Inka ilaaj rokna NAHI, balki jawab
+  //      mein saaf kehna hai ki maanga hua granth hamare paas nahi.
+  //      (Wo prompt ka kaam hai, yahan ka nahi.)
+  //
+  //   B) content hamare paas HAI HI NAHI —
+  //      "Majjhima Nikaya me Buddha ki teaching" → ईशादि उपनिषद्
+  //      "Chandogya Upanishad me Shvetaketu"     → ईशादि उपनिषद्
+  //      "Avidya ko Patanjali kyu mante hain"    → महाभारत
+  //      Yahan koi bhi citation poori tarah jhoothi hai.
+  //
+  // Ye list SIRF (B) ke liye hai — anya paramparaon ke wo granth jinka
+  // hamare 24 se koi overlap nahi. (A) wale jaan-boojhkar bahar rakhe
+  // hain, kyunki unhe rokne se asli jawab bhi ruk jaata.
+  /\b(?:dhammapada|majjhima\s*nikaya|digha\s*nikaya|tripitaka|sutta)\b/i,
+  /\blotus\s*sutra\b|\bbodhisattva\b/i,
+  /\b(?:tattvartha|acharanga)\s*sutra\b/i,
+  /\btao\s*te\s*ching\b|\bwu\s*wei\b|\banalects\b|\bconfucius\b/i,
+  /\bmarcus\s*aurelius\b|\bmeditations\s+(?:me|mein|book)\b/i,
+  /\balmustafa\b|\bimitation\s*of\s*christ\b/i,
+  /\bdasam\s*granth\b/i,
+  // Upanishad jo hamare paas nahi — hamare paas sirf ईशादि aur कठ hain.
+  // Inhe rokna zaroori hai kyunki generic "upanishad" hint inhe ईशादि par
+  // bhej deta tha, aur wo GALAT granth hai.
+  /\b(?:chandogya|brihadaranyaka|mandukya|taittiriya|aitareya|mundaka)\b/i,
+  // "prashna"/"kena" akele MAT likhna — "प्रश्न" Sanskrit ka aam shabd hai
+  // aur "Yaksha Prashna" (Mahabharata ka prasang) usme fans jaata tha.
+  /\b(?:prashna|kena)\s*upanishad\b/i,
+  /\bshvetaketu\b|\byajnavalkya\b|\bmaitreyi\b/i,
   // takneek / utpaad — sawaal granth ka nahi, bazaar ka hai
   /\b(?:app|application|website|online|download|youtube|google|whatsapp|instagram)\b/i,
   /\b(?:weight\s*loss|gym|diet\s*plan|calorie|fitness)\b/i,
@@ -1020,8 +1058,29 @@ const OUT_OF_SCOPE = [
  * Kya ye sawaal hamare 24 granthon ke daayre se bahar hai?
  * `true` = citation mat lagao (jawab phir bhi do, bas granth ka naam na lo).
  */
+/**
+ * CHHOOT — ye sawaal DAAYRE ME hain, chahe upar ka koi niyam match kare.
+ *
+ * Dono asli naap se aaye:
+ *   "Mahabharata me Yaksha Prashna episode kya hai?"
+ *        → "prashna" wala niyam pakad leta tha (Prashna Upanishad samajh
+ *          kar), jabki "प्रश्न" Sanskrit ka aam shabd hai aur ye prasang
+ *          Mahabharata ka hai — hamari sabse badi kitab.
+ *   "Agni Puran me Ayurveda se related kya material milta hai?"
+ *        → "ayurved" wala niyam pakadta tha. Par Agni Puran me SACH MEIN
+ *          Ayurveda ka hissa hai, aur wo hamari kitab hai.
+ *
+ * Yahan sirf wo mamle likhne hain jahan HAMARI kitab ka naam saath mein
+ * ho — warna ye list ek pichhla darwaza ban jaayegi.
+ */
+const CHHOOT = [
+  /yaksha\s*prashna/i,
+  /agni\s*pura?na?\b.{0,40}ayurved/i,
+];
+
 export function isOutOfScope(text) {
   const s = String(text || "");
+  if (CHHOOT.some(re => re.test(s))) return false;
   return OUT_OF_SCOPE.some(re => re.test(s));
 }
 

@@ -1,600 +1,4531 @@
 {
-  "_readme": [
-    "SAARTHI — Ask section ka test-set. eval-ask.mjs ise padhti hai.",
-    "",
-    "DO SET, DO ALAG RAASTE:",
-    "  hindi_100    — Devanagari mein likhe sawaal (default). Ye asli app ka",
-    "                 mukhya raasta hai aur granth-paryay ka imtihaan bhi.",
-    "  hinglish_100 — Roman mein likhe sawaal. Ye TRANSLIT ka raasta jaanchta",
-    "                 hai. --hinglish se chalao.",
-    "",
-    "'any' = wo shabd jinme se KOI EK sahi ansh mein hona chahiye. Har shabd",
-    "corpus mein pehle GINA gaya hai (5.66 crore akshar) — yaani sawaal fail",
-    "hone ka matlab DHOONDHNE ki galti hai, kitab mein kami nahi. Jahan shabd",
-    "kam mila wahan vyapak shabd liya:",
-    "    आत्मविश्वास 6 hits → धैर्य/बल/साहस     चिंता 75  → चिन्ता 1,267",
-    "    संतुलन 20          → समता/सम           मंदिर 83  → मन्दिर 561",
-    "    सकारात्मक 4        → शुभ/विचार         तनाव 38   → उद्वेग/क्लेश",
-    "",
-    "'compare': true = 'X aur Y mein kya antar hai' kism ka sawaal. Ye MAIN",
-    "SCORE MEIN GINE JAATE HAIN — chhipaye nahi. Bas alag se bhi dikhaye jaate",
-    "hain, kyunki pichhli baar aise 4 me se 4 fail hue the aur ye jaanna zaroori",
-    "hai ki wo alag kism ki kami hai (ek ansh do cheezon ka antar kam hi batata",
-    "hai) ya wahi aam kami.",
-    "",
-    "'control' = jiska jawab kitaabon mein hai hi nahi. Sahi natija = kuch bhi",
-    "grounded na mile. Yahan ek bhi citation JHOOTHI citation hai."
-  ],
-
-  "hindi_100": [
-    { "q": "आत्मा और मन में क्या अंतर है?", "any": ["आत्मा", "मन"], "compare": true },
-    { "q": "मनुष्य को अपने जीवन का उद्देश्य कैसे पता चलता है?", "any": ["उद्देश्य", "जीवन", "पुरुषार्थ"] },
-    { "q": "सच्ची शांति प्राप्त करने का सबसे सरल मार्ग क्या है?", "any": ["शान्ति", "मार्ग"] },
-    { "q": "क्रोध को नियंत्रित करने के लिए शास्त्र क्या कहते हैं?", "any": ["क्रोध", "संयम", "क्षमा"] },
-    { "q": "मोह और प्रेम में क्या अंतर होता है?", "any": ["मोह", "प्रेम"], "compare": true },
-    { "q": "अच्छे कर्मों का फल कब और कैसे मिलता है?", "any": ["कर्म", "फल", "पुण्य"] },
-    { "q": "भाग्य और कर्म में कौन अधिक शक्तिशाली है?", "any": ["भाग्य", "कर्म", "दैव"], "compare": true },
-    { "q": "भगवान से जुड़ने का सही तरीका क्या है?", "any": ["भगवान", "भक्ति", "शरण"] },
-    { "q": "ध्यान करते समय मन को स्थिर कैसे करें?", "any": ["ध्यान", "स्थिर", "मन"] },
-    { "q": "आत्मविश्वास बढ़ाने के लिए आध्यात्मिक ज्ञान क्या कहता है?", "any": ["धैर्य", "बल", "साहस", "उत्साह"] },
-
-    { "q": "भय को समाप्त करने का उपाय क्या है?", "any": ["भय", "निर्भय", "अभय"] },
-    { "q": "जीवन में दुख क्यों आते हैं?", "any": ["दुःख", "कष्ट", "कर्म"] },
-    { "q": "सुख और दुख को समान भाव से कैसे स्वीकार करें?", "any": ["सुख", "दुःख", "समता"] },
-    { "q": "अहंकार मनुष्य के पतन का कारण क्यों बनता है?", "any": ["अहंकार", "पतन", "गर्व"] },
-    { "q": "विनम्रता का महत्व क्या है?", "any": ["नम्र", "विनय", "दीन"] },
-    { "q": "मनुष्य को क्षमा करना क्यों सीखना चाहिए?", "any": ["क्षमा"] },
-    { "q": "सच्चा गुरु किसे कहा जाता है?", "any": ["गुरु", "आचार्य"] },
-    { "q": "गुरु का जीवन में क्या महत्व है?", "any": ["गुरु", "शिष्य"] },
-    { "q": "शिष्य के अंदर कौन से गुण होने चाहिए?", "any": ["शिष्य", "गुण", "विनय"] },
-    { "q": "ज्ञान और अनुभव में क्या अंतर है?", "any": ["ज्ञान", "अनुभव"], "compare": true },
-
-    { "q": "धर्म का वास्तविक अर्थ क्या है?", "any": ["धर्म"] },
-    { "q": "सनातन धर्म की मुख्य शिक्षाएं क्या हैं?", "any": ["सनातन", "धर्म"] },
-    { "q": "सत्य बोलने का महत्व क्या है?", "any": ["सत्य", "असत्य"] },
-    { "q": "जीवन में संयम क्यों आवश्यक है?", "any": ["संयम", "इन्द्रिय"] },
-    { "q": "इच्छाओं को नियंत्रित कैसे किया जा सकता है?", "any": ["इच्छा", "कामना", "तृष्णा"] },
-    { "q": "लोभ मनुष्य को कैसे प्रभावित करता है?", "any": ["लोभ", "तृष्णा"] },
-    { "q": "ईर्ष्या से मुक्ति कैसे प्राप्त करें?", "any": ["ईर्ष्या", "द्वेष", "मत्सर"] },
-    { "q": "मन की शुद्धि कैसे की जाती है?", "any": ["शुद्धि", "मन", "पवित्र"] },
-    { "q": "आत्मज्ञान प्राप्त करने के लिए क्या करना चाहिए?", "any": ["आत्मज्ञान", "आत्मा", "ज्ञान"] },
-    { "q": "भगवान को पाने के लिए कौन सा मार्ग श्रेष्ठ है?", "any": ["मार्ग", "भक्ति", "श्रेष्ठ"] },
-
-    { "q": "कर्म योग क्या है?", "any": ["कर्मयोग", "कर्म", "योग"] },
-    { "q": "ज्ञान योग क्या है?", "any": ["ज्ञानयोग", "ज्ञान", "योग"] },
-    { "q": "भक्ति योग का महत्व क्या है?", "any": ["भक्ति", "योग"] },
-    { "q": "राज योग क्या सिखाता है?", "any": ["योग", "समाधि", "ध्यान"] },
-    { "q": "योग केवल शरीर के लिए है या आत्मा के लिए भी?", "any": ["योग", "शरीर", "आत्मा"], "compare": true },
-    { "q": "प्रार्थना का वास्तविक प्रभाव क्या होता है?", "any": ["प्रार्थना", "स्तुति"] },
-    { "q": "मंत्र जाप क्यों किया जाता है?", "any": ["जप", "मन्त्र", "मंत्र"] },
-    { "q": "ॐ मंत्र का आध्यात्मिक महत्व क्या है?", "any": ["ॐ", "ओंकार", "प्रणव"] },
-    { "q": "गायत्री मंत्र की शक्ति क्या है?", "any": ["गायत्री", "सावित्री"] },
-    { "q": "महामृत्युंजय मंत्र का महत्व क्या है?", "any": ["मृत्युंजय", "शिव", "मन्त्र"] },
-
-    { "q": "वेदों में जीवन के बारे में क्या बताया गया है?", "any": ["वेद", "जीवन", "आयु"] },
-    { "q": "उपनिषदों की मुख्य शिक्षाएं क्या हैं?", "any": ["उपनिषद", "ब्रह्म", "आत्मा"] },
-    { "q": "भगवद गीता मनुष्य को क्या संदेश देती है?", "any": ["गीता", "कर्म", "योग"] },
-    { "q": "गीता के अनुसार सफलता का रहस्य क्या है?", "any": ["सिद्धि", "कर्म", "फल"] },
-    { "q": "गीता के अनुसार अच्छा नेता कैसा होना चाहिए?", "any": ["नेता", "राजा", "श्रेष्ठ"] },
-    { "q": "गीता में मन को जीतने का उपाय क्या है?", "any": ["मन", "अभ्यास", "वैराग्य", "संयम"] },
-    { "q": "भगवान कृष्ण ने कर्म करने के लिए क्या कहा है?", "any": ["कृष्ण", "कर्म"] },
-    { "q": "अर्जुन के भ्रम को कृष्ण ने कैसे दूर किया?", "any": ["अर्जुन", "मोह", "संशय"] },
-    { "q": "रामायण से हमें कौन सी जीवन शिक्षा मिलती है?", "any": ["रामायण", "राम", "मर्यादा"] },
-    { "q": "भगवान राम के आदर्श जीवन से क्या सीख सकते हैं?", "any": ["राम", "मर्यादा", "धर्म"] },
-
-    { "q": "माता-पिता की सेवा का महत्व क्या है?", "any": ["माता", "पिता", "सेवा"] },
-    { "q": "परिवार में प्रेम और सम्मान कैसे बनाए रखें?", "any": ["परिवार", "कुटुम्ब", "प्रेम"] },
-    { "q": "बच्चों को अच्छे संस्कार कैसे दिए जाएं?", "any": ["संस्कार", "बालक", "पुत्र"] },
-    { "q": "अच्छे मित्र की पहचान कैसे करें?", "any": ["मित्र", "पहचान", "विपत्ति"] },
-    { "q": "गलत संगति से बचना क्यों जरूरी है?", "any": ["संगति", "सङ्ग", "दुर्जन"] },
-    { "q": "जीवन में अनुशासन का महत्व क्या है?", "any": ["अनुशासन", "संयम", "नियम"] },
-    { "q": "समय का सही उपयोग कैसे करें?", "any": ["समय", "काल", "अवसर"] },
-    { "q": "आलस्य को कैसे दूर करें?", "any": ["आलस्य", "प्रमाद", "उद्यम"] },
-    { "q": "नकारात्मक विचारों से कैसे बचें?", "any": ["विचार", "चित्त", "मन"] },
-    { "q": "सकारात्मक सोच का आध्यात्मिक महत्व क्या है?", "any": ["शुभ", "विचार", "चित्त"] },
-
-    { "q": "मृत्यु के बाद आत्मा का क्या होता है?", "any": ["मृत्यु", "आत्मा", "परलोक"] },
-    { "q": "पुनर्जन्म का सिद्धांत क्या है?", "any": ["पुनर्जन्म", "जन्म", "देह"] },
-    { "q": "स्वर्ग और नरक की अवधारणा क्या है?", "any": ["स्वर्ग", "नरक"] },
-    { "q": "कर्मों का हिसाब कैसे होता है?", "any": ["कर्म", "फल", "यम"] },
-    { "q": "जन्म और मृत्यु के चक्र से मुक्ति कैसे मिलती है?", "any": ["जन्म", "मृत्यु", "मुक्ति"] },
-    { "q": "मोक्ष क्या है?", "any": ["मोक्ष", "मुक्ति"] },
-    { "q": "मुक्ति प्राप्त करने का मार्ग क्या है?", "any": ["मुक्ति", "मोक्ष", "मार्ग"] },
-    { "q": "आत्मा अमर क्यों कही जाती है?", "any": ["आत्मा", "अमर", "नित्य", "अजर"] },
-    { "q": "शरीर और आत्मा का संबंध क्या है?", "any": ["शरीर", "आत्मा", "देह"], "compare": true },
-    { "q": "चेतना क्या होती है?", "any": ["चेतना", "चैतन्य", "चित्"] },
-
-    { "q": "भगवान हर जगह कैसे उपस्थित हैं?", "any": ["सर्वत्र", "व्यापक", "ब्रह्म"] },
-    { "q": "ईश्वर को अनुभव कैसे किया जा सकता है?", "any": ["ईश्वर", "अनुभव", "साक्षात्"] },
-    { "q": "भक्ति में विश्वास क्यों आवश्यक है?", "any": ["भक्ति", "विश्वास", "श्रद्धा"] },
-    { "q": "सच्ची श्रद्धा क्या होती है?", "any": ["श्रद्धा", "विश्वास"] },
-    { "q": "पूजा का सही अर्थ क्या है?", "any": ["पूजा", "अर्चना", "उपासना"] },
-    { "q": "मंदिर जाने का आध्यात्मिक महत्व क्या है?", "any": ["मन्दिर", "देवालय", "दर्शन"] },
-    { "q": "तीर्थ यात्रा क्यों की जाती है?", "any": ["तीर्थ", "यात्रा", "स्नान"] },
-    { "q": "व्रत रखने का उद्देश्य क्या है?", "any": ["व्रत", "उपवास"] },
-    { "q": "दान करने का महत्व क्या है?", "any": ["दान", "अन्नदान"] },
-    { "q": "सेवा भाव क्यों जरूरी है?", "any": ["सेवा", "परोपकार"] },
-
-    { "q": "करुणा और दया का महत्व क्या है?", "any": ["करुणा", "दया"] },
-    { "q": "मनुष्य को दूसरों की सहायता क्यों करनी चाहिए?", "any": ["सहायता", "परोपकार", "उपकार"] },
-    { "q": "अच्छे विचार जीवन को कैसे बदलते हैं?", "any": ["विचार", "मन", "चित्त"] },
-    { "q": "आध्यात्मिक जीवन और भौतिक जीवन में संतुलन कैसे बनाएं?", "any": ["समता", "गृहस्थ", "संयम"], "compare": true },
-    { "q": "धन का सही उपयोग कैसे करें?", "any": ["धन", "दान", "अर्जन"] },
-    { "q": "सफलता मिलने के बाद अहंकार से कैसे बचें?", "any": ["अहंकार", "गर्व", "मद"] },
-    { "q": "असफलता से सीख कैसे लें?", "any": ["पराजय", "हानि", "धैर्य"] },
-    { "q": "जीवन में धैर्य क्यों जरूरी है?", "any": ["धैर्य", "धीर"] },
-    { "q": "कठिन समय में भगवान पर विश्वास कैसे रखें?", "any": ["विश्वास", "शरण", "श्रद्धा"] },
-    { "q": "चिंता और तनाव से मुक्ति का आध्यात्मिक उपाय क्या है?", "any": ["चिन्ता", "उद्वेग", "क्लेश"] },
-
-    { "q": "एक आदर्श जीवन कैसा होना चाहिए?", "any": ["आचरण", "धर्म", "जीवन"] },
-    { "q": "महान व्यक्ति बनने के लिए कौन से गुण चाहिए?", "any": ["गुण", "महान", "श्रेष्ठ"] },
-    { "q": "आत्म-अनुशासन कैसे विकसित करें?", "any": ["संयम", "इन्द्रिय", "निग्रह"] },
-    { "q": "अपने मन को सकारात्मक दिशा में कैसे लगाएं?", "any": ["मन", "अभ्यास", "चित्त"] },
-    { "q": "आध्यात्मिक ज्ञान को दैनिक जीवन में कैसे अपनाएं?", "any": ["नित्य", "आचरण", "ज्ञान"] },
-    { "q": "सत्य, प्रेम और करुणा का महत्व क्या है?", "any": ["सत्य", "प्रेम", "करुणा"] },
-    { "q": "मनुष्य अपने अंदर भगवान को कैसे खोज सकता है?", "any": ["आत्मा", "हृदय", "ब्रह्म"] },
-    { "q": "जीवन में संतोष कैसे प्राप्त करें?", "any": ["संतोष", "तृप्ति"] },
-    { "q": "परम सत्य क्या है?", "any": ["परम", "सत्य", "ब्रह्म"] },
-    { "q": "मानव जीवन को सफल बनाने का सबसे बड़ा रहस्य क्या है?", "any": ["जीवन", "सफल", "पुरुषार्थ"] }
-  ],
-
-  "hinglish_100": [
-    { "q": "Dharma aur Nyaya mein kya antar hai?", "any": ["धर्म", "न्याय"], "compare": true },
-    { "q": "Kya hamesha satya bolna hi dharma hota hai?", "any": ["सत्य", "धर्म"] },
-    { "q": "Mushkil samay mein sabse pehle kis granth ki sharan leni chahiye?", "any": ["शरण", "ग्रंथ", "कष्ट"] },
-    { "q": "Gussa aane par kaunsa shastriya upay sabse prabhavi hai?", "any": ["क्रोध", "उपाय", "शान्ति"] },
-    { "q": "Kya Bhagwan bina pooja ke prasann ho sakte hain?", "any": ["पूजा", "प्रसन्न", "भक्ति"] },
-    { "q": "Jeevan ka asli uddeshya kya hai?", "any": ["जीवन", "उद्देश्य", "पुरुषार्थ"] },
-    { "q": "Paap aur galti mein kya antar hai?", "any": ["पाप", "दोष"], "compare": true },
-    { "q": "Kya bhagya badla ja sakta hai?", "any": ["भाग्य", "प्रारब्ध", "दैव"] },
-    { "q": "Karm aur Prarabdh ka sambandh kya hai?", "any": ["कर्म", "प्रारब्ध"] },
-    { "q": "Sabse bada daan kaunsa maana gaya hai?", "any": ["दान", "अन्नदान"] },
-    { "q": "Shri Ram ko Maryada Purushottam kyun kaha gaya?", "any": ["राम", "मर्यादा"] },
-    { "q": "Shri Ram ne vanvas ko kaise sweekar kiya?", "any": ["वनवास", "राम", "वन"] },
-    { "q": "Bharat ka tyag hume kya sikhata hai?", "any": ["भरत", "त्याग"] },
-    { "q": "Hanuman ji ki sabse badi shakti kya thi?", "any": ["हनुमान", "शक्ति"] },
-    { "q": "Vibhishan ne Lanka kyun chhodi?", "any": ["विभीषण", "लंका"] },
-    { "q": "Ravan ki sabse badi galti kya thi?", "any": ["रावण", "दोष", "अहंकार"] },
-    { "q": "Ram Rajya ki mukhya visheshtayein kya thi?", "any": ["राज्य", "प्रजा", "शासन"] },
-    { "q": "Mata Sita ka dhairya hume kya sikhata hai?", "any": ["सीता", "धैर्य"] },
-    { "q": "Lakshman ka kartavya-bodh kya tha?", "any": ["लक्ष्मण", "कर्तव्य"] },
-    { "q": "Shabari ki bhakti ka saar kya hai?", "any": ["शबरी", "भक्ति", "भील"] },
-    { "q": "Arjun ka sabse bada confusion kya tha?", "any": ["अर्जुन", "मोह", "संशय"] },
-    { "q": "Nishkam Karma ka arth kya hai?", "any": ["निष्काम", "कर्म", "फल"] },
-    { "q": "Bhagavad Gita ke anusaar safalta kya hai?", "any": ["सफल", "सिद्धि", "कर्म"] },
-    { "q": "Man ko kaise niyantrit karein?", "any": ["मन", "संयम", "इन्द्रिय"] },
-    { "q": "Gita ke anusaar sabse bada shatru kaun hai?", "any": ["शत्रु", "काम", "क्रोध"] },
-    { "q": "Teen gun ka jeevan par kya prabhav hai?", "any": ["गुण", "सत्त्व", "रज", "तम"] },
-    { "q": "Kya Gita business leadership sikhati hai?", "any": ["कर्म", "राजा", "नेतृ"] },
-    { "q": "Gita ke anusaar depression ka samadhan kya hai?", "any": ["शोक", "विषाद", "दुःख"] },
-    { "q": "Bhagwan Krishna ne yudh kyun nahi roka?", "any": ["कृष्ण", "युद्ध", "धर्म"] },
-    { "q": "Gita ka sabse practical adhyay kaunsa hai?", "any": ["अध्याय", "कर्म", "योग"] },
-    { "q": "Rigveda mein Agni ka mahatva kya hai?", "any": ["अग्नि", "यज्ञ"] },
-    { "q": "Rigveda mein jal ko pavitra kyun maana gaya?", "any": ["जल", "पवित्र", "आप"] },
-    { "q": "Rigveda prakriti ke baare mein kya kehta hai?", "any": ["प्रकृति", "वायु", "पृथ्वी"] },
-    { "q": "Rigveda ke anusaar satya kya hai?", "any": ["सत्य", "ऋत"] },
-    { "q": "Rigveda mein shiksha ka uddeshya kya tha?", "any": ["शिक्षा", "विद्या", "ज्ञान"] },
-    { "q": "Yajurveda ke anusaar kartavya kya hai?", "any": ["कर्तव्य", "यज्ञ", "कर्म"] },
-    { "q": "Yajurveda mein yagya ka asli arth kya hai?", "any": ["यज्ञ", "आहुति", "हवि"] },
-    { "q": "Samaveda mein sangeet ka adhyatmik mahatva kya hai?", "any": ["संगीत", "साम", "गान"] },
-    { "q": "Atharvaveda mein swasthya ka rahasya kya hai?", "any": ["औषध", "रोग", "आरोग्य"] },
-    { "q": "Chaaro Ved ek doosre se kaise jude hue hain?", "any": ["वेद", "ऋग्", "साम", "यजुर्"] },
-    { "q": "Vishnu Puran ke anusaar Kaliyug ke lakshan kya hain?", "any": ["कलियुग", "लक्षण", "युग"] },
-    { "q": "Garud Puran mrityu ke baare mein kya batata hai?", "any": ["मृत्यु", "यम", "परलोक"] },
-    { "q": "Agni Puran mein rajdharma kya hai?", "any": ["राजधर्म", "राजा", "प्रजा"] },
-    { "q": "Shiv Puran mein bhakti ka sarvottam roop kya hai?", "any": ["शिव", "भक्ति"] },
-    { "q": "Narsimha Puran ka mukhya sandesh kya hai?", "any": ["नृसिंह", "प्रह्लाद", "भक्त"] },
-    { "q": "Bhavishya Puran mein bhavishya kaise varnit hai?", "any": ["भविष्य", "युग", "काल"] },
-    { "q": "Vishnu ke Dashavatar ka uddeshya kya tha?", "any": ["अवतार", "विष्णु"] },
-    { "q": "Shiv aur Vishnu mein bhed hai ya ek hi tattva?", "any": ["शिव", "विष्णु", "अभेद"], "compare": true },
-    { "q": "Garud Puran sirf mrityu ke baad hi kyun padha jata hai?", "any": ["मृत्यु", "श्राद्ध", "प्रेत"] },
-    { "q": "Puranon ka aaj ke yug mein kya mahatva hai?", "any": ["पुराण", "युग", "धर्म"] },
-    { "q": "Kathopanishad mein Nachiketa ne kya seekha?", "any": ["नचिकेता", "यम", "आत्मा"] },
-    { "q": "Atma aur Sharir mein kya antar hai?", "any": ["आत्मा", "शरीर", "देह"], "compare": true },
-    { "q": "Moksha ka asli arth kya hai?", "any": ["मोक्ष", "मुक्ति"] },
-    { "q": "Upanishad ke anusaar Brahman kya hai?", "any": ["ब्रह्म", "आत्मा"] },
-    { "q": "Dhyan ka antim lakshya kya hai?", "any": ["ध्यान", "समाधि", "योग"] },
-    { "q": "Man aur Buddhi mein kya antar hai?", "any": ["मन", "बुद्धि"], "compare": true },
-    { "q": "Jeevan aur Mrityu ka rahasya kya hai?", "any": ["जीवन", "मृत्यु"] },
-    { "q": "Kaun si cheez kabhi nahi marti?", "any": ["आत्मा", "अजर", "अमर", "नित्य"] },
-    { "q": "Sachcha gyani kise kaha gaya hai?", "any": ["ज्ञानी", "ज्ञान", "पण्डित"] },
-    { "q": "Upanishad ka sabse bada sandesh kya hai?", "any": ["उपनिषद", "ब्रह्म", "आत्मा"] },
-    { "q": "Chanakya ke anusaar safal vyakti kaise banta hai?", "any": ["सफल", "पुरुष", "उद्यम"] },
-    { "q": "Dushman ko kaise pehchanein?", "any": ["शत्रु", "रिपु", "पहचान"] },
-    { "q": "Paisa aur samman mein kaun bada hai?", "any": ["धन", "सम्मान", "प्रतिष्ठा"], "compare": true },
-    { "q": "Galat mitra ki pehchan kaise karein?", "any": ["मित्र", "पहचान", "विपत्ति"] },
-    { "q": "Rajneeti aur Neeti mein kya antar hai?", "any": ["नीति", "राजा", "राज्य"], "compare": true },
-    { "q": "Chanakya ne discipline ko itna mahatva kyun diya?", "any": ["अनुशासन", "संयम", "नियम"] },
-    { "q": "Kaun si aadatein jeevan barbaad karti hain?", "any": ["व्यसन", "दोष", "नाश"] },
-    { "q": "Chanakya ke anusaar samay ka upyog kaise karein?", "any": ["समय", "काल", "अवसर"] },
-    { "q": "Kaunsi galti kabhi maaf nahi karni chahiye?", "any": ["अपराध", "दोष", "क्षमा"] },
-    { "q": "Achha leader kaise banein?", "any": ["राजा", "नेतृ", "शासन"] },
-    { "q": "Guru Granth Sahib ke anusaar seva kya hai?", "any": ["सेवा", "सेवक"] },
-    { "q": "Naam Simran ka mahatva kya hai?", "any": ["सिमरन", "नाम", "स्मरण"] },
-    { "q": "Guru Nanak Dev ji ne sabse pehla sandesh kya diya?", "any": ["नानक", "गुरु", "नाम"] },
-    { "q": "Ahankar ka nash kaise hota hai?", "any": ["अहंकार", "गर्व", "नाश"] },
-    { "q": "Sab mein ek hi Parmatma ka arth kya hai?", "any": ["परमात्मा", "ब्रह्म", "एक"] },
-    { "q": "Guru Granth Sahib ke anusaar sachchi kamai kya hai?", "any": ["कमाई", "श्रम", "सत्य"] },
-    { "q": "Kya dharm bina daya ke adhura hai?", "any": ["दया", "धर्म"] },
-    { "q": "Langar ki parampara kya sikhati hai?", "any": ["लंगर", "सेवा", "अन्न"] },
-    { "q": "Krodh ko kaise jeeta ja sakta hai?", "any": ["क्रोध", "क्षमा", "संयम"] },
-    { "q": "Guru Granth Sahib mein prem ka kya mahatva hai?", "any": ["प्रेम", "भक्ति"] },
-    { "q": "Ekadashi vrat ka adhyatmik mahatva kya hai?", "any": ["एकादशी", "व्रत"] },
-    { "q": "Mantra Shakti kaise kaam karti hai?", "any": ["मन्त्र", "मंत्र", "शक्ति"] },
-    { "q": "Nitya Karma kyun zaruri hai?", "any": ["नित्य", "कर्म", "संध्या"] },
-    { "q": "Dev Archana ka sahi samay kya hai?", "any": ["अर्चना", "पूजा", "काल"] },
-    { "q": "Kya bina diksha mantra jap kar sakte hain?", "any": ["दीक्षा", "जप", "मन्त्र"] },
-    { "q": "Puja mein sankalp ka mahatva kya hai?", "any": ["संकल्प", "पूजा"] },
-    { "q": "Mantra jap mein dhyan bhatakne par kya karein?", "any": ["जप", "ध्यान", "मन"] },
-    { "q": "Kaunsa mantra shanti ke liye uttam hai?", "any": ["शान्ति", "मन्त्र", "मंत्र"] },
-    { "q": "Jap aur Dhyan mein kya antar hai?", "any": ["जप", "ध्यान"], "compare": true },
-    { "q": "Mantra ka uchcharan galat ho jaye to kya prabhav padta hai?", "any": ["उच्चारण", "मन्त्र", "दोष"] },
-    { "q": "Mahabharat aur Ramayan mein sabse bada antar kya hai?", "any": ["महाभारत", "रामायण"], "meta": true },
-    { "q": "Shri Ram aur Shri Krishna ki leadership mein kya antar tha?", "any": ["राम", "कृष्ण"], "meta": true },
-    { "q": "Gita aur Upanishad ek doosre ko kaise support karte hain?", "any": ["गीता", "उपनिषद", "ब्रह्म"], "meta": true },
-    { "q": "Ved aur Puran mein kya sambandh hai?", "any": ["वेद", "पुराण"], "meta": true },
-    { "q": "Chanakya aur Krishna ki neeti mein kya samanata hai?", "any": ["नीति", "कृष्ण"], "meta": true },
-    { "q": "Guru Granth Sahib aur Gita mein kaun se common values hain?", "any": ["गुरु", "गीता", "नाम"], "meta": true },
-    { "q": "Garud Puran aur Kathopanishad mrityu ko kaise alag samjhate hain?", "any": ["मृत्यु", "यम", "आत्मा"], "meta": true },
-    { "q": "Agar ek hi prashn ka uttar do granthon mein alag ho to SAARTHI kya bataye?", "any": ["ग्रंथ", "धर्म"], "meta": true },
-    { "q": "Aaj ke yug ke liye sabse adhik practical granth kaunsa hai aur kyun?", "any": ["ग्रंथ", "युग", "धर्म"], "meta": true },
-    { "q": "Agar mujhe jeevan ke liye sirf ek granth padhna ho to aap kya sujhav denge aur kyun?", "any": ["ग्रंथ", "जीवन"], "meta": true }
-  ],
-
-  "hinglish_300": [
-    { "q": "Bhagavad Gita ke according life ka real purpose kya hai?", "any": ["जीवन", "उद्देश्य", "पुरुषार्थ"] },
-    { "q": "Krishna ji ne Arjun ko karma ke bare me kya samjhaya tha?", "any": ["कृष्ण", "अर्जुन", "कर्म"] },
-    { "q": "Atma aur body me kya difference hota hai?", "any": ["आत्मा", "शरीर", "देह"], "compare": true },
-    { "q": "Hum life me dukhi kyu hote hain spiritual view se?", "any": ["दुःख", "कष्ट", "कर्म"] },
-    { "q": "Bhagavad Gita ke according happiness kaise milegi?", "any": ["सुख", "आनन्द", "संतोष"] },
-    { "q": "Kya insaan apni destiny change kar sakta hai?", "any": ["भाग्य", "प्रारब्ध", "पुरुषार्थ"] },
-    { "q": "Karma kya hota hai aur iska result kaise milta hai?", "any": ["कर्म", "फल"] },
-    { "q": "Achhe karma aur bure karma me difference kya hai?", "any": ["पुण्य", "पाप", "कर्म"], "compare": true },
-    { "q": "Bhagavad Gita me fear ko kaise overcome karne ko kaha gaya hai?", "any": ["भय", "अभय", "निर्भय"] },
-    { "q": "Krishna ji ke according successful life ka formula kya hai?", "any": ["कृष्ण", "कर्म", "सिद्धि"] },
-    { "q": "Meditation karne ka sahi tarika kya hai?", "any": ["ध्यान", "आसन", "एकाग्र"] },
-    { "q": "Mind ko control kaise kare according to spirituality?", "any": ["मन", "संयम", "निग्रह"] },
-    { "q": "Overthinking ko kaise kam kare spiritual way se?", "any": ["चिन्ता", "संकल्प", "चित्त"] },
-    { "q": "Bhagwan par trust kaise develop kare?", "any": ["विश्वास", "श्रद्धा", "शरण"] },
-    { "q": "Kya sab kuch pehle se decided hota hai?", "any": ["दैव", "प्रारब्ध", "विधि"] },
-    { "q": "Free will aur destiny ka relation kya hai?", "any": ["पुरुषार्थ", "दैव", "प्रारब्ध"], "compare": true },
-    { "q": "Life me problems kyu aati hain?", "any": ["कष्ट", "विघ्न", "कर्म"] },
-    { "q": "Spiritual person kaise bana ja sakta hai?", "any": ["साधक", "साधना", "आचरण"] },
-    { "q": "Gussa control karne ke liye Gita kya kehti hai?", "any": ["क्रोध", "संयम", "क्षमा"] },
-    { "q": "Ego kya hota hai aur ise kaise kam kare?", "any": ["अहंकार", "गर्व", "मद"] },
-
-    { "q": "Moksha kya hota hai simple language me samjhao?", "any": ["मोक्ष", "मुक्ति"] },
-    { "q": "Janam aur punarjanam ka concept kya hai?", "any": ["जन्म", "पुनर्जन्म", "देह"] },
-    { "q": "Death ke baad atma ke sath kya hota hai?", "any": ["मृत्यु", "आत्मा", "परलोक"] },
-    { "q": "Bhagavad Gita me death ke bare me kya likha hai?", "any": ["मृत्यु", "देह", "आत्मा"] },
-    { "q": "Kya soul kabhi nahi marti?", "any": ["आत्मा", "अजर", "अमर", "नित्य"] },
-    { "q": "Bhagwan ko kaise feel kar sakte hain?", "any": ["भगवान", "साक्षात्", "अनुभव"] },
-    { "q": "Bhakti aur spirituality me kya difference hai?", "any": ["भक्ति", "साधना", "ज्ञान"], "compare": true },
-    { "q": "Sahi decision lene ke liye spirituality kya bolti hai?", "any": ["बुद्धि", "विवेक", "निश्चय"] },
-    { "q": "Negative thoughts ko kaise remove kare?", "any": ["विचार", "चित्त", "मन"] },
-    { "q": "Mind aur emotions ko balance kaise kare?", "any": ["मन", "समता", "संयम"] },
-    { "q": "Dharma ka actual meaning kya hai?", "any": ["धर्म"] },
-    { "q": "Apna life purpose kaise find kare?", "any": ["उद्देश्य", "स्वधर्म", "कर्तव्य"] },
-    { "q": "Bhagavad Gita students ko kya sikhati hai?", "any": ["विद्या", "शिक्षा", "अभ्यास"] },
-    { "q": "Students ke liye Krishna ji ki best advice kya hai?", "any": ["कृष्ण", "अभ्यास", "कर्म"] },
-    { "q": "Career choose karne me spirituality ka kya role hai?", "any": ["स्वधर्म", "कर्म", "वृत्ति"] },
-    { "q": "Success ke liye karma important hai ya luck?", "any": ["कर्म", "दैव", "पुरुषार्थ"], "compare": true },
-    { "q": "Bhagwan humari help kab karte hain?", "any": ["शरण", "कृपा", "भक्त"] },
-    { "q": "Kya prayer se life change ho sakti hai?", "any": ["प्रार्थना", "स्तुति", "कृपा"] },
-    { "q": "Mantra chanting ka kya benefit hota hai?", "any": ["जप", "मन्त्र", "सिद्धि"] },
-    { "q": "Om mantra ka meaning kya hai?", "any": ["ॐ", "ओंकार", "प्रणव"] },
-
-    { "q": "Gayatri mantra ka importance kya hai?", "any": ["गायत्री", "सावित्री"] },
-    { "q": "Meditation se brain aur mind par kya effect hota hai?", "any": ["ध्यान", "मन", "चित्त"] },
-    { "q": "Spiritual growth kya hoti hai?", "any": ["साधना", "उन्नति", "ज्ञान"] },
-    { "q": "Inner peace kaise achieve kare?", "any": ["शान्ति", "समाधान"] },
-    { "q": "Apne mind ko peaceful kaise banaye?", "any": ["मन", "शान्ति", "संयम"] },
-    { "q": "Attachment aur love me kya difference hai?", "any": ["मोह", "प्रेम"], "compare": true },
-    { "q": "Relationship me spirituality ka kya role hai?", "any": ["सम्बन्ध", "प्रेम", "गृहस्थ"] },
-    { "q": "Family problems ko spiritual way se kaise solve kare?", "any": ["कुटुम्ब", "गृहस्थ", "कलह"] },
-    { "q": "Forgiveness ka importance kya hai?", "any": ["क्षमा"] },
-    { "q": "Kisi ko maaf karna kyu zaroori hai?", "any": ["क्षमा", "क्षमाशील"] },
-    { "q": "Bhagavad Gita me anger ke bare me kya kaha gaya hai?", "any": ["क्रोध", "काम", "मोह"] },
-    { "q": "Jealousy ko kaise control kare?", "any": ["ईर्ष्या", "द्वेष", "मत्सर"] },
-    { "q": "Comparison karna kaise chhode?", "any": ["समता", "संतोष", "ईर्ष्या"] },
-    { "q": "Life me patience kaise laaye?", "any": ["धैर्य", "धीर", "सहन"] },
-    { "q": "Gratitude kya hota hai aur iska benefit kya hai?", "any": ["कृतज्ञ", "संतोष", "उपकार"] },
-    { "q": "Positive thinking aur spirituality ka relation kya hai?", "any": ["शुभ", "विचार", "चित्त"] },
-    { "q": "Bhagwan sabki test kyu lete hain?", "any": ["परीक्षा", "कष्ट", "भक्त"] },
-    { "q": "Suffering ka spiritual meaning kya hai?", "any": ["दुःख", "कष्ट", "कर्म"] },
-    { "q": "Kya dukh bhi growth ka reason ban sakta hai?", "any": ["दुःख", "वैराग्य", "ज्ञान"] },
-    { "q": "Bhagavad Gita ke according fearlessness kaise aaye?", "any": ["अभय", "भय", "निर्भय"] },
-
-    { "q": "Krishna ji ne Arjun ko war ke liye kyu motivate kiya?", "any": ["अर्जुन", "युद्ध", "स्वधर्म"] },
-    { "q": "Kurukshetra war ka spiritual meaning kya hai?", "any": ["कुरुक्षेत्र", "युद्ध", "धर्म"] },
-    { "q": "Arjun ko confusion kyu hua tha?", "any": ["अर्जुन", "मोह", "विषाद"] },
-    { "q": "Gita ka sabse important message kya hai?", "any": ["गीता", "कर्म", "योग"] },
-    { "q": "Bhagavad Gita ko daily life me kaise apply kare?", "any": ["कर्म", "आचरण", "नित्य"] },
-    { "q": "Vedas kya hain aur inka importance kya hai?", "any": ["वेद", "श्रुति"] },
-    { "q": "Upanishads kya sikhate hain?", "any": ["उपनिषद", "ब्रह्म", "आत्मा"] },
-    { "q": "Ved aur Puran me kya difference hai?", "any": ["वेद", "पुराण"], "compare": true },
-    { "q": "Ramayan ka main message kya hai?", "any": ["रामायण", "राम", "मर्यादा"] },
-    { "q": "Shri Ram ke life se kya seekh sakte hain?", "any": ["राम", "मर्यादा", "धर्म"] },
-    { "q": "Hanuman ji se kya inspiration milti hai?", "any": ["हनुमान", "भक्ति", "बल"] },
-    { "q": "Mahabharat ka real lesson kya hai?", "any": ["महाभारत", "धर्म"] },
-    { "q": "Krishna ji ko Bhagwan kyu mana jata hai?", "any": ["कृष्ण", "अवतार", "भगवान"] },
-    { "q": "Vishnu ji ke avatar ka concept kya hai?", "any": ["अवतार", "विष्णु"] },
-    { "q": "Shiv ji ka spiritual meaning kya hai?", "any": ["शिव", "शंकर", "महादेव"] },
-    { "q": "Brahma Vishnu Mahesh ka concept kya hai?", "any": ["ब्रह्मा", "विष्णु", "शिव"] },
-    { "q": "Sanatan Dharma kya hota hai?", "any": ["सनातन", "धर्म"] },
-    { "q": "Kya spirituality aur science ek dusre se connected hain?", "any": ["ज्ञान", "विद्या", "सृष्टि"] },
-    { "q": "Consciousness kya hoti hai?", "any": ["चेतन", "चैतन्य", "चित्"] },
-    { "q": "Awareness aur meditation ka kya relation hai?", "any": ["ध्यान", "जागृत", "चित्त"] },
-
-    { "q": "Apne andar ki energy ko kaise improve kare?", "any": ["तेज", "ओज", "प्राण", "बल"] },
-    { "q": "Chakras kya hote hain?", "any": ["चक्र", "मूलाधार", "कुण्डलिनी"] },
-    { "q": "Kundalini energy kya hoti hai?", "any": ["कुण्डलिनी", "प्राण", "नाड़ी"] },
-    { "q": "Yoga ka actual purpose kya hai?", "any": ["योग", "समाधि", "मोक्ष"] },
-    { "q": "Ashtanga Yoga kya hota hai?", "any": ["योग", "यम", "नियम", "प्राणायाम"] },
-    { "q": "Patanjali Yoga Sutra kya sikhata hai?", "any": ["योग", "चित्तवृत्ति", "समाधि"] },
-    { "q": "Mindfulness kya hoti hai?", "any": ["एकाग्र", "चित्त", "ध्यान"] },
-    { "q": "Spiritual books padhne ka kya benefit hai?", "any": ["शास्त्र", "स्वाध्याय", "श्रवण"] },
-    { "q": "Roz Bhagavad Gita padhne se kya fayda hota hai?", "any": ["गीता", "पाठ", "स्वाध्याय"] },
-    { "q": "Kya spirituality se stress kam ho sakta hai?", "any": ["चिन्ता", "क्लेश", "शान्ति"] },
-    { "q": "Life me balance kaise maintain kare?", "any": ["समता", "संयम", "मध्यम"] },
-    { "q": "Apne thoughts ko observe kaise kare?", "any": ["विचार", "चित्त", "साक्षी"] },
-    { "q": "Inner voice kya hoti hai?", "any": ["अन्तःकरण", "हृदय", "आत्मा"] },
-    { "q": "Soul connection kya hota hai?", "any": ["आत्मा", "सम्बन्ध", "ब्रह्म"] },
-    { "q": "Bhagwan ke kareeb kaise aaye?", "any": ["शरण", "भक्ति", "निकट"] },
-    { "q": "Real happiness kaha milti hai?", "any": ["सुख", "आनन्द", "संतोष"] },
-    { "q": "Material success aur spiritual success me difference kya hai?", "any": ["धन", "मोक्ष", "अर्थ"], "compare": true },
-    { "q": "Simple aur peaceful life kaise jiye?", "any": ["संतोष", "शान्ति", "सरल"] },
-    { "q": "Spiritual journey start kaise kare?", "any": ["साधना", "आरम्भ", "गुरु"] },
-
-    { "q": "Bhagavad Gita ke according Atma ka actual nature kya hai?", "any": ["आत्मा", "नित्य", "अजर"] },
-    { "q": "Krishna ji ne Arjun ko Atma ke amar hone ke bare me kya bataya?", "any": ["आत्मा", "अमर", "नित्य"] },
-    { "q": "Kya Atma ka koi gender hota hai?", "any": ["आत्मा", "निर्गुण", "देह"] },
-    { "q": "Paramatma aur Atma me kya difference hai?", "any": ["परमात्मा", "आत्मा"], "compare": true },
-    { "q": "Jeevatma aur Paramatma ka connection kya hai?", "any": ["जीव", "परमात्मा", "ब्रह्म"] },
-    { "q": "Brahman kya hota hai Upanishads ke according?", "any": ["ब्रह्म", "उपनिषद"] },
-    { "q": "\"Aham Brahmasmi\" ka meaning kya hai?", "any": ["ब्रह्मास्मि", "ब्रह्म", "आत्मा"] },
-    { "q": "\"Tat Tvam Asi\" ka kya arth hai?", "any": ["तत्त्वमसि", "ब्रह्म", "आत्मा"] },
-    { "q": "Upanishads me consciousness ke bare me kya kaha gaya hai?", "any": ["चेतन", "चैतन्य", "ब्रह्म"] },
-    { "q": "Vedas ko eternal knowledge kyu kaha jata hai?", "any": ["वेद", "नित्य", "श्रुति"] },
-    { "q": "Chaar Vedas kaun se hain aur unka purpose kya hai?", "any": ["ऋग्", "यजुर्", "साम", "अथर्व"] },
-    { "q": "Rigveda me kis type ka knowledge diya gaya hai?", "any": ["ऋग्वेद", "ऋचा", "सूक्त"] },
-    { "q": "Yajurveda ka main focus kya hai?", "any": ["यजुर्वेद", "यज्ञ", "आहुति"] },
-    { "q": "Samaveda ka importance kya hai?", "any": ["सामवेद", "साम", "गान"] },
-    { "q": "Atharvaveda me kya knowledge milti hai?", "any": ["अथर्व", "औषध", "रोग"] },
-    { "q": "Vedic philosophy me creation ka concept kya hai?", "any": ["सृष्टि", "उत्पत्ति", "ब्रह्मा"] },
-    { "q": "Universe ki creation ke bare me Vedas kya kehte hain?", "any": ["सृष्टि", "उत्पत्ति", "प्रलय"] },
-    { "q": "Purusha Sukta kya hai aur iska importance kya hai?", "any": ["पुरुषसूक्त", "पुरुष", "सूक्त"] },
-    { "q": "Nasadiya Sukta me creation ke bare me kya bataya gaya hai?", "any": ["सृष्टि", "उत्पत्ति", "सूक्त"] },
-    { "q": "Vedas aur modern science ke beech kya connection hai?", "any": ["वेद", "विद्या", "सृष्टि"] },
-
-    { "q": "Bhagavad Gita ke 18 chapters ka summary kya hai?", "any": ["अध्याय", "गीता", "योग"] },
-    { "q": "Gita ke pehle chapter me kya hua tha?", "any": ["अर्जुन", "विषाद", "सेना"] },
-    { "q": "Arjun Vishad Yoga ka meaning kya hai?", "any": ["विषाद", "अर्जुन", "शोक"] },
-    { "q": "Sankhya Yoga kya sikhata hai?", "any": ["सांख्य", "आत्मा", "ज्ञान"] },
-    { "q": "Karma Yoga ka actual meaning kya hai?", "any": ["कर्मयोग", "कर्म", "फल"] },
-    { "q": "Nishkam Karma kya hota hai?", "any": ["निष्काम", "कर्म", "फल"] },
-    { "q": "Gita ke according bina attachment ke kaam kaise kare?", "any": ["आसक्ति", "कर्म", "त्याग"] },
-    { "q": "Jnana Yoga kya hota hai?", "any": ["ज्ञानयोग", "ज्ञान", "योग"] },
-    { "q": "Bhakti Yoga ka importance kya hai?", "any": ["भक्ति", "योग", "शरण"] },
-    { "q": "Dhyana Yoga kya explain karta hai?", "any": ["ध्यान", "योग", "समाधि"] },
-    { "q": "Bhagavad Gita me ideal person kise kaha gaya hai?", "any": ["स्थितप्रज्ञ", "योगी", "श्रेष्ठ"] },
-    { "q": "Sthitaprajna kaun hota hai?", "any": ["स्थितप्रज्ञ", "प्रज्ञा", "समता"] },
-    { "q": "Sthitaprajna insaan ke qualities kya hoti hain?", "any": ["स्थितप्रज्ञ", "समता", "संयम"] },
-    { "q": "Triguna kya hote hain?", "any": ["सत्त्व", "रज", "तम", "गुण"] },
-    { "q": "Sattva, Rajas aur Tamas ka meaning kya hai?", "any": ["सत्त्व", "रजस", "तमस"] },
-    { "q": "Apne andar Sattva guna kaise badhaye?", "any": ["सत्त्व", "शुद्ध", "आहार"] },
-    { "q": "Rajas guna ka life par kya effect hota hai?", "any": ["रजस", "रज", "कर्म"] },
-    { "q": "Tamas guna se kaise bahar nikle?", "any": ["तमस", "तम", "आलस्य"] },
-    { "q": "Maya kya hoti hai Vedanta ke according?", "any": ["माया", "मिथ्या", "अविद्या"] },
-    { "q": "Maya aur reality me difference kya hai?", "any": ["माया", "सत्य", "मिथ्या"], "compare": true },
-
-    { "q": "Bhagwan ki Maya ko kaise samjha ja sakta hai?", "any": ["माया", "भगवान", "अविद्या"] },
-    { "q": "Ego aur Atma me kya difference hai?", "any": ["अहंकार", "आत्मा"], "compare": true },
-    { "q": "Ahankar kaise develop hota hai?", "any": ["अहंकार", "गर्व", "मद"] },
-    { "q": "Spiritual growth me ego sabse bada obstacle kyu hai?", "any": ["अहंकार", "बाधा", "साधना"] },
-    { "q": "Desire aur attachment ka connection kya hai?", "any": ["काम", "आसक्ति", "तृष्णा"] },
-    { "q": "Gita ke according desires ko control kaise kare?", "any": ["काम", "इच्छा", "संयम"] },
-    { "q": "Kaam, Krodh aur Lobh ko enemies kyu kaha gaya hai?", "any": ["काम", "क्रोध", "लोभ"] },
-    { "q": "Bhagavad Gita me anger ka root cause kya bataya gaya hai?", "any": ["क्रोध", "काम", "मोह"] },
-    { "q": "Fear ka spiritual solution kya hai?", "any": ["भय", "अभय", "शरण"] },
-    { "q": "Anxiety ko Gita ke according kaise handle kare?", "any": ["चिन्ता", "शोक", "समता"] },
-    { "q": "Karma ke kitne types hote hain?", "any": ["संचित", "प्रारब्ध", "क्रियमाण"] },
-    { "q": "Sanchit Karma kya hota hai?", "any": ["संचित", "कर्म"] },
-    { "q": "Prarabdha Karma kya hota hai?", "any": ["प्रारब्ध", "कर्म"] },
-    { "q": "Kriyamana Karma kya hota hai?", "any": ["क्रियमाण", "कर्म"] },
-    { "q": "Kya karma ko badla ja sakta hai?", "any": ["कर्म", "प्रायश्चित्त", "प्रारब्ध"] },
-    { "q": "Kya achhe karma se future improve ho sakta hai?", "any": ["पुण्य", "कर्म", "फल"] },
-    { "q": "Kya Bhagwan karma ke rules ko change kar sakte hain?", "any": ["कर्म", "विधि", "ईश्वर"] },
-    { "q": "Karma aur destiny ka relation kya hai?", "any": ["कर्म", "दैव", "प्रारब्ध"] },
-    { "q": "Kya past life karma present life ko affect karta hai?", "any": ["पूर्वजन्म", "प्रारब्ध", "कर्म"] },
-    { "q": "Rebirth ka concept Hindu scriptures me kaise explain hua hai?", "any": ["पुनर्जन्म", "जन्म", "देह"] },
-
-    { "q": "Moksha kaise prapt hota hai?", "any": ["मोक्ष", "मुक्ति", "ज्ञान"] },
-    { "q": "Liberation aur salvation me kya difference hai?", "any": ["मोक्ष", "मुक्ति"], "compare": true },
-    { "q": "Jeevan Mukti kya hoti hai?", "any": ["जीवन्मुक्त", "मुक्ति", "मोक्ष"] },
-    { "q": "Death ke time consciousness ka kya role hota hai?", "any": ["मृत्यु", "स्मरण", "चेतन"] },
-    { "q": "Bhagavad Gita ke according antim samay kya yaad karna chahiye?", "any": ["अन्तकाल", "स्मरण", "मृत्यु"] },
-    { "q": "Om chanting se spiritual benefit kaise milta hai?", "any": ["ॐ", "ओंकार", "प्रणव"] },
-    { "q": "Mantra ki power kaise kaam karti hai?", "any": ["मन्त्र", "सिद्धि", "शक्ति"] },
-    { "q": "Beej mantra kya hota hai?", "any": ["बीज", "मन्त्र", "अक्षर"] },
-    { "q": "Meditation me thoughts ko kaise control kare?", "any": ["ध्यान", "चित्त", "एकाग्र"] },
-    { "q": "Deep meditation ki state kya hoti hai?", "any": ["समाधि", "ध्यान", "एकाग्र"] },
-    { "q": "Samadhi kya hoti hai?", "any": ["समाधि"] },
-    { "q": "Yoga Sutra me Chitta Vritti Nirodha ka meaning kya hai?", "any": ["चित्तवृत्ति", "चित्त", "निरोध"] },
-    { "q": "Patanjali ke Ashtanga Yoga ke 8 steps kya hain?", "any": ["यम", "नियम", "आसन", "प्राणायाम"] },
-    { "q": "Yama aur Niyama kya hote hain?", "any": ["यम", "नियम", "अहिंसा"] },
-    { "q": "Pranayama ka spiritual importance kya hai?", "any": ["प्राणायाम", "प्राण", "श्वास"] },
-    { "q": "Kundalini awakening kya hoti hai?", "any": ["कुण्डलिनी", "नाड़ी", "प्राण"] },
-    { "q": "Chakras ka concept kaha se aaya hai?", "any": ["चक्र", "मूलाधार", "नाड़ी"] },
-    { "q": "Muladhara chakra ka meaning kya hai?", "any": ["मूलाधार", "चक्र"] },
-    { "q": "Ajna chakra ko third eye kyu kaha jata hai?", "any": ["आज्ञा", "चक्र", "नेत्र"] },
-    { "q": "Sahasrara chakra ka spiritual meaning kya hai?", "any": ["सहस्रार", "चक्र", "ब्रह्मरन्ध्र"] },
-
-    { "q": "Ramayan me Shri Ram ko Maryada Purushottam kyu kaha gaya?", "any": ["राम", "मर्यादा"] },
-    { "q": "Ramayan se leadership ke kya lessons milte hain?", "any": ["राम", "राजा", "प्रजा"] },
-    { "q": "Hanuman ji ki bhakti ka secret kya hai?", "any": ["हनुमान", "भक्ति", "सेवा"] },
-    { "q": "Hanuman ji ko strength aur devotion ka symbol kyu mana jata hai?", "any": ["हनुमान", "बल", "भक्ति"] },
-    { "q": "Mahabharat me Krishna ki strategy ka spiritual meaning kya hai?", "any": ["कृष्ण", "नीति", "धर्म"] },
-    { "q": "Mahabharat me Dharma aur Adharma ka difference kya hai?", "any": ["धर्म", "अधर्म"], "compare": true },
-    { "q": "Bhishma Pitamah se kya seekh milti hai?", "any": ["भीष्म", "प्रतिज्ञा", "धर्म"] },
-    { "q": "Karna ke character se kya lesson milta hai?", "any": ["कर्ण", "दान", "मित्र"] },
-    { "q": "Draupadi ke life lessons kya hain?", "any": ["द्रौपदी", "धर्म", "सहन"] },
-    { "q": "Guru ka spiritual importance kya hota hai?", "any": ["गुरु", "शिष्य", "दीक्षा"] },
-    { "q": "Guru aur teacher me kya difference hai?", "any": ["गुरु", "आचार्य"], "compare": true },
-    { "q": "Sadguru kise kaha jata hai?", "any": ["सद्गुरु", "गुरु", "ब्रह्मनिष्ठ"] },
-    { "q": "Seva ka spiritual meaning kya hai?", "any": ["सेवा", "परोपकार"] },
-    { "q": "Daan ka importance scriptures me kya hai?", "any": ["दान", "अन्नदान"] },
-    { "q": "Yagya ka actual meaning kya hai?", "any": ["यज्ञ", "आहुति", "हवि"] },
-    { "q": "Vedic lifestyle kya hota hai?", "any": ["आचार", "नित्य", "संध्या"] },
-    { "q": "Sanatan Dharma me daily routine kaisa bataya gaya hai?", "any": ["नित्य", "संध्या", "आचार"] },
-    { "q": "Brahmacharya ka real meaning kya hai?", "any": ["ब्रह्मचर्य", "संयम"] },
-    { "q": "Spiritual discipline kaise develop kare?", "any": ["संयम", "नियम", "अभ्यास"] },
-    { "q": "Ek advanced spiritual seeker ko daily kya practice karni chahiye?", "any": ["साधना", "अभ्यास", "नित्य"] },
-
-    { "q": "Rigveda me sabse important spiritual concepts kaun se hain?", "any": ["ऋग्वेद", "ऋत", "अग्नि"] },
-    { "q": "Yajurveda me karma aur yagya ka kya importance hai?", "any": ["यजुर्वेद", "यज्ञ", "कर्म"] },
-    { "q": "Samaveda ko music aur spirituality se kyu joda jata hai?", "any": ["सामवेद", "साम", "गान"] },
-    { "q": "Atharvaveda me health aur life ke bare me kya knowledge hai?", "any": ["अथर्व", "औषध", "आयु"] },
-    { "q": "Vedas ke according ideal human life kaisi honi chahiye?", "any": ["वेद", "आचार", "धर्म"] },
-    { "q": "Upanishads me Brahman ko kaise explain kiya gaya hai?", "any": ["ब्रह्म", "उपनिषद", "आत्मा"] },
-    { "q": "Kena Upanishad ka main message kya hai?", "any": ["उपनिषद", "ब्रह्म", "इन्द्रिय"] },
-    { "q": "Katha Upanishad me Nachiketa aur Yamraj ki story kya sikhati hai?", "any": ["नचिकेता", "यम", "आत्मा"] },
-    { "q": "Isha Upanishad ka main teaching kya hai?", "any": ["ईश", "उपनिषद", "त्याग"] },
-    { "q": "Mandukya Upanishad me Om ke char states kya bataye gaye hain?", "any": ["ॐ", "जाग्रत", "स्वप्न", "सुषुप्ति"] },
-    { "q": "Taittiriya Upanishad me Panch Kosha kya hote hain?", "any": ["कोश", "अन्नमय", "प्राणमय"] },
-    { "q": "Panch Mahabhuta kya hote hain?", "any": ["पृथ्वी", "जल", "अग्नि", "वायु", "आकाश"] },
-    { "q": "Prithvi, Jal, Agni, Vayu aur Akash ka spiritual meaning kya hai?", "any": ["पृथ्वी", "जल", "आकाश", "वायु"] },
-    { "q": "Vedanta philosophy kya hoti hai?", "any": ["वेदान्त", "ब्रह्म", "आत्मा"] },
-    { "q": "Advaita Vedanta ka meaning kya hai?", "any": ["अद्वैत", "ब्रह्म", "अभेद"] },
-    { "q": "Dvaita aur Advaita me kya difference hai?", "any": ["द्वैत", "अद्वैत"], "compare": true },
-    { "q": "Bhagavad Gita ke according real knowledge kya hota hai?", "any": ["ज्ञान", "विज्ञान", "विवेक"] },
-    { "q": "Gita me Guru ki importance kya batayi gayi hai?", "any": ["गुरु", "शिष्य", "प्रणिपात"] },
-    { "q": "Krishna ji ne Arjun ko surrender ke bare me kya samjhaya?", "any": ["शरण", "कृष्ण", "समर्पण"] },
-    { "q": "\"Sarva Dharman Parityajya\" shlok ka meaning kya hai?", "any": ["शरण", "धर्म", "त्याग"] },
-
-    { "q": "Bhagavad Gita ka sabse powerful shlok kaunsa hai aur kyu?", "any": ["गीता", "श्लोक", "कर्म"] },
-    { "q": "Gita me mind ko friend aur enemy kyu kaha gaya hai?", "any": ["मन", "मित्र", "शत्रु"] },
-    { "q": "Manushya apne mind ka master kaise ban sakta hai?", "any": ["मन", "जीत", "संयम"] },
-    { "q": "Gita ke according happiness ke teen types kya hain?", "any": ["सुख", "सात्त्विक", "राजस", "तामस"] },
-    { "q": "Sukha aur Ananda me kya difference hai?", "any": ["सुख", "आनन्द"], "compare": true },
-    { "q": "Bhagavad Gita me food ke teen types kaun se hain?", "any": ["आहार", "सात्त्विक", "राजस"] },
-    { "q": "Sattvik bhojan kya hota hai?", "any": ["सात्त्विक", "आहार", "भोजन"] },
-    { "q": "Spiritual person ko kaisa food lena chahiye?", "any": ["आहार", "सात्त्विक", "भोजन"] },
-    { "q": "Gita ke according meditation ke liye kya rules hain?", "any": ["ध्यान", "आसन", "एकान्त"] },
-    { "q": "Krishna consciousness kya hoti hai?", "any": ["कृष्ण", "स्मरण", "भक्ति"] },
-    { "q": "Bhakti ke kitne forms hote hain?", "any": ["भक्ति", "नवधा", "श्रवण"] },
-    { "q": "Navadha Bhakti kya hoti hai?", "any": ["नवधा", "भक्ति", "श्रवण"] },
-    { "q": "Bhakti aur devotion ko kaise strong kare?", "any": ["भक्ति", "श्रद्धा", "सत्संग"] },
-    { "q": "Naam jap ka spiritual power kya hai?", "any": ["नाम", "जप", "स्मरण"] },
-    { "q": "Hare Krishna mantra ka importance kya hai?", "any": ["कृष्ण", "नाम", "जप"] },
-    { "q": "Shiv mantra Om Namah Shivaya ka meaning kya hai?", "any": ["शिव", "नमः", "मन्त्र"] },
-    { "q": "Mahamrityunjaya mantra kyu kiya jata hai?", "any": ["मृत्युंजय", "शिव", "मन्त्र"] },
-    { "q": "Gayatri mantra ka deep meaning kya hai?", "any": ["गायत्री", "सावित्री", "सविता"] },
-    { "q": "Mantra chanting me pronunciation kitna important hai?", "any": ["उच्चारण", "मन्त्र", "स्वर"] },
-    { "q": "Kya mantra se mind healing ho sakti hai?", "any": ["मन्त्र", "मन", "शान्ति"] },
-
-    { "q": "Ramayan ke Bal Kand se kya seekh milti hai?", "any": ["बालकाण्ड", "राम", "विश्वामित्र"] },
-    { "q": "Shri Ram ke vanvas ka spiritual meaning kya hai?", "any": ["वनवास", "राम", "वन"] },
-    { "q": "Bharat ji ki bhakti aur sacrifice se kya seekh milti hai?", "any": ["भरत", "त्याग", "भक्ति"] },
-    { "q": "Lakshman ji ke character ka importance kya hai?", "any": ["लक्ष्मण", "सेवा", "भ्राता"] },
-    { "q": "Sita ji ke qualities kya thi?", "any": ["सीता", "पतिव्रता", "धैर्य"] },
-    { "q": "Ravana intelligent hone ke baad bhi fail kyu hua?", "any": ["रावण", "अहंकार", "मद"] },
-    { "q": "Ram Rajya ka concept kya hai?", "any": ["रामराज्य", "प्रजा", "राज्य"] },
-    { "q": "Hanuman Chalisa ka spiritual significance kya hai?", "any": ["हनुमान", "स्तुति", "पाठ"] },
-    { "q": "Hanuman ji ko Chiranjeevi kyu kaha jata hai?", "any": ["हनुमान", "चिरंजीवी", "अमर"] },
-    { "q": "Sundar Kand ka main message kya hai?", "any": ["सुन्दरकाण्ड", "हनुमान", "लंका"] },
-    { "q": "Mahabharat me Dharma ko kaise define kiya gaya hai?", "any": ["धर्म", "महाभारत"] },
-    { "q": "Krishna ne Pandavo ka support kyu kiya?", "any": ["पाण्डव", "कृष्ण", "धर्म"] },
-    { "q": "Kaurav aur Pandav conflict ka inner meaning kya hai?", "any": ["कौरव", "पाण्डव", "धर्म"] },
-    { "q": "Mahabharat hume decision making ke bare me kya sikhata hai?", "any": ["निर्णय", "बुद्धि", "धर्म"] },
-    { "q": "Yudhishthir ke character se kya seekh milti hai?", "any": ["युधिष्ठिर", "धर्म", "सत्य"] },
-    { "q": "Arjun ek great warrior hote hue bhi confused kyu hua?", "any": ["अर्जुन", "मोह", "विषाद"] },
-    { "q": "Krishna ki leadership qualities kya thi?", "any": ["कृष्ण", "नीति", "बुद्धि"] },
-    { "q": "Bhishma Pitamah ki life se kya lesson milta hai?", "any": ["भीष्म", "प्रतिज्ञा", "ब्रह्मचर्य"] },
-    { "q": "Dronacharya ke character ka analysis kya hai?", "any": ["द्रोण", "आचार्य", "शिष्य"] },
-    { "q": "Karna ke jeevan ka spiritual lesson kya hai?", "any": ["कर्ण", "दान", "कवच"] },
-
-    { "q": "Vishnu Puran me creation ke bare me kya bataya gaya hai?", "any": ["सृष्टि", "विष्णु", "उत्पत्ति"] },
-    { "q": "Shiv Puran ka main message kya hai?", "any": ["शिव", "भक्ति", "लिंग"] },
-    { "q": "Devi Bhagwat Puran kya sikhata hai?", "any": ["देवी", "शक्ति", "भगवती"] },
-    { "q": "Bhagwat Puran me Krishna ke childhood ka importance kya hai?", "any": ["कृष्ण", "बाल", "गोकुल"] },
-    { "q": "Puran aur Itihas me kya difference hai?", "any": ["पुराण", "इतिहास"], "compare": true },
-    { "q": "Dashavatar ka spiritual meaning kya hai?", "any": ["अवतार", "विष्णु", "दश"] },
-    { "q": "Matsya Avatar ki story kya sikhati hai?", "any": ["मत्स्य", "अवतार", "प्रलय"] },
-    { "q": "Narasimha Avatar ka significance kya hai?", "any": ["नृसिंह", "प्रह्लाद", "अवतार"] },
-    { "q": "Vaman Avatar ka spiritual message kya hai?", "any": ["वामन", "बलि", "अवतार"] },
-    { "q": "Kalki Avatar ka concept kya hai?", "any": ["कल्कि", "कलियुग", "अवतार"] },
-    { "q": "Guru Granth Sahib ka main message kya hai?", "any": ["नानक", "नाम", "गुरु"] },
-    { "q": "Sikh Dharma me Naam Simran kya hota hai?", "any": ["सिमरन", "नाम", "स्मरण"] },
-    { "q": "Guru Nanak Dev ji ki teachings kya hain?", "any": ["नानक", "नाम", "सेवा"] },
-    { "q": "Ek Onkar ka meaning kya hai?", "any": ["ओंकार", "एक", "ॐ"] },
-    { "q": "Guru Granth Sahib me equality ke bare me kya kaha gaya hai?", "any": ["समान", "जाति", "एक"] },
-    { "q": "Seva aur Simran ka importance kya hai?", "any": ["सेवा", "सिमरन", "नाम"] },
-    { "q": "Yoga Vashisht kya sikhata hai?", "any": ["वसिष्ठ", "मन", "वैराग्य"] },
-    { "q": "Yoga Vashisht me mind ko reality ka source kyu kaha gaya hai?", "any": ["मन", "चित्त", "जगत"] },
-    { "q": "Yoga Vashisht ke according liberation kaise milti hai?", "any": ["मोक्ष", "मुक्ति", "वैराग्य"] },
-    { "q": "Consciousness aur universe ka relation kya hai?", "any": ["चेतन", "जगत", "ब्रह्म"] },
-
-    { "q": "Jyotish shastra ka spiritual purpose kya hai?", "any": ["ज्योतिष", "ग्रह", "फल"] },
-    { "q": "Kya astrology destiny ko change kar sakti hai?", "any": ["ग्रह", "भाग्य", "उपाय"] },
-    { "q": "Kundli me karma ka connection kaise dekha jata hai?", "any": ["कुण्डली", "कर्म", "ग्रह"] },
-    { "q": "Navgraha ka spiritual meaning kya hai?", "any": ["ग्रह", "नवग्रह", "शान्ति"] },
-    { "q": "Surya dev ka importance kya hai?", "any": ["सूर्य", "आदित्य", "भास्कर"] },
-    { "q": "Chandra grah ka mind se kya relation hai?", "any": ["चन्द्र", "मन", "सोम"] },
-    { "q": "Guru grah (Jupiter) ka spiritual significance kya hai?", "any": ["बृहस्पति", "गुरु", "ग्रह"] },
-    { "q": "Shani dev ko karma ka judge kyu kaha jata hai?", "any": ["शनि", "कर्म", "फल"] },
-    { "q": "Rahu aur Ketu ka spiritual meaning kya hai?", "any": ["राहु", "केतु", "ग्रह"] },
-    { "q": "Muhurat ka concept kya hota hai?", "any": ["मुहूर्त", "काल", "शुभ"] },
-    { "q": "Chanakya Niti se successful life ke kya rules milte hain?", "any": ["नीति", "पुरुष", "उद्यम"] },
-    { "q": "Chanakya ke according ek intelligent person ki qualities kya hoti hain?", "any": ["बुद्धि", "पण्डित", "विवेक"] },
-    { "q": "Chanakya Niti me friendship ke bare me kya kaha gaya hai?", "any": ["मित्र", "सखा", "विपत्ति"] },
-    { "q": "Chanakya ke according paisa aur dharma ka relation kya hai?", "any": ["धन", "धर्म", "अर्थ"] },
-    { "q": "Leadership ke liye Chanakya ke kya principles hain?", "any": ["राजा", "नीति", "शासन"] },
-    { "q": "Life me discipline ka importance Chanakya ke according kya hai?", "any": ["नियम", "संयम", "अनुशासन"] },
-    { "q": "Krodh aur ego ko control karne ke liye Chanakya kya kehte hain?", "any": ["क्रोध", "अहंकार", "संयम"] },
-    { "q": "Achha decision lene ke liye Chanakya ki kya advice hai?", "any": ["बुद्धि", "विवेक", "निर्णय"] },
-    { "q": "Spiritual aur practical life ko balance kaise kare?", "any": ["गृहस्थ", "समता", "धर्म"], "compare": true }
-  ],
-
-  "control": [
-    "SAARTHI GYAAN AI se spiritual guidance kaise le sakte hain",
-    "SAARTHI GYAAN AI ek spiritual guide ki tarah meri daily life me kaise help kar sakta hai",
-    "iPhone 15 ka price kya hai",
-    "Python mein for loop kaise likhte hain",
-    "आज बिटकॉइन का भाव क्या है",
-    "मुंबई से दिल्ली की फ्लाइट कितने की है",
-    "IPL 2026 kaun jeeta",
-    "मेरा वाई-फाई राउटर काम नहीं कर रहा",
-    "kal ka mausam kaisa rahega",
-    "train ka time table batao",
-    "sabse acchi car kaunsi hai",
-    "GST return kaise file karein",
-    "मेरे फोन की बैटरी जल्दी खत्म होती है",
-    "Instagram par followers kaise badhayein",
-    "petrol ka aaj ka rate",
-    "डॉलर का भाव क्या चल रहा है",
-    "nearest hospital kahan hai",
-
-    "_KHATARNAK CONTROL (2026-08-10) — ye sawaal AADHYATMIK LAGTE hain par",
-    "_hamari 24 kitaabon mein inka jawab hai HI NAHI. Purane 17 control",
-    "_(mausam, petrol, IPL) bahut aasan the — unka sabse ooncha rerank score",
-    "_0.177 tha. Gate girane ka faisla unhi par tika tha, jo kaafi nahi.",
-    "_Asli khatra yahi hai: jo sawaal granth-jaisa lagta hai, uspar model",
-    "_kisi bhi paas-paas ke ansh ko jawab maan sakta hai.",
-    "Bible me jeevan ke bare me kya likha hai",
-    "Quran ki mukhya shiksha kya hai",
-    "Gautam Buddha ne dukh ke bare me kya kaha",
-    "Jain dharma me ahimsa ka kya sthan hai",
-    "Confucius ki neeti kya sikhati hai",
-    "Socrates ke according atma kya hai",
-    "Tarot card reading kaise ki jati hai",
-    "Numerology me 7 number ka kya matlab hai",
-    "Reiki healing kaise kaam karti hai",
-    "Feng shui ke according ghar kaisa hona chahiye",
-    "Vastu me main gate kis disha me hona chahiye",
-    "Ayurveda me vata pitta kapha kya hote hain",
-    "Yoga se weight loss kaise hota hai",
-    "Meditation app kaunsa best hai",
-    "Isha Foundation ke Sadhguru kya kehte hain"
-  ]
+ "_readme": [
+  "SAARTHI — Ask section ka test-set. eval-ask.mjs ise padhti hai.",
+  "",
+  "DO SET, DO ALAG RAASTE:",
+  "  hindi_100    — Devanagari mein likhe sawaal (default). Ye asli app ka",
+  "                 mukhya raasta hai aur granth-paryay ka imtihaan bhi.",
+  "  hinglish_100 — Roman mein likhe sawaal. Ye TRANSLIT ka raasta jaanchta",
+  "                 hai. --hinglish se chalao.",
+  "",
+  "'any' = wo shabd jinme se KOI EK sahi ansh mein hona chahiye. Har shabd",
+  "corpus mein pehle GINA gaya hai (5.66 crore akshar) — yaani sawaal fail",
+  "hone ka matlab DHOONDHNE ki galti hai, kitab mein kami nahi. Jahan shabd",
+  "kam mila wahan vyapak shabd liya:",
+  "    आत्मविश्वास 6 hits → धैर्य/बल/साहस     चिंता 75  → चिन्ता 1,267",
+  "    संतुलन 20          → समता/सम           मंदिर 83  → मन्दिर 561",
+  "    सकारात्मक 4        → शुभ/विचार         तनाव 38   → उद्वेग/क्लेश",
+  "",
+  "'compare': true = 'X aur Y mein kya antar hai' kism ka sawaal. Ye MAIN",
+  "SCORE MEIN GINE JAATE HAIN — chhipaye nahi. Bas alag se bhi dikhaye jaate",
+  "hain, kyunki pichhli baar aise 4 me se 4 fail hue the aur ye jaanna zaroori",
+  "hai ki wo alag kism ki kami hai (ek ansh do cheezon ka antar kam hi batata",
+  "hai) ya wahi aam kami.",
+  "",
+  "'control' = jiska jawab kitaabon mein hai hi nahi. Sahi natija = kuch bhi",
+  "grounded na mile. Yahan ek bhi citation JHOOTHI citation hai."
+ ],
+ "hindi_100": [
+  {
+   "q": "आत्मा और मन में क्या अंतर है?",
+   "any": [
+    "आत्मा",
+    "मन"
+   ],
+   "compare": true
+  },
+  {
+   "q": "मनुष्य को अपने जीवन का उद्देश्य कैसे पता चलता है?",
+   "any": [
+    "उद्देश्य",
+    "जीवन",
+    "पुरुषार्थ"
+   ]
+  },
+  {
+   "q": "सच्ची शांति प्राप्त करने का सबसे सरल मार्ग क्या है?",
+   "any": [
+    "शान्ति",
+    "मार्ग"
+   ]
+  },
+  {
+   "q": "क्रोध को नियंत्रित करने के लिए शास्त्र क्या कहते हैं?",
+   "any": [
+    "क्रोध",
+    "संयम",
+    "क्षमा"
+   ]
+  },
+  {
+   "q": "मोह और प्रेम में क्या अंतर होता है?",
+   "any": [
+    "मोह",
+    "प्रेम"
+   ],
+   "compare": true
+  },
+  {
+   "q": "अच्छे कर्मों का फल कब और कैसे मिलता है?",
+   "any": [
+    "कर्म",
+    "फल",
+    "पुण्य"
+   ]
+  },
+  {
+   "q": "भाग्य और कर्म में कौन अधिक शक्तिशाली है?",
+   "any": [
+    "भाग्य",
+    "कर्म",
+    "दैव"
+   ],
+   "compare": true
+  },
+  {
+   "q": "भगवान से जुड़ने का सही तरीका क्या है?",
+   "any": [
+    "भगवान",
+    "भक्ति",
+    "शरण"
+   ]
+  },
+  {
+   "q": "ध्यान करते समय मन को स्थिर कैसे करें?",
+   "any": [
+    "ध्यान",
+    "स्थिर",
+    "मन"
+   ]
+  },
+  {
+   "q": "आत्मविश्वास बढ़ाने के लिए आध्यात्मिक ज्ञान क्या कहता है?",
+   "any": [
+    "धैर्य",
+    "बल",
+    "साहस",
+    "उत्साह"
+   ]
+  },
+  {
+   "q": "भय को समाप्त करने का उपाय क्या है?",
+   "any": [
+    "भय",
+    "निर्भय",
+    "अभय"
+   ]
+  },
+  {
+   "q": "जीवन में दुख क्यों आते हैं?",
+   "any": [
+    "दुःख",
+    "कष्ट",
+    "कर्म"
+   ]
+  },
+  {
+   "q": "सुख और दुख को समान भाव से कैसे स्वीकार करें?",
+   "any": [
+    "सुख",
+    "दुःख",
+    "समता"
+   ]
+  },
+  {
+   "q": "अहंकार मनुष्य के पतन का कारण क्यों बनता है?",
+   "any": [
+    "अहंकार",
+    "पतन",
+    "गर्व"
+   ]
+  },
+  {
+   "q": "विनम्रता का महत्व क्या है?",
+   "any": [
+    "नम्र",
+    "विनय",
+    "दीन"
+   ]
+  },
+  {
+   "q": "मनुष्य को क्षमा करना क्यों सीखना चाहिए?",
+   "any": [
+    "क्षमा"
+   ]
+  },
+  {
+   "q": "सच्चा गुरु किसे कहा जाता है?",
+   "any": [
+    "गुरु",
+    "आचार्य"
+   ]
+  },
+  {
+   "q": "गुरु का जीवन में क्या महत्व है?",
+   "any": [
+    "गुरु",
+    "शिष्य"
+   ]
+  },
+  {
+   "q": "शिष्य के अंदर कौन से गुण होने चाहिए?",
+   "any": [
+    "शिष्य",
+    "गुण",
+    "विनय"
+   ]
+  },
+  {
+   "q": "ज्ञान और अनुभव में क्या अंतर है?",
+   "any": [
+    "ज्ञान",
+    "अनुभव"
+   ],
+   "compare": true
+  },
+  {
+   "q": "धर्म का वास्तविक अर्थ क्या है?",
+   "any": [
+    "धर्म"
+   ]
+  },
+  {
+   "q": "सनातन धर्म की मुख्य शिक्षाएं क्या हैं?",
+   "any": [
+    "सनातन",
+    "धर्म"
+   ]
+  },
+  {
+   "q": "सत्य बोलने का महत्व क्या है?",
+   "any": [
+    "सत्य",
+    "असत्य"
+   ]
+  },
+  {
+   "q": "जीवन में संयम क्यों आवश्यक है?",
+   "any": [
+    "संयम",
+    "इन्द्रिय"
+   ]
+  },
+  {
+   "q": "इच्छाओं को नियंत्रित कैसे किया जा सकता है?",
+   "any": [
+    "इच्छा",
+    "कामना",
+    "तृष्णा"
+   ]
+  },
+  {
+   "q": "लोभ मनुष्य को कैसे प्रभावित करता है?",
+   "any": [
+    "लोभ",
+    "तृष्णा"
+   ]
+  },
+  {
+   "q": "ईर्ष्या से मुक्ति कैसे प्राप्त करें?",
+   "any": [
+    "ईर्ष्या",
+    "द्वेष",
+    "मत्सर"
+   ]
+  },
+  {
+   "q": "मन की शुद्धि कैसे की जाती है?",
+   "any": [
+    "शुद्धि",
+    "मन",
+    "पवित्र"
+   ]
+  },
+  {
+   "q": "आत्मज्ञान प्राप्त करने के लिए क्या करना चाहिए?",
+   "any": [
+    "आत्मज्ञान",
+    "आत्मा",
+    "ज्ञान"
+   ]
+  },
+  {
+   "q": "भगवान को पाने के लिए कौन सा मार्ग श्रेष्ठ है?",
+   "any": [
+    "मार्ग",
+    "भक्ति",
+    "श्रेष्ठ"
+   ]
+  },
+  {
+   "q": "कर्म योग क्या है?",
+   "any": [
+    "कर्मयोग",
+    "कर्म",
+    "योग"
+   ]
+  },
+  {
+   "q": "ज्ञान योग क्या है?",
+   "any": [
+    "ज्ञानयोग",
+    "ज्ञान",
+    "योग"
+   ]
+  },
+  {
+   "q": "भक्ति योग का महत्व क्या है?",
+   "any": [
+    "भक्ति",
+    "योग"
+   ]
+  },
+  {
+   "q": "राज योग क्या सिखाता है?",
+   "any": [
+    "योग",
+    "समाधि",
+    "ध्यान"
+   ]
+  },
+  {
+   "q": "योग केवल शरीर के लिए है या आत्मा के लिए भी?",
+   "any": [
+    "योग",
+    "शरीर",
+    "आत्मा"
+   ],
+   "compare": true
+  },
+  {
+   "q": "प्रार्थना का वास्तविक प्रभाव क्या होता है?",
+   "any": [
+    "प्रार्थना",
+    "स्तुति"
+   ]
+  },
+  {
+   "q": "मंत्र जाप क्यों किया जाता है?",
+   "any": [
+    "जप",
+    "मन्त्र",
+    "मंत्र"
+   ]
+  },
+  {
+   "q": "ॐ मंत्र का आध्यात्मिक महत्व क्या है?",
+   "any": [
+    "ॐ",
+    "ओंकार",
+    "प्रणव"
+   ]
+  },
+  {
+   "q": "गायत्री मंत्र की शक्ति क्या है?",
+   "any": [
+    "गायत्री",
+    "सावित्री"
+   ]
+  },
+  {
+   "q": "महामृत्युंजय मंत्र का महत्व क्या है?",
+   "any": [
+    "मृत्युंजय",
+    "शिव",
+    "मन्त्र"
+   ]
+  },
+  {
+   "q": "वेदों में जीवन के बारे में क्या बताया गया है?",
+   "any": [
+    "वेद",
+    "जीवन",
+    "आयु"
+   ]
+  },
+  {
+   "q": "उपनिषदों की मुख्य शिक्षाएं क्या हैं?",
+   "any": [
+    "उपनिषद",
+    "ब्रह्म",
+    "आत्मा"
+   ]
+  },
+  {
+   "q": "भगवद गीता मनुष्य को क्या संदेश देती है?",
+   "any": [
+    "गीता",
+    "कर्म",
+    "योग"
+   ]
+  },
+  {
+   "q": "गीता के अनुसार सफलता का रहस्य क्या है?",
+   "any": [
+    "सिद्धि",
+    "कर्म",
+    "फल"
+   ]
+  },
+  {
+   "q": "गीता के अनुसार अच्छा नेता कैसा होना चाहिए?",
+   "any": [
+    "नेता",
+    "राजा",
+    "श्रेष्ठ"
+   ]
+  },
+  {
+   "q": "गीता में मन को जीतने का उपाय क्या है?",
+   "any": [
+    "मन",
+    "अभ्यास",
+    "वैराग्य",
+    "संयम"
+   ]
+  },
+  {
+   "q": "भगवान कृष्ण ने कर्म करने के लिए क्या कहा है?",
+   "any": [
+    "कृष्ण",
+    "कर्म"
+   ]
+  },
+  {
+   "q": "अर्जुन के भ्रम को कृष्ण ने कैसे दूर किया?",
+   "any": [
+    "अर्जुन",
+    "मोह",
+    "संशय"
+   ]
+  },
+  {
+   "q": "रामायण से हमें कौन सी जीवन शिक्षा मिलती है?",
+   "any": [
+    "रामायण",
+    "राम",
+    "मर्यादा"
+   ]
+  },
+  {
+   "q": "भगवान राम के आदर्श जीवन से क्या सीख सकते हैं?",
+   "any": [
+    "राम",
+    "मर्यादा",
+    "धर्म"
+   ]
+  },
+  {
+   "q": "माता-पिता की सेवा का महत्व क्या है?",
+   "any": [
+    "माता",
+    "पिता",
+    "सेवा"
+   ]
+  },
+  {
+   "q": "परिवार में प्रेम और सम्मान कैसे बनाए रखें?",
+   "any": [
+    "परिवार",
+    "कुटुम्ब",
+    "प्रेम"
+   ]
+  },
+  {
+   "q": "बच्चों को अच्छे संस्कार कैसे दिए जाएं?",
+   "any": [
+    "संस्कार",
+    "बालक",
+    "पुत्र"
+   ]
+  },
+  {
+   "q": "अच्छे मित्र की पहचान कैसे करें?",
+   "any": [
+    "मित्र",
+    "पहचान",
+    "विपत्ति"
+   ]
+  },
+  {
+   "q": "गलत संगति से बचना क्यों जरूरी है?",
+   "any": [
+    "संगति",
+    "सङ्ग",
+    "दुर्जन"
+   ]
+  },
+  {
+   "q": "जीवन में अनुशासन का महत्व क्या है?",
+   "any": [
+    "अनुशासन",
+    "संयम",
+    "नियम"
+   ]
+  },
+  {
+   "q": "समय का सही उपयोग कैसे करें?",
+   "any": [
+    "समय",
+    "काल",
+    "अवसर"
+   ]
+  },
+  {
+   "q": "आलस्य को कैसे दूर करें?",
+   "any": [
+    "आलस्य",
+    "प्रमाद",
+    "उद्यम"
+   ]
+  },
+  {
+   "q": "नकारात्मक विचारों से कैसे बचें?",
+   "any": [
+    "विचार",
+    "चित्त",
+    "मन"
+   ]
+  },
+  {
+   "q": "सकारात्मक सोच का आध्यात्मिक महत्व क्या है?",
+   "any": [
+    "शुभ",
+    "विचार",
+    "चित्त"
+   ]
+  },
+  {
+   "q": "मृत्यु के बाद आत्मा का क्या होता है?",
+   "any": [
+    "मृत्यु",
+    "आत्मा",
+    "परलोक"
+   ]
+  },
+  {
+   "q": "पुनर्जन्म का सिद्धांत क्या है?",
+   "any": [
+    "पुनर्जन्म",
+    "जन्म",
+    "देह"
+   ]
+  },
+  {
+   "q": "स्वर्ग और नरक की अवधारणा क्या है?",
+   "any": [
+    "स्वर्ग",
+    "नरक"
+   ]
+  },
+  {
+   "q": "कर्मों का हिसाब कैसे होता है?",
+   "any": [
+    "कर्म",
+    "फल",
+    "यम"
+   ]
+  },
+  {
+   "q": "जन्म और मृत्यु के चक्र से मुक्ति कैसे मिलती है?",
+   "any": [
+    "जन्म",
+    "मृत्यु",
+    "मुक्ति"
+   ]
+  },
+  {
+   "q": "मोक्ष क्या है?",
+   "any": [
+    "मोक्ष",
+    "मुक्ति"
+   ]
+  },
+  {
+   "q": "मुक्ति प्राप्त करने का मार्ग क्या है?",
+   "any": [
+    "मुक्ति",
+    "मोक्ष",
+    "मार्ग"
+   ]
+  },
+  {
+   "q": "आत्मा अमर क्यों कही जाती है?",
+   "any": [
+    "आत्मा",
+    "अमर",
+    "नित्य",
+    "अजर"
+   ]
+  },
+  {
+   "q": "शरीर और आत्मा का संबंध क्या है?",
+   "any": [
+    "शरीर",
+    "आत्मा",
+    "देह"
+   ],
+   "compare": true
+  },
+  {
+   "q": "चेतना क्या होती है?",
+   "any": [
+    "चेतना",
+    "चैतन्य",
+    "चित्"
+   ]
+  },
+  {
+   "q": "भगवान हर जगह कैसे उपस्थित हैं?",
+   "any": [
+    "सर्वत्र",
+    "व्यापक",
+    "ब्रह्म"
+   ]
+  },
+  {
+   "q": "ईश्वर को अनुभव कैसे किया जा सकता है?",
+   "any": [
+    "ईश्वर",
+    "अनुभव",
+    "साक्षात्"
+   ]
+  },
+  {
+   "q": "भक्ति में विश्वास क्यों आवश्यक है?",
+   "any": [
+    "भक्ति",
+    "विश्वास",
+    "श्रद्धा"
+   ]
+  },
+  {
+   "q": "सच्ची श्रद्धा क्या होती है?",
+   "any": [
+    "श्रद्धा",
+    "विश्वास"
+   ]
+  },
+  {
+   "q": "पूजा का सही अर्थ क्या है?",
+   "any": [
+    "पूजा",
+    "अर्चना",
+    "उपासना"
+   ]
+  },
+  {
+   "q": "मंदिर जाने का आध्यात्मिक महत्व क्या है?",
+   "any": [
+    "मन्दिर",
+    "देवालय",
+    "दर्शन"
+   ]
+  },
+  {
+   "q": "तीर्थ यात्रा क्यों की जाती है?",
+   "any": [
+    "तीर्थ",
+    "यात्रा",
+    "स्नान"
+   ]
+  },
+  {
+   "q": "व्रत रखने का उद्देश्य क्या है?",
+   "any": [
+    "व्रत",
+    "उपवास"
+   ]
+  },
+  {
+   "q": "दान करने का महत्व क्या है?",
+   "any": [
+    "दान",
+    "अन्नदान"
+   ]
+  },
+  {
+   "q": "सेवा भाव क्यों जरूरी है?",
+   "any": [
+    "सेवा",
+    "परोपकार"
+   ]
+  },
+  {
+   "q": "करुणा और दया का महत्व क्या है?",
+   "any": [
+    "करुणा",
+    "दया"
+   ]
+  },
+  {
+   "q": "मनुष्य को दूसरों की सहायता क्यों करनी चाहिए?",
+   "any": [
+    "सहायता",
+    "परोपकार",
+    "उपकार"
+   ]
+  },
+  {
+   "q": "अच्छे विचार जीवन को कैसे बदलते हैं?",
+   "any": [
+    "विचार",
+    "मन",
+    "चित्त"
+   ]
+  },
+  {
+   "q": "आध्यात्मिक जीवन और भौतिक जीवन में संतुलन कैसे बनाएं?",
+   "any": [
+    "समता",
+    "गृहस्थ",
+    "संयम"
+   ],
+   "compare": true
+  },
+  {
+   "q": "धन का सही उपयोग कैसे करें?",
+   "any": [
+    "धन",
+    "दान",
+    "अर्जन"
+   ]
+  },
+  {
+   "q": "सफलता मिलने के बाद अहंकार से कैसे बचें?",
+   "any": [
+    "अहंकार",
+    "गर्व",
+    "मद"
+   ]
+  },
+  {
+   "q": "असफलता से सीख कैसे लें?",
+   "any": [
+    "पराजय",
+    "हानि",
+    "धैर्य"
+   ]
+  },
+  {
+   "q": "जीवन में धैर्य क्यों जरूरी है?",
+   "any": [
+    "धैर्य",
+    "धीर"
+   ]
+  },
+  {
+   "q": "कठिन समय में भगवान पर विश्वास कैसे रखें?",
+   "any": [
+    "विश्वास",
+    "शरण",
+    "श्रद्धा"
+   ]
+  },
+  {
+   "q": "चिंता और तनाव से मुक्ति का आध्यात्मिक उपाय क्या है?",
+   "any": [
+    "चिन्ता",
+    "उद्वेग",
+    "क्लेश"
+   ]
+  },
+  {
+   "q": "एक आदर्श जीवन कैसा होना चाहिए?",
+   "any": [
+    "आचरण",
+    "धर्म",
+    "जीवन"
+   ]
+  },
+  {
+   "q": "महान व्यक्ति बनने के लिए कौन से गुण चाहिए?",
+   "any": [
+    "गुण",
+    "महान",
+    "श्रेष्ठ"
+   ]
+  },
+  {
+   "q": "आत्म-अनुशासन कैसे विकसित करें?",
+   "any": [
+    "संयम",
+    "इन्द्रिय",
+    "निग्रह"
+   ]
+  },
+  {
+   "q": "अपने मन को सकारात्मक दिशा में कैसे लगाएं?",
+   "any": [
+    "मन",
+    "अभ्यास",
+    "चित्त"
+   ]
+  },
+  {
+   "q": "आध्यात्मिक ज्ञान को दैनिक जीवन में कैसे अपनाएं?",
+   "any": [
+    "नित्य",
+    "आचरण",
+    "ज्ञान"
+   ]
+  },
+  {
+   "q": "सत्य, प्रेम और करुणा का महत्व क्या है?",
+   "any": [
+    "सत्य",
+    "प्रेम",
+    "करुणा"
+   ]
+  },
+  {
+   "q": "मनुष्य अपने अंदर भगवान को कैसे खोज सकता है?",
+   "any": [
+    "आत्मा",
+    "हृदय",
+    "ब्रह्म"
+   ]
+  },
+  {
+   "q": "जीवन में संतोष कैसे प्राप्त करें?",
+   "any": [
+    "संतोष",
+    "तृप्ति"
+   ]
+  },
+  {
+   "q": "परम सत्य क्या है?",
+   "any": [
+    "परम",
+    "सत्य",
+    "ब्रह्म"
+   ]
+  },
+  {
+   "q": "मानव जीवन को सफल बनाने का सबसे बड़ा रहस्य क्या है?",
+   "any": [
+    "जीवन",
+    "सफल",
+    "पुरुषार्थ"
+   ]
+  }
+ ],
+ "hinglish_100": [
+  {
+   "q": "Dharma aur Nyaya mein kya antar hai?",
+   "any": [
+    "धर्म",
+    "न्याय"
+   ],
+   "compare": true
+  },
+  {
+   "q": "Kya hamesha satya bolna hi dharma hota hai?",
+   "any": [
+    "सत्य",
+    "धर्म"
+   ]
+  },
+  {
+   "q": "Mushkil samay mein sabse pehle kis granth ki sharan leni chahiye?",
+   "any": [
+    "शरण",
+    "ग्रंथ",
+    "कष्ट"
+   ]
+  },
+  {
+   "q": "Gussa aane par kaunsa shastriya upay sabse prabhavi hai?",
+   "any": [
+    "क्रोध",
+    "उपाय",
+    "शान्ति"
+   ]
+  },
+  {
+   "q": "Kya Bhagwan bina pooja ke prasann ho sakte hain?",
+   "any": [
+    "पूजा",
+    "प्रसन्न",
+    "भक्ति"
+   ]
+  },
+  {
+   "q": "Jeevan ka asli uddeshya kya hai?",
+   "any": [
+    "जीवन",
+    "उद्देश्य",
+    "पुरुषार्थ"
+   ]
+  },
+  {
+   "q": "Paap aur galti mein kya antar hai?",
+   "any": [
+    "पाप",
+    "दोष"
+   ],
+   "compare": true
+  },
+  {
+   "q": "Kya bhagya badla ja sakta hai?",
+   "any": [
+    "भाग्य",
+    "प्रारब्ध",
+    "दैव"
+   ]
+  },
+  {
+   "q": "Karm aur Prarabdh ka sambandh kya hai?",
+   "any": [
+    "कर्म",
+    "प्रारब्ध"
+   ]
+  },
+  {
+   "q": "Sabse bada daan kaunsa maana gaya hai?",
+   "any": [
+    "दान",
+    "अन्नदान"
+   ]
+  },
+  {
+   "q": "Shri Ram ko Maryada Purushottam kyun kaha gaya?",
+   "any": [
+    "राम",
+    "मर्यादा"
+   ]
+  },
+  {
+   "q": "Shri Ram ne vanvas ko kaise sweekar kiya?",
+   "any": [
+    "वनवास",
+    "राम",
+    "वन"
+   ]
+  },
+  {
+   "q": "Bharat ka tyag hume kya sikhata hai?",
+   "any": [
+    "भरत",
+    "त्याग"
+   ]
+  },
+  {
+   "q": "Hanuman ji ki sabse badi shakti kya thi?",
+   "any": [
+    "हनुमान",
+    "शक्ति"
+   ]
+  },
+  {
+   "q": "Vibhishan ne Lanka kyun chhodi?",
+   "any": [
+    "विभीषण",
+    "लंका"
+   ]
+  },
+  {
+   "q": "Ravan ki sabse badi galti kya thi?",
+   "any": [
+    "रावण",
+    "दोष",
+    "अहंकार"
+   ]
+  },
+  {
+   "q": "Ram Rajya ki mukhya visheshtayein kya thi?",
+   "any": [
+    "राज्य",
+    "प्रजा",
+    "शासन"
+   ]
+  },
+  {
+   "q": "Mata Sita ka dhairya hume kya sikhata hai?",
+   "any": [
+    "सीता",
+    "धैर्य"
+   ]
+  },
+  {
+   "q": "Lakshman ka kartavya-bodh kya tha?",
+   "any": [
+    "लक्ष्मण",
+    "कर्तव्य"
+   ]
+  },
+  {
+   "q": "Shabari ki bhakti ka saar kya hai?",
+   "any": [
+    "शबरी",
+    "भक्ति",
+    "भील"
+   ]
+  },
+  {
+   "q": "Arjun ka sabse bada confusion kya tha?",
+   "any": [
+    "अर्जुन",
+    "मोह",
+    "संशय"
+   ]
+  },
+  {
+   "q": "Nishkam Karma ka arth kya hai?",
+   "any": [
+    "निष्काम",
+    "कर्म",
+    "फल"
+   ]
+  },
+  {
+   "q": "Bhagavad Gita ke anusaar safalta kya hai?",
+   "any": [
+    "सफल",
+    "सिद्धि",
+    "कर्म"
+   ]
+  },
+  {
+   "q": "Man ko kaise niyantrit karein?",
+   "any": [
+    "मन",
+    "संयम",
+    "इन्द्रिय"
+   ]
+  },
+  {
+   "q": "Gita ke anusaar sabse bada shatru kaun hai?",
+   "any": [
+    "शत्रु",
+    "काम",
+    "क्रोध"
+   ]
+  },
+  {
+   "q": "Teen gun ka jeevan par kya prabhav hai?",
+   "any": [
+    "गुण",
+    "सत्त्व",
+    "रज",
+    "तम"
+   ]
+  },
+  {
+   "q": "Kya Gita business leadership sikhati hai?",
+   "any": [
+    "कर्म",
+    "राजा",
+    "नेतृ"
+   ]
+  },
+  {
+   "q": "Gita ke anusaar depression ka samadhan kya hai?",
+   "any": [
+    "शोक",
+    "विषाद",
+    "दुःख"
+   ]
+  },
+  {
+   "q": "Bhagwan Krishna ne yudh kyun nahi roka?",
+   "any": [
+    "कृष्ण",
+    "युद्ध",
+    "धर्म"
+   ]
+  },
+  {
+   "q": "Gita ka sabse practical adhyay kaunsa hai?",
+   "any": [
+    "अध्याय",
+    "कर्म",
+    "योग"
+   ]
+  },
+  {
+   "q": "Rigveda mein Agni ka mahatva kya hai?",
+   "any": [
+    "अग्नि",
+    "यज्ञ"
+   ]
+  },
+  {
+   "q": "Rigveda mein jal ko pavitra kyun maana gaya?",
+   "any": [
+    "जल",
+    "पवित्र",
+    "आप"
+   ]
+  },
+  {
+   "q": "Rigveda prakriti ke baare mein kya kehta hai?",
+   "any": [
+    "प्रकृति",
+    "वायु",
+    "पृथ्वी"
+   ]
+  },
+  {
+   "q": "Rigveda ke anusaar satya kya hai?",
+   "any": [
+    "सत्य",
+    "ऋत"
+   ]
+  },
+  {
+   "q": "Rigveda mein shiksha ka uddeshya kya tha?",
+   "any": [
+    "शिक्षा",
+    "विद्या",
+    "ज्ञान"
+   ]
+  },
+  {
+   "q": "Yajurveda ke anusaar kartavya kya hai?",
+   "any": [
+    "कर्तव्य",
+    "यज्ञ",
+    "कर्म"
+   ]
+  },
+  {
+   "q": "Yajurveda mein yagya ka asli arth kya hai?",
+   "any": [
+    "यज्ञ",
+    "आहुति",
+    "हवि"
+   ]
+  },
+  {
+   "q": "Samaveda mein sangeet ka adhyatmik mahatva kya hai?",
+   "any": [
+    "संगीत",
+    "साम",
+    "गान"
+   ]
+  },
+  {
+   "q": "Atharvaveda mein swasthya ka rahasya kya hai?",
+   "any": [
+    "औषध",
+    "रोग",
+    "आरोग्य"
+   ]
+  },
+  {
+   "q": "Chaaro Ved ek doosre se kaise jude hue hain?",
+   "any": [
+    "वेद",
+    "ऋग्",
+    "साम",
+    "यजुर्"
+   ]
+  },
+  {
+   "q": "Vishnu Puran ke anusaar Kaliyug ke lakshan kya hain?",
+   "any": [
+    "कलियुग",
+    "लक्षण",
+    "युग"
+   ]
+  },
+  {
+   "q": "Garud Puran mrityu ke baare mein kya batata hai?",
+   "any": [
+    "मृत्यु",
+    "यम",
+    "परलोक"
+   ]
+  },
+  {
+   "q": "Agni Puran mein rajdharma kya hai?",
+   "any": [
+    "राजधर्म",
+    "राजा",
+    "प्रजा"
+   ]
+  },
+  {
+   "q": "Shiv Puran mein bhakti ka sarvottam roop kya hai?",
+   "any": [
+    "शिव",
+    "भक्ति"
+   ]
+  },
+  {
+   "q": "Narsimha Puran ka mukhya sandesh kya hai?",
+   "any": [
+    "नृसिंह",
+    "प्रह्लाद",
+    "भक्त"
+   ]
+  },
+  {
+   "q": "Bhavishya Puran mein bhavishya kaise varnit hai?",
+   "any": [
+    "भविष्य",
+    "युग",
+    "काल"
+   ]
+  },
+  {
+   "q": "Vishnu ke Dashavatar ka uddeshya kya tha?",
+   "any": [
+    "अवतार",
+    "विष्णु"
+   ]
+  },
+  {
+   "q": "Shiv aur Vishnu mein bhed hai ya ek hi tattva?",
+   "any": [
+    "शिव",
+    "विष्णु",
+    "अभेद"
+   ],
+   "compare": true
+  },
+  {
+   "q": "Garud Puran sirf mrityu ke baad hi kyun padha jata hai?",
+   "any": [
+    "मृत्यु",
+    "श्राद्ध",
+    "प्रेत"
+   ]
+  },
+  {
+   "q": "Puranon ka aaj ke yug mein kya mahatva hai?",
+   "any": [
+    "पुराण",
+    "युग",
+    "धर्म"
+   ]
+  },
+  {
+   "q": "Kathopanishad mein Nachiketa ne kya seekha?",
+   "any": [
+    "नचिकेता",
+    "यम",
+    "आत्मा"
+   ]
+  },
+  {
+   "q": "Atma aur Sharir mein kya antar hai?",
+   "any": [
+    "आत्मा",
+    "शरीर",
+    "देह"
+   ],
+   "compare": true
+  },
+  {
+   "q": "Moksha ka asli arth kya hai?",
+   "any": [
+    "मोक्ष",
+    "मुक्ति"
+   ]
+  },
+  {
+   "q": "Upanishad ke anusaar Brahman kya hai?",
+   "any": [
+    "ब्रह्म",
+    "आत्मा"
+   ]
+  },
+  {
+   "q": "Dhyan ka antim lakshya kya hai?",
+   "any": [
+    "ध्यान",
+    "समाधि",
+    "योग"
+   ]
+  },
+  {
+   "q": "Man aur Buddhi mein kya antar hai?",
+   "any": [
+    "मन",
+    "बुद्धि"
+   ],
+   "compare": true
+  },
+  {
+   "q": "Jeevan aur Mrityu ka rahasya kya hai?",
+   "any": [
+    "जीवन",
+    "मृत्यु"
+   ]
+  },
+  {
+   "q": "Kaun si cheez kabhi nahi marti?",
+   "any": [
+    "आत्मा",
+    "अजर",
+    "अमर",
+    "नित्य"
+   ]
+  },
+  {
+   "q": "Sachcha gyani kise kaha gaya hai?",
+   "any": [
+    "ज्ञानी",
+    "ज्ञान",
+    "पण्डित"
+   ]
+  },
+  {
+   "q": "Upanishad ka sabse bada sandesh kya hai?",
+   "any": [
+    "उपनिषद",
+    "ब्रह्म",
+    "आत्मा"
+   ]
+  },
+  {
+   "q": "Chanakya ke anusaar safal vyakti kaise banta hai?",
+   "any": [
+    "सफल",
+    "पुरुष",
+    "उद्यम"
+   ]
+  },
+  {
+   "q": "Dushman ko kaise pehchanein?",
+   "any": [
+    "शत्रु",
+    "रिपु",
+    "पहचान"
+   ]
+  },
+  {
+   "q": "Paisa aur samman mein kaun bada hai?",
+   "any": [
+    "धन",
+    "सम्मान",
+    "प्रतिष्ठा"
+   ],
+   "compare": true
+  },
+  {
+   "q": "Galat mitra ki pehchan kaise karein?",
+   "any": [
+    "मित्र",
+    "पहचान",
+    "विपत्ति"
+   ]
+  },
+  {
+   "q": "Rajneeti aur Neeti mein kya antar hai?",
+   "any": [
+    "नीति",
+    "राजा",
+    "राज्य"
+   ],
+   "compare": true
+  },
+  {
+   "q": "Chanakya ne discipline ko itna mahatva kyun diya?",
+   "any": [
+    "अनुशासन",
+    "संयम",
+    "नियम"
+   ]
+  },
+  {
+   "q": "Kaun si aadatein jeevan barbaad karti hain?",
+   "any": [
+    "व्यसन",
+    "दोष",
+    "नाश"
+   ]
+  },
+  {
+   "q": "Chanakya ke anusaar samay ka upyog kaise karein?",
+   "any": [
+    "समय",
+    "काल",
+    "अवसर"
+   ]
+  },
+  {
+   "q": "Kaunsi galti kabhi maaf nahi karni chahiye?",
+   "any": [
+    "अपराध",
+    "दोष",
+    "क्षमा"
+   ]
+  },
+  {
+   "q": "Achha leader kaise banein?",
+   "any": [
+    "राजा",
+    "नेतृ",
+    "शासन"
+   ]
+  },
+  {
+   "q": "Guru Granth Sahib ke anusaar seva kya hai?",
+   "any": [
+    "सेवा",
+    "सेवक"
+   ]
+  },
+  {
+   "q": "Naam Simran ka mahatva kya hai?",
+   "any": [
+    "सिमरन",
+    "नाम",
+    "स्मरण"
+   ]
+  },
+  {
+   "q": "Guru Nanak Dev ji ne sabse pehla sandesh kya diya?",
+   "any": [
+    "नानक",
+    "गुरु",
+    "नाम"
+   ]
+  },
+  {
+   "q": "Ahankar ka nash kaise hota hai?",
+   "any": [
+    "अहंकार",
+    "गर्व",
+    "नाश"
+   ]
+  },
+  {
+   "q": "Sab mein ek hi Parmatma ka arth kya hai?",
+   "any": [
+    "परमात्मा",
+    "ब्रह्म",
+    "एक"
+   ]
+  },
+  {
+   "q": "Guru Granth Sahib ke anusaar sachchi kamai kya hai?",
+   "any": [
+    "कमाई",
+    "श्रम",
+    "सत्य"
+   ]
+  },
+  {
+   "q": "Kya dharm bina daya ke adhura hai?",
+   "any": [
+    "दया",
+    "धर्म"
+   ]
+  },
+  {
+   "q": "Langar ki parampara kya sikhati hai?",
+   "any": [
+    "लंगर",
+    "सेवा",
+    "अन्न"
+   ]
+  },
+  {
+   "q": "Krodh ko kaise jeeta ja sakta hai?",
+   "any": [
+    "क्रोध",
+    "क्षमा",
+    "संयम"
+   ]
+  },
+  {
+   "q": "Guru Granth Sahib mein prem ka kya mahatva hai?",
+   "any": [
+    "प्रेम",
+    "भक्ति"
+   ]
+  },
+  {
+   "q": "Ekadashi vrat ka adhyatmik mahatva kya hai?",
+   "any": [
+    "एकादशी",
+    "व्रत"
+   ]
+  },
+  {
+   "q": "Mantra Shakti kaise kaam karti hai?",
+   "any": [
+    "मन्त्र",
+    "मंत्र",
+    "शक्ति"
+   ]
+  },
+  {
+   "q": "Nitya Karma kyun zaruri hai?",
+   "any": [
+    "नित्य",
+    "कर्म",
+    "संध्या"
+   ]
+  },
+  {
+   "q": "Dev Archana ka sahi samay kya hai?",
+   "any": [
+    "अर्चना",
+    "पूजा",
+    "काल"
+   ]
+  },
+  {
+   "q": "Kya bina diksha mantra jap kar sakte hain?",
+   "any": [
+    "दीक्षा",
+    "जप",
+    "मन्त्र"
+   ]
+  },
+  {
+   "q": "Puja mein sankalp ka mahatva kya hai?",
+   "any": [
+    "संकल्प",
+    "पूजा"
+   ]
+  },
+  {
+   "q": "Mantra jap mein dhyan bhatakne par kya karein?",
+   "any": [
+    "जप",
+    "ध्यान",
+    "मन"
+   ]
+  },
+  {
+   "q": "Kaunsa mantra shanti ke liye uttam hai?",
+   "any": [
+    "शान्ति",
+    "मन्त्र",
+    "मंत्र"
+   ]
+  },
+  {
+   "q": "Jap aur Dhyan mein kya antar hai?",
+   "any": [
+    "जप",
+    "ध्यान"
+   ],
+   "compare": true
+  },
+  {
+   "q": "Mantra ka uchcharan galat ho jaye to kya prabhav padta hai?",
+   "any": [
+    "उच्चारण",
+    "मन्त्र",
+    "दोष"
+   ]
+  },
+  {
+   "q": "Mahabharat aur Ramayan mein sabse bada antar kya hai?",
+   "any": [
+    "महाभारत",
+    "रामायण"
+   ],
+   "meta": true
+  },
+  {
+   "q": "Shri Ram aur Shri Krishna ki leadership mein kya antar tha?",
+   "any": [
+    "राम",
+    "कृष्ण"
+   ],
+   "meta": true
+  },
+  {
+   "q": "Gita aur Upanishad ek doosre ko kaise support karte hain?",
+   "any": [
+    "गीता",
+    "उपनिषद",
+    "ब्रह्म"
+   ],
+   "meta": true
+  },
+  {
+   "q": "Ved aur Puran mein kya sambandh hai?",
+   "any": [
+    "वेद",
+    "पुराण"
+   ],
+   "meta": true
+  },
+  {
+   "q": "Chanakya aur Krishna ki neeti mein kya samanata hai?",
+   "any": [
+    "नीति",
+    "कृष्ण"
+   ],
+   "meta": true
+  },
+  {
+   "q": "Guru Granth Sahib aur Gita mein kaun se common values hain?",
+   "any": [
+    "गुरु",
+    "गीता",
+    "नाम"
+   ],
+   "meta": true
+  },
+  {
+   "q": "Garud Puran aur Kathopanishad mrityu ko kaise alag samjhate hain?",
+   "any": [
+    "मृत्यु",
+    "यम",
+    "आत्मा"
+   ],
+   "meta": true
+  },
+  {
+   "q": "Agar ek hi prashn ka uttar do granthon mein alag ho to SAARTHI kya bataye?",
+   "any": [
+    "ग्रंथ",
+    "धर्म"
+   ],
+   "meta": true
+  },
+  {
+   "q": "Aaj ke yug ke liye sabse adhik practical granth kaunsa hai aur kyun?",
+   "any": [
+    "ग्रंथ",
+    "युग",
+    "धर्म"
+   ],
+   "meta": true
+  },
+  {
+   "q": "Agar mujhe jeevan ke liye sirf ek granth padhna ho to aap kya sujhav denge aur kyun?",
+   "any": [
+    "ग्रंथ",
+    "जीवन"
+   ],
+   "meta": true
+  }
+ ],
+ "hinglish_300": [
+  {
+   "q": "Bhagavad Gita ke according life ka real purpose kya hai?",
+   "any": [
+    "जीवन",
+    "उद्देश्य",
+    "पुरुषार्थ"
+   ]
+  },
+  {
+   "q": "Krishna ji ne Arjun ko karma ke bare me kya samjhaya tha?",
+   "any": [
+    "कृष्ण",
+    "अर्जुन",
+    "कर्म"
+   ]
+  },
+  {
+   "q": "Atma aur body me kya difference hota hai?",
+   "any": [
+    "आत्मा",
+    "शरीर",
+    "देह"
+   ],
+   "compare": true
+  },
+  {
+   "q": "Hum life me dukhi kyu hote hain spiritual view se?",
+   "any": [
+    "दुःख",
+    "कष्ट",
+    "कर्म"
+   ]
+  },
+  {
+   "q": "Bhagavad Gita ke according happiness kaise milegi?",
+   "any": [
+    "सुख",
+    "आनन्द",
+    "संतोष"
+   ]
+  },
+  {
+   "q": "Kya insaan apni destiny change kar sakta hai?",
+   "any": [
+    "भाग्य",
+    "प्रारब्ध",
+    "पुरुषार्थ"
+   ]
+  },
+  {
+   "q": "Karma kya hota hai aur iska result kaise milta hai?",
+   "any": [
+    "कर्म",
+    "फल"
+   ]
+  },
+  {
+   "q": "Achhe karma aur bure karma me difference kya hai?",
+   "any": [
+    "पुण्य",
+    "पाप",
+    "कर्म"
+   ],
+   "compare": true
+  },
+  {
+   "q": "Bhagavad Gita me fear ko kaise overcome karne ko kaha gaya hai?",
+   "any": [
+    "भय",
+    "अभय",
+    "निर्भय"
+   ]
+  },
+  {
+   "q": "Krishna ji ke according successful life ka formula kya hai?",
+   "any": [
+    "कृष्ण",
+    "कर्म",
+    "सिद्धि"
+   ]
+  },
+  {
+   "q": "Meditation karne ka sahi tarika kya hai?",
+   "any": [
+    "ध्यान",
+    "आसन",
+    "एकाग्र"
+   ]
+  },
+  {
+   "q": "Mind ko control kaise kare according to spirituality?",
+   "any": [
+    "मन",
+    "संयम",
+    "निग्रह"
+   ]
+  },
+  {
+   "q": "Overthinking ko kaise kam kare spiritual way se?",
+   "any": [
+    "चिन्ता",
+    "संकल्प",
+    "चित्त"
+   ]
+  },
+  {
+   "q": "Bhagwan par trust kaise develop kare?",
+   "any": [
+    "विश्वास",
+    "श्रद्धा",
+    "शरण"
+   ]
+  },
+  {
+   "q": "Kya sab kuch pehle se decided hota hai?",
+   "any": [
+    "दैव",
+    "प्रारब्ध",
+    "विधि"
+   ]
+  },
+  {
+   "q": "Free will aur destiny ka relation kya hai?",
+   "any": [
+    "पुरुषार्थ",
+    "दैव",
+    "प्रारब्ध"
+   ],
+   "compare": true
+  },
+  {
+   "q": "Life me problems kyu aati hain?",
+   "any": [
+    "कष्ट",
+    "विघ्न",
+    "कर्म"
+   ]
+  },
+  {
+   "q": "Spiritual person kaise bana ja sakta hai?",
+   "any": [
+    "साधक",
+    "साधना",
+    "आचरण"
+   ]
+  },
+  {
+   "q": "Gussa control karne ke liye Gita kya kehti hai?",
+   "any": [
+    "क्रोध",
+    "संयम",
+    "क्षमा"
+   ]
+  },
+  {
+   "q": "Ego kya hota hai aur ise kaise kam kare?",
+   "any": [
+    "अहंकार",
+    "गर्व",
+    "मद"
+   ]
+  },
+  {
+   "q": "Moksha kya hota hai simple language me samjhao?",
+   "any": [
+    "मोक्ष",
+    "मुक्ति"
+   ]
+  },
+  {
+   "q": "Janam aur punarjanam ka concept kya hai?",
+   "any": [
+    "जन्म",
+    "पुनर्जन्म",
+    "देह"
+   ]
+  },
+  {
+   "q": "Death ke baad atma ke sath kya hota hai?",
+   "any": [
+    "मृत्यु",
+    "आत्मा",
+    "परलोक"
+   ]
+  },
+  {
+   "q": "Bhagavad Gita me death ke bare me kya likha hai?",
+   "any": [
+    "मृत्यु",
+    "देह",
+    "आत्मा"
+   ]
+  },
+  {
+   "q": "Kya soul kabhi nahi marti?",
+   "any": [
+    "आत्मा",
+    "अजर",
+    "अमर",
+    "नित्य"
+   ]
+  },
+  {
+   "q": "Bhagwan ko kaise feel kar sakte hain?",
+   "any": [
+    "भगवान",
+    "साक्षात्",
+    "अनुभव"
+   ]
+  },
+  {
+   "q": "Bhakti aur spirituality me kya difference hai?",
+   "any": [
+    "भक्ति",
+    "साधना",
+    "ज्ञान"
+   ],
+   "compare": true
+  },
+  {
+   "q": "Sahi decision lene ke liye spirituality kya bolti hai?",
+   "any": [
+    "बुद्धि",
+    "विवेक",
+    "निश्चय"
+   ]
+  },
+  {
+   "q": "Negative thoughts ko kaise remove kare?",
+   "any": [
+    "विचार",
+    "चित्त",
+    "मन"
+   ]
+  },
+  {
+   "q": "Mind aur emotions ko balance kaise kare?",
+   "any": [
+    "मन",
+    "समता",
+    "संयम"
+   ]
+  },
+  {
+   "q": "Dharma ka actual meaning kya hai?",
+   "any": [
+    "धर्म"
+   ]
+  },
+  {
+   "q": "Apna life purpose kaise find kare?",
+   "any": [
+    "उद्देश्य",
+    "स्वधर्म",
+    "कर्तव्य"
+   ]
+  },
+  {
+   "q": "Bhagavad Gita students ko kya sikhati hai?",
+   "any": [
+    "विद्या",
+    "शिक्षा",
+    "अभ्यास"
+   ]
+  },
+  {
+   "q": "Students ke liye Krishna ji ki best advice kya hai?",
+   "any": [
+    "कृष्ण",
+    "अभ्यास",
+    "कर्म"
+   ]
+  },
+  {
+   "q": "Career choose karne me spirituality ka kya role hai?",
+   "any": [
+    "स्वधर्म",
+    "कर्म",
+    "वृत्ति"
+   ]
+  },
+  {
+   "q": "Success ke liye karma important hai ya luck?",
+   "any": [
+    "कर्म",
+    "दैव",
+    "पुरुषार्थ"
+   ],
+   "compare": true
+  },
+  {
+   "q": "Bhagwan humari help kab karte hain?",
+   "any": [
+    "शरण",
+    "कृपा",
+    "भक्त"
+   ]
+  },
+  {
+   "q": "Kya prayer se life change ho sakti hai?",
+   "any": [
+    "प्रार्थना",
+    "स्तुति",
+    "कृपा"
+   ]
+  },
+  {
+   "q": "Mantra chanting ka kya benefit hota hai?",
+   "any": [
+    "जप",
+    "मन्त्र",
+    "सिद्धि"
+   ]
+  },
+  {
+   "q": "Om mantra ka meaning kya hai?",
+   "any": [
+    "ॐ",
+    "ओंकार",
+    "प्रणव"
+   ]
+  },
+  {
+   "q": "Gayatri mantra ka importance kya hai?",
+   "any": [
+    "गायत्री",
+    "सावित्री"
+   ]
+  },
+  {
+   "q": "Meditation se brain aur mind par kya effect hota hai?",
+   "any": [
+    "ध्यान",
+    "मन",
+    "चित्त"
+   ]
+  },
+  {
+   "q": "Spiritual growth kya hoti hai?",
+   "any": [
+    "साधना",
+    "उन्नति",
+    "ज्ञान"
+   ]
+  },
+  {
+   "q": "Inner peace kaise achieve kare?",
+   "any": [
+    "शान्ति",
+    "समाधान"
+   ]
+  },
+  {
+   "q": "Apne mind ko peaceful kaise banaye?",
+   "any": [
+    "मन",
+    "शान्ति",
+    "संयम"
+   ]
+  },
+  {
+   "q": "Attachment aur love me kya difference hai?",
+   "any": [
+    "मोह",
+    "प्रेम"
+   ],
+   "compare": true
+  },
+  {
+   "q": "Relationship me spirituality ka kya role hai?",
+   "any": [
+    "सम्बन्ध",
+    "प्रेम",
+    "गृहस्थ"
+   ]
+  },
+  {
+   "q": "Family problems ko spiritual way se kaise solve kare?",
+   "any": [
+    "कुटुम्ब",
+    "गृहस्थ",
+    "कलह"
+   ]
+  },
+  {
+   "q": "Forgiveness ka importance kya hai?",
+   "any": [
+    "क्षमा"
+   ]
+  },
+  {
+   "q": "Kisi ko maaf karna kyu zaroori hai?",
+   "any": [
+    "क्षमा",
+    "क्षमाशील"
+   ]
+  },
+  {
+   "q": "Bhagavad Gita me anger ke bare me kya kaha gaya hai?",
+   "any": [
+    "क्रोध",
+    "काम",
+    "मोह"
+   ]
+  },
+  {
+   "q": "Jealousy ko kaise control kare?",
+   "any": [
+    "ईर्ष्या",
+    "द्वेष",
+    "मत्सर"
+   ]
+  },
+  {
+   "q": "Comparison karna kaise chhode?",
+   "any": [
+    "समता",
+    "संतोष",
+    "ईर्ष्या"
+   ]
+  },
+  {
+   "q": "Life me patience kaise laaye?",
+   "any": [
+    "धैर्य",
+    "धीर",
+    "सहन"
+   ]
+  },
+  {
+   "q": "Gratitude kya hota hai aur iska benefit kya hai?",
+   "any": [
+    "कृतज्ञ",
+    "संतोष",
+    "उपकार"
+   ]
+  },
+  {
+   "q": "Positive thinking aur spirituality ka relation kya hai?",
+   "any": [
+    "शुभ",
+    "विचार",
+    "चित्त"
+   ]
+  },
+  {
+   "q": "Bhagwan sabki test kyu lete hain?",
+   "any": [
+    "परीक्षा",
+    "कष्ट",
+    "भक्त"
+   ]
+  },
+  {
+   "q": "Suffering ka spiritual meaning kya hai?",
+   "any": [
+    "दुःख",
+    "कष्ट",
+    "कर्म"
+   ]
+  },
+  {
+   "q": "Kya dukh bhi growth ka reason ban sakta hai?",
+   "any": [
+    "दुःख",
+    "वैराग्य",
+    "ज्ञान"
+   ]
+  },
+  {
+   "q": "Bhagavad Gita ke according fearlessness kaise aaye?",
+   "any": [
+    "अभय",
+    "भय",
+    "निर्भय"
+   ]
+  },
+  {
+   "q": "Krishna ji ne Arjun ko war ke liye kyu motivate kiya?",
+   "any": [
+    "अर्जुन",
+    "युद्ध",
+    "स्वधर्म"
+   ]
+  },
+  {
+   "q": "Kurukshetra war ka spiritual meaning kya hai?",
+   "any": [
+    "कुरुक्षेत्र",
+    "युद्ध",
+    "धर्म"
+   ]
+  },
+  {
+   "q": "Arjun ko confusion kyu hua tha?",
+   "any": [
+    "अर्जुन",
+    "मोह",
+    "विषाद"
+   ]
+  },
+  {
+   "q": "Gita ka sabse important message kya hai?",
+   "any": [
+    "गीता",
+    "कर्म",
+    "योग"
+   ]
+  },
+  {
+   "q": "Bhagavad Gita ko daily life me kaise apply kare?",
+   "any": [
+    "कर्म",
+    "आचरण",
+    "नित्य"
+   ]
+  },
+  {
+   "q": "Vedas kya hain aur inka importance kya hai?",
+   "any": [
+    "वेद",
+    "श्रुति"
+   ]
+  },
+  {
+   "q": "Upanishads kya sikhate hain?",
+   "any": [
+    "उपनिषद",
+    "ब्रह्म",
+    "आत्मा"
+   ]
+  },
+  {
+   "q": "Ved aur Puran me kya difference hai?",
+   "any": [
+    "वेद",
+    "पुराण"
+   ],
+   "compare": true
+  },
+  {
+   "q": "Ramayan ka main message kya hai?",
+   "any": [
+    "रामायण",
+    "राम",
+    "मर्यादा"
+   ]
+  },
+  {
+   "q": "Shri Ram ke life se kya seekh sakte hain?",
+   "any": [
+    "राम",
+    "मर्यादा",
+    "धर्म"
+   ]
+  },
+  {
+   "q": "Hanuman ji se kya inspiration milti hai?",
+   "any": [
+    "हनुमान",
+    "भक्ति",
+    "बल"
+   ]
+  },
+  {
+   "q": "Mahabharat ka real lesson kya hai?",
+   "any": [
+    "महाभारत",
+    "धर्म"
+   ]
+  },
+  {
+   "q": "Krishna ji ko Bhagwan kyu mana jata hai?",
+   "any": [
+    "कृष्ण",
+    "अवतार",
+    "भगवान"
+   ]
+  },
+  {
+   "q": "Vishnu ji ke avatar ka concept kya hai?",
+   "any": [
+    "अवतार",
+    "विष्णु"
+   ]
+  },
+  {
+   "q": "Shiv ji ka spiritual meaning kya hai?",
+   "any": [
+    "शिव",
+    "शंकर",
+    "महादेव"
+   ]
+  },
+  {
+   "q": "Brahma Vishnu Mahesh ka concept kya hai?",
+   "any": [
+    "ब्रह्मा",
+    "विष्णु",
+    "शिव"
+   ]
+  },
+  {
+   "q": "Sanatan Dharma kya hota hai?",
+   "any": [
+    "सनातन",
+    "धर्म"
+   ]
+  },
+  {
+   "q": "Kya spirituality aur science ek dusre se connected hain?",
+   "any": [
+    "ज्ञान",
+    "विद्या",
+    "सृष्टि"
+   ]
+  },
+  {
+   "q": "Consciousness kya hoti hai?",
+   "any": [
+    "चेतन",
+    "चैतन्य",
+    "चित्"
+   ]
+  },
+  {
+   "q": "Awareness aur meditation ka kya relation hai?",
+   "any": [
+    "ध्यान",
+    "जागृत",
+    "चित्त"
+   ]
+  },
+  {
+   "q": "Apne andar ki energy ko kaise improve kare?",
+   "any": [
+    "तेज",
+    "ओज",
+    "प्राण",
+    "बल"
+   ]
+  },
+  {
+   "q": "Chakras kya hote hain?",
+   "any": [
+    "चक्र",
+    "मूलाधार",
+    "कुण्डलिनी"
+   ]
+  },
+  {
+   "q": "Kundalini energy kya hoti hai?",
+   "any": [
+    "कुण्डलिनी",
+    "प्राण",
+    "नाड़ी"
+   ]
+  },
+  {
+   "q": "Yoga ka actual purpose kya hai?",
+   "any": [
+    "योग",
+    "समाधि",
+    "मोक्ष"
+   ]
+  },
+  {
+   "q": "Ashtanga Yoga kya hota hai?",
+   "any": [
+    "योग",
+    "यम",
+    "नियम",
+    "प्राणायाम"
+   ]
+  },
+  {
+   "q": "Patanjali Yoga Sutra kya sikhata hai?",
+   "any": [
+    "योग",
+    "चित्तवृत्ति",
+    "समाधि"
+   ]
+  },
+  {
+   "q": "Mindfulness kya hoti hai?",
+   "any": [
+    "एकाग्र",
+    "चित्त",
+    "ध्यान"
+   ]
+  },
+  {
+   "q": "Spiritual books padhne ka kya benefit hai?",
+   "any": [
+    "शास्त्र",
+    "स्वाध्याय",
+    "श्रवण"
+   ]
+  },
+  {
+   "q": "Roz Bhagavad Gita padhne se kya fayda hota hai?",
+   "any": [
+    "गीता",
+    "पाठ",
+    "स्वाध्याय"
+   ]
+  },
+  {
+   "q": "Kya spirituality se stress kam ho sakta hai?",
+   "any": [
+    "चिन्ता",
+    "क्लेश",
+    "शान्ति"
+   ]
+  },
+  {
+   "q": "Life me balance kaise maintain kare?",
+   "any": [
+    "समता",
+    "संयम",
+    "मध्यम"
+   ]
+  },
+  {
+   "q": "Apne thoughts ko observe kaise kare?",
+   "any": [
+    "विचार",
+    "चित्त",
+    "साक्षी"
+   ]
+  },
+  {
+   "q": "Inner voice kya hoti hai?",
+   "any": [
+    "अन्तःकरण",
+    "हृदय",
+    "आत्मा"
+   ]
+  },
+  {
+   "q": "Soul connection kya hota hai?",
+   "any": [
+    "आत्मा",
+    "सम्बन्ध",
+    "ब्रह्म"
+   ]
+  },
+  {
+   "q": "Bhagwan ke kareeb kaise aaye?",
+   "any": [
+    "शरण",
+    "भक्ति",
+    "निकट"
+   ]
+  },
+  {
+   "q": "Real happiness kaha milti hai?",
+   "any": [
+    "सुख",
+    "आनन्द",
+    "संतोष"
+   ]
+  },
+  {
+   "q": "Material success aur spiritual success me difference kya hai?",
+   "any": [
+    "धन",
+    "मोक्ष",
+    "अर्थ"
+   ],
+   "compare": true
+  },
+  {
+   "q": "Simple aur peaceful life kaise jiye?",
+   "any": [
+    "संतोष",
+    "शान्ति",
+    "सरल"
+   ]
+  },
+  {
+   "q": "Spiritual journey start kaise kare?",
+   "any": [
+    "साधना",
+    "आरम्भ",
+    "गुरु"
+   ]
+  },
+  {
+   "q": "Bhagavad Gita ke according Atma ka actual nature kya hai?",
+   "any": [
+    "आत्मा",
+    "नित्य",
+    "अजर"
+   ]
+  },
+  {
+   "q": "Krishna ji ne Arjun ko Atma ke amar hone ke bare me kya bataya?",
+   "any": [
+    "आत्मा",
+    "अमर",
+    "नित्य"
+   ]
+  },
+  {
+   "q": "Kya Atma ka koi gender hota hai?",
+   "any": [
+    "आत्मा",
+    "निर्गुण",
+    "देह"
+   ]
+  },
+  {
+   "q": "Paramatma aur Atma me kya difference hai?",
+   "any": [
+    "परमात्मा",
+    "आत्मा"
+   ],
+   "compare": true
+  },
+  {
+   "q": "Jeevatma aur Paramatma ka connection kya hai?",
+   "any": [
+    "जीव",
+    "परमात्मा",
+    "ब्रह्म"
+   ]
+  },
+  {
+   "q": "Brahman kya hota hai Upanishads ke according?",
+   "any": [
+    "ब्रह्म",
+    "उपनिषद"
+   ]
+  },
+  {
+   "q": "\"Aham Brahmasmi\" ka meaning kya hai?",
+   "any": [
+    "ब्रह्मास्मि",
+    "ब्रह्म",
+    "आत्मा"
+   ]
+  },
+  {
+   "q": "\"Tat Tvam Asi\" ka kya arth hai?",
+   "any": [
+    "तत्त्वमसि",
+    "ब्रह्म",
+    "आत्मा"
+   ]
+  },
+  {
+   "q": "Upanishads me consciousness ke bare me kya kaha gaya hai?",
+   "any": [
+    "चेतन",
+    "चैतन्य",
+    "ब्रह्म"
+   ]
+  },
+  {
+   "q": "Vedas ko eternal knowledge kyu kaha jata hai?",
+   "any": [
+    "वेद",
+    "नित्य",
+    "श्रुति"
+   ]
+  },
+  {
+   "q": "Chaar Vedas kaun se hain aur unka purpose kya hai?",
+   "any": [
+    "ऋग्",
+    "यजुर्",
+    "साम",
+    "अथर्व"
+   ]
+  },
+  {
+   "q": "Rigveda me kis type ka knowledge diya gaya hai?",
+   "any": [
+    "ऋग्वेद",
+    "ऋचा",
+    "सूक्त"
+   ]
+  },
+  {
+   "q": "Yajurveda ka main focus kya hai?",
+   "any": [
+    "यजुर्वेद",
+    "यज्ञ",
+    "आहुति"
+   ]
+  },
+  {
+   "q": "Samaveda ka importance kya hai?",
+   "any": [
+    "सामवेद",
+    "साम",
+    "गान"
+   ]
+  },
+  {
+   "q": "Atharvaveda me kya knowledge milti hai?",
+   "any": [
+    "अथर्व",
+    "औषध",
+    "रोग"
+   ]
+  },
+  {
+   "q": "Vedic philosophy me creation ka concept kya hai?",
+   "any": [
+    "सृष्टि",
+    "उत्पत्ति",
+    "ब्रह्मा"
+   ]
+  },
+  {
+   "q": "Universe ki creation ke bare me Vedas kya kehte hain?",
+   "any": [
+    "सृष्टि",
+    "उत्पत्ति",
+    "प्रलय"
+   ]
+  },
+  {
+   "q": "Purusha Sukta kya hai aur iska importance kya hai?",
+   "any": [
+    "पुरुषसूक्त",
+    "पुरुष",
+    "सूक्त"
+   ]
+  },
+  {
+   "q": "Nasadiya Sukta me creation ke bare me kya bataya gaya hai?",
+   "any": [
+    "सृष्टि",
+    "उत्पत्ति",
+    "सूक्त"
+   ]
+  },
+  {
+   "q": "Vedas aur modern science ke beech kya connection hai?",
+   "any": [
+    "वेद",
+    "विद्या",
+    "सृष्टि"
+   ]
+  },
+  {
+   "q": "Bhagavad Gita ke 18 chapters ka summary kya hai?",
+   "any": [
+    "अध्याय",
+    "गीता",
+    "योग"
+   ]
+  },
+  {
+   "q": "Gita ke pehle chapter me kya hua tha?",
+   "any": [
+    "अर्जुन",
+    "विषाद",
+    "सेना"
+   ]
+  },
+  {
+   "q": "Arjun Vishad Yoga ka meaning kya hai?",
+   "any": [
+    "विषाद",
+    "अर्जुन",
+    "शोक"
+   ]
+  },
+  {
+   "q": "Sankhya Yoga kya sikhata hai?",
+   "any": [
+    "सांख्य",
+    "आत्मा",
+    "ज्ञान"
+   ]
+  },
+  {
+   "q": "Karma Yoga ka actual meaning kya hai?",
+   "any": [
+    "कर्मयोग",
+    "कर्म",
+    "फल"
+   ]
+  },
+  {
+   "q": "Nishkam Karma kya hota hai?",
+   "any": [
+    "निष्काम",
+    "कर्म",
+    "फल"
+   ]
+  },
+  {
+   "q": "Gita ke according bina attachment ke kaam kaise kare?",
+   "any": [
+    "आसक्ति",
+    "कर्म",
+    "त्याग"
+   ]
+  },
+  {
+   "q": "Jnana Yoga kya hota hai?",
+   "any": [
+    "ज्ञानयोग",
+    "ज्ञान",
+    "योग"
+   ]
+  },
+  {
+   "q": "Bhakti Yoga ka importance kya hai?",
+   "any": [
+    "भक्ति",
+    "योग",
+    "शरण"
+   ]
+  },
+  {
+   "q": "Dhyana Yoga kya explain karta hai?",
+   "any": [
+    "ध्यान",
+    "योग",
+    "समाधि"
+   ]
+  },
+  {
+   "q": "Bhagavad Gita me ideal person kise kaha gaya hai?",
+   "any": [
+    "स्थितप्रज्ञ",
+    "योगी",
+    "श्रेष्ठ"
+   ]
+  },
+  {
+   "q": "Sthitaprajna kaun hota hai?",
+   "any": [
+    "स्थितप्रज्ञ",
+    "प्रज्ञा",
+    "समता"
+   ]
+  },
+  {
+   "q": "Sthitaprajna insaan ke qualities kya hoti hain?",
+   "any": [
+    "स्थितप्रज्ञ",
+    "समता",
+    "संयम"
+   ]
+  },
+  {
+   "q": "Triguna kya hote hain?",
+   "any": [
+    "सत्त्व",
+    "रज",
+    "तम",
+    "गुण"
+   ]
+  },
+  {
+   "q": "Sattva, Rajas aur Tamas ka meaning kya hai?",
+   "any": [
+    "सत्त्व",
+    "रजस",
+    "तमस"
+   ]
+  },
+  {
+   "q": "Apne andar Sattva guna kaise badhaye?",
+   "any": [
+    "सत्त्व",
+    "शुद्ध",
+    "आहार"
+   ]
+  },
+  {
+   "q": "Rajas guna ka life par kya effect hota hai?",
+   "any": [
+    "रजस",
+    "रज",
+    "कर्म"
+   ]
+  },
+  {
+   "q": "Tamas guna se kaise bahar nikle?",
+   "any": [
+    "तमस",
+    "तम",
+    "आलस्य"
+   ]
+  },
+  {
+   "q": "Maya kya hoti hai Vedanta ke according?",
+   "any": [
+    "माया",
+    "मिथ्या",
+    "अविद्या"
+   ]
+  },
+  {
+   "q": "Maya aur reality me difference kya hai?",
+   "any": [
+    "माया",
+    "सत्य",
+    "मिथ्या"
+   ],
+   "compare": true
+  },
+  {
+   "q": "Bhagwan ki Maya ko kaise samjha ja sakta hai?",
+   "any": [
+    "माया",
+    "भगवान",
+    "अविद्या"
+   ]
+  },
+  {
+   "q": "Ego aur Atma me kya difference hai?",
+   "any": [
+    "अहंकार",
+    "आत्मा"
+   ],
+   "compare": true
+  },
+  {
+   "q": "Ahankar kaise develop hota hai?",
+   "any": [
+    "अहंकार",
+    "गर्व",
+    "मद"
+   ]
+  },
+  {
+   "q": "Spiritual growth me ego sabse bada obstacle kyu hai?",
+   "any": [
+    "अहंकार",
+    "बाधा",
+    "साधना"
+   ]
+  },
+  {
+   "q": "Desire aur attachment ka connection kya hai?",
+   "any": [
+    "काम",
+    "आसक्ति",
+    "तृष्णा"
+   ]
+  },
+  {
+   "q": "Gita ke according desires ko control kaise kare?",
+   "any": [
+    "काम",
+    "इच्छा",
+    "संयम"
+   ]
+  },
+  {
+   "q": "Kaam, Krodh aur Lobh ko enemies kyu kaha gaya hai?",
+   "any": [
+    "काम",
+    "क्रोध",
+    "लोभ"
+   ]
+  },
+  {
+   "q": "Bhagavad Gita me anger ka root cause kya bataya gaya hai?",
+   "any": [
+    "क्रोध",
+    "काम",
+    "मोह"
+   ]
+  },
+  {
+   "q": "Fear ka spiritual solution kya hai?",
+   "any": [
+    "भय",
+    "अभय",
+    "शरण"
+   ]
+  },
+  {
+   "q": "Anxiety ko Gita ke according kaise handle kare?",
+   "any": [
+    "चिन्ता",
+    "शोक",
+    "समता"
+   ]
+  },
+  {
+   "q": "Karma ke kitne types hote hain?",
+   "any": [
+    "संचित",
+    "प्रारब्ध",
+    "क्रियमाण"
+   ]
+  },
+  {
+   "q": "Sanchit Karma kya hota hai?",
+   "any": [
+    "संचित",
+    "कर्म"
+   ]
+  },
+  {
+   "q": "Prarabdha Karma kya hota hai?",
+   "any": [
+    "प्रारब्ध",
+    "कर्म"
+   ]
+  },
+  {
+   "q": "Kriyamana Karma kya hota hai?",
+   "any": [
+    "क्रियमाण",
+    "कर्म"
+   ]
+  },
+  {
+   "q": "Kya karma ko badla ja sakta hai?",
+   "any": [
+    "कर्म",
+    "प्रायश्चित्त",
+    "प्रारब्ध"
+   ]
+  },
+  {
+   "q": "Kya achhe karma se future improve ho sakta hai?",
+   "any": [
+    "पुण्य",
+    "कर्म",
+    "फल"
+   ]
+  },
+  {
+   "q": "Kya Bhagwan karma ke rules ko change kar sakte hain?",
+   "any": [
+    "कर्म",
+    "विधि",
+    "ईश्वर"
+   ]
+  },
+  {
+   "q": "Karma aur destiny ka relation kya hai?",
+   "any": [
+    "कर्म",
+    "दैव",
+    "प्रारब्ध"
+   ]
+  },
+  {
+   "q": "Kya past life karma present life ko affect karta hai?",
+   "any": [
+    "पूर्वजन्म",
+    "प्रारब्ध",
+    "कर्म"
+   ]
+  },
+  {
+   "q": "Rebirth ka concept Hindu scriptures me kaise explain hua hai?",
+   "any": [
+    "पुनर्जन्म",
+    "जन्म",
+    "देह"
+   ]
+  },
+  {
+   "q": "Moksha kaise prapt hota hai?",
+   "any": [
+    "मोक्ष",
+    "मुक्ति",
+    "ज्ञान"
+   ]
+  },
+  {
+   "q": "Liberation aur salvation me kya difference hai?",
+   "any": [
+    "मोक्ष",
+    "मुक्ति"
+   ],
+   "compare": true
+  },
+  {
+   "q": "Jeevan Mukti kya hoti hai?",
+   "any": [
+    "जीवन्मुक्त",
+    "मुक्ति",
+    "मोक्ष"
+   ]
+  },
+  {
+   "q": "Death ke time consciousness ka kya role hota hai?",
+   "any": [
+    "मृत्यु",
+    "स्मरण",
+    "चेतन"
+   ]
+  },
+  {
+   "q": "Bhagavad Gita ke according antim samay kya yaad karna chahiye?",
+   "any": [
+    "अन्तकाल",
+    "स्मरण",
+    "मृत्यु"
+   ]
+  },
+  {
+   "q": "Om chanting se spiritual benefit kaise milta hai?",
+   "any": [
+    "ॐ",
+    "ओंकार",
+    "प्रणव"
+   ]
+  },
+  {
+   "q": "Mantra ki power kaise kaam karti hai?",
+   "any": [
+    "मन्त्र",
+    "सिद्धि",
+    "शक्ति"
+   ]
+  },
+  {
+   "q": "Beej mantra kya hota hai?",
+   "any": [
+    "बीज",
+    "मन्त्र",
+    "अक्षर"
+   ]
+  },
+  {
+   "q": "Meditation me thoughts ko kaise control kare?",
+   "any": [
+    "ध्यान",
+    "चित्त",
+    "एकाग्र"
+   ]
+  },
+  {
+   "q": "Deep meditation ki state kya hoti hai?",
+   "any": [
+    "समाधि",
+    "ध्यान",
+    "एकाग्र"
+   ]
+  },
+  {
+   "q": "Samadhi kya hoti hai?",
+   "any": [
+    "समाधि"
+   ]
+  },
+  {
+   "q": "Yoga Sutra me Chitta Vritti Nirodha ka meaning kya hai?",
+   "any": [
+    "चित्तवृत्ति",
+    "चित्त",
+    "निरोध"
+   ]
+  },
+  {
+   "q": "Patanjali ke Ashtanga Yoga ke 8 steps kya hain?",
+   "any": [
+    "यम",
+    "नियम",
+    "आसन",
+    "प्राणायाम"
+   ]
+  },
+  {
+   "q": "Yama aur Niyama kya hote hain?",
+   "any": [
+    "यम",
+    "नियम",
+    "अहिंसा"
+   ]
+  },
+  {
+   "q": "Pranayama ka spiritual importance kya hai?",
+   "any": [
+    "प्राणायाम",
+    "प्राण",
+    "श्वास"
+   ]
+  },
+  {
+   "q": "Kundalini awakening kya hoti hai?",
+   "any": [
+    "कुण्डलिनी",
+    "नाड़ी",
+    "प्राण"
+   ]
+  },
+  {
+   "q": "Chakras ka concept kaha se aaya hai?",
+   "any": [
+    "चक्र",
+    "मूलाधार",
+    "नाड़ी"
+   ]
+  },
+  {
+   "q": "Muladhara chakra ka meaning kya hai?",
+   "any": [
+    "मूलाधार",
+    "चक्र"
+   ]
+  },
+  {
+   "q": "Ajna chakra ko third eye kyu kaha jata hai?",
+   "any": [
+    "आज्ञा",
+    "चक्र",
+    "नेत्र"
+   ]
+  },
+  {
+   "q": "Sahasrara chakra ka spiritual meaning kya hai?",
+   "any": [
+    "सहस्रार",
+    "चक्र",
+    "ब्रह्मरन्ध्र"
+   ]
+  },
+  {
+   "q": "Ramayan me Shri Ram ko Maryada Purushottam kyu kaha gaya?",
+   "any": [
+    "राम",
+    "मर्यादा"
+   ]
+  },
+  {
+   "q": "Ramayan se leadership ke kya lessons milte hain?",
+   "any": [
+    "राम",
+    "राजा",
+    "प्रजा"
+   ]
+  },
+  {
+   "q": "Hanuman ji ki bhakti ka secret kya hai?",
+   "any": [
+    "हनुमान",
+    "भक्ति",
+    "सेवा"
+   ]
+  },
+  {
+   "q": "Hanuman ji ko strength aur devotion ka symbol kyu mana jata hai?",
+   "any": [
+    "हनुमान",
+    "बल",
+    "भक्ति"
+   ]
+  },
+  {
+   "q": "Mahabharat me Krishna ki strategy ka spiritual meaning kya hai?",
+   "any": [
+    "कृष्ण",
+    "नीति",
+    "धर्म"
+   ]
+  },
+  {
+   "q": "Mahabharat me Dharma aur Adharma ka difference kya hai?",
+   "any": [
+    "धर्म",
+    "अधर्म"
+   ],
+   "compare": true
+  },
+  {
+   "q": "Bhishma Pitamah se kya seekh milti hai?",
+   "any": [
+    "भीष्म",
+    "प्रतिज्ञा",
+    "धर्म"
+   ]
+  },
+  {
+   "q": "Karna ke character se kya lesson milta hai?",
+   "any": [
+    "कर्ण",
+    "दान",
+    "मित्र"
+   ]
+  },
+  {
+   "q": "Draupadi ke life lessons kya hain?",
+   "any": [
+    "द्रौपदी",
+    "धर्म",
+    "सहन"
+   ]
+  },
+  {
+   "q": "Guru ka spiritual importance kya hota hai?",
+   "any": [
+    "गुरु",
+    "शिष्य",
+    "दीक्षा"
+   ]
+  },
+  {
+   "q": "Guru aur teacher me kya difference hai?",
+   "any": [
+    "गुरु",
+    "आचार्य"
+   ],
+   "compare": true
+  },
+  {
+   "q": "Sadguru kise kaha jata hai?",
+   "any": [
+    "सद्गुरु",
+    "गुरु",
+    "ब्रह्मनिष्ठ"
+   ]
+  },
+  {
+   "q": "Seva ka spiritual meaning kya hai?",
+   "any": [
+    "सेवा",
+    "परोपकार"
+   ]
+  },
+  {
+   "q": "Daan ka importance scriptures me kya hai?",
+   "any": [
+    "दान",
+    "अन्नदान"
+   ]
+  },
+  {
+   "q": "Yagya ka actual meaning kya hai?",
+   "any": [
+    "यज्ञ",
+    "आहुति",
+    "हवि"
+   ]
+  },
+  {
+   "q": "Vedic lifestyle kya hota hai?",
+   "any": [
+    "आचार",
+    "नित्य",
+    "संध्या"
+   ]
+  },
+  {
+   "q": "Sanatan Dharma me daily routine kaisa bataya gaya hai?",
+   "any": [
+    "नित्य",
+    "संध्या",
+    "आचार"
+   ]
+  },
+  {
+   "q": "Brahmacharya ka real meaning kya hai?",
+   "any": [
+    "ब्रह्मचर्य",
+    "संयम"
+   ]
+  },
+  {
+   "q": "Spiritual discipline kaise develop kare?",
+   "any": [
+    "संयम",
+    "नियम",
+    "अभ्यास"
+   ]
+  },
+  {
+   "q": "Ek advanced spiritual seeker ko daily kya practice karni chahiye?",
+   "any": [
+    "साधना",
+    "अभ्यास",
+    "नित्य"
+   ]
+  },
+  {
+   "q": "Rigveda me sabse important spiritual concepts kaun se hain?",
+   "any": [
+    "ऋग्वेद",
+    "ऋत",
+    "अग्नि"
+   ]
+  },
+  {
+   "q": "Yajurveda me karma aur yagya ka kya importance hai?",
+   "any": [
+    "यजुर्वेद",
+    "यज्ञ",
+    "कर्म"
+   ]
+  },
+  {
+   "q": "Samaveda ko music aur spirituality se kyu joda jata hai?",
+   "any": [
+    "सामवेद",
+    "साम",
+    "गान"
+   ]
+  },
+  {
+   "q": "Atharvaveda me health aur life ke bare me kya knowledge hai?",
+   "any": [
+    "अथर्व",
+    "औषध",
+    "आयु"
+   ]
+  },
+  {
+   "q": "Vedas ke according ideal human life kaisi honi chahiye?",
+   "any": [
+    "वेद",
+    "आचार",
+    "धर्म"
+   ]
+  },
+  {
+   "q": "Upanishads me Brahman ko kaise explain kiya gaya hai?",
+   "any": [
+    "ब्रह्म",
+    "उपनिषद",
+    "आत्मा"
+   ]
+  },
+  {
+   "q": "Kena Upanishad ka main message kya hai?",
+   "any": [
+    "उपनिषद",
+    "ब्रह्म",
+    "इन्द्रिय"
+   ]
+  },
+  {
+   "q": "Katha Upanishad me Nachiketa aur Yamraj ki story kya sikhati hai?",
+   "any": [
+    "नचिकेता",
+    "यम",
+    "आत्मा"
+   ]
+  },
+  {
+   "q": "Isha Upanishad ka main teaching kya hai?",
+   "any": [
+    "ईश",
+    "उपनिषद",
+    "त्याग"
+   ]
+  },
+  {
+   "q": "Mandukya Upanishad me Om ke char states kya bataye gaye hain?",
+   "any": [
+    "ॐ",
+    "जाग्रत",
+    "स्वप्न",
+    "सुषुप्ति"
+   ]
+  },
+  {
+   "q": "Taittiriya Upanishad me Panch Kosha kya hote hain?",
+   "any": [
+    "कोश",
+    "अन्नमय",
+    "प्राणमय"
+   ]
+  },
+  {
+   "q": "Panch Mahabhuta kya hote hain?",
+   "any": [
+    "पृथ्वी",
+    "जल",
+    "अग्नि",
+    "वायु",
+    "आकाश"
+   ]
+  },
+  {
+   "q": "Prithvi, Jal, Agni, Vayu aur Akash ka spiritual meaning kya hai?",
+   "any": [
+    "पृथ्वी",
+    "जल",
+    "आकाश",
+    "वायु"
+   ]
+  },
+  {
+   "q": "Vedanta philosophy kya hoti hai?",
+   "any": [
+    "वेदान्त",
+    "ब्रह्म",
+    "आत्मा"
+   ]
+  },
+  {
+   "q": "Advaita Vedanta ka meaning kya hai?",
+   "any": [
+    "अद्वैत",
+    "ब्रह्म",
+    "अभेद"
+   ]
+  },
+  {
+   "q": "Dvaita aur Advaita me kya difference hai?",
+   "any": [
+    "द्वैत",
+    "अद्वैत"
+   ],
+   "compare": true
+  },
+  {
+   "q": "Bhagavad Gita ke according real knowledge kya hota hai?",
+   "any": [
+    "ज्ञान",
+    "विज्ञान",
+    "विवेक"
+   ]
+  },
+  {
+   "q": "Gita me Guru ki importance kya batayi gayi hai?",
+   "any": [
+    "गुरु",
+    "शिष्य",
+    "प्रणिपात"
+   ]
+  },
+  {
+   "q": "Krishna ji ne Arjun ko surrender ke bare me kya samjhaya?",
+   "any": [
+    "शरण",
+    "कृष्ण",
+    "समर्पण"
+   ]
+  },
+  {
+   "q": "\"Sarva Dharman Parityajya\" shlok ka meaning kya hai?",
+   "any": [
+    "शरण",
+    "धर्म",
+    "त्याग"
+   ]
+  },
+  {
+   "q": "Bhagavad Gita ka sabse powerful shlok kaunsa hai aur kyu?",
+   "any": [
+    "गीता",
+    "श्लोक",
+    "कर्म"
+   ]
+  },
+  {
+   "q": "Gita me mind ko friend aur enemy kyu kaha gaya hai?",
+   "any": [
+    "मन",
+    "मित्र",
+    "शत्रु"
+   ]
+  },
+  {
+   "q": "Manushya apne mind ka master kaise ban sakta hai?",
+   "any": [
+    "मन",
+    "जीत",
+    "संयम"
+   ]
+  },
+  {
+   "q": "Gita ke according happiness ke teen types kya hain?",
+   "any": [
+    "सुख",
+    "सात्त्विक",
+    "राजस",
+    "तामस"
+   ]
+  },
+  {
+   "q": "Sukha aur Ananda me kya difference hai?",
+   "any": [
+    "सुख",
+    "आनन्द"
+   ],
+   "compare": true
+  },
+  {
+   "q": "Bhagavad Gita me food ke teen types kaun se hain?",
+   "any": [
+    "आहार",
+    "सात्त्विक",
+    "राजस"
+   ]
+  },
+  {
+   "q": "Sattvik bhojan kya hota hai?",
+   "any": [
+    "सात्त्विक",
+    "आहार",
+    "भोजन"
+   ]
+  },
+  {
+   "q": "Spiritual person ko kaisa food lena chahiye?",
+   "any": [
+    "आहार",
+    "सात्त्विक",
+    "भोजन"
+   ]
+  },
+  {
+   "q": "Gita ke according meditation ke liye kya rules hain?",
+   "any": [
+    "ध्यान",
+    "आसन",
+    "एकान्त"
+   ]
+  },
+  {
+   "q": "Krishna consciousness kya hoti hai?",
+   "any": [
+    "कृष्ण",
+    "स्मरण",
+    "भक्ति"
+   ]
+  },
+  {
+   "q": "Bhakti ke kitne forms hote hain?",
+   "any": [
+    "भक्ति",
+    "नवधा",
+    "श्रवण"
+   ]
+  },
+  {
+   "q": "Navadha Bhakti kya hoti hai?",
+   "any": [
+    "नवधा",
+    "भक्ति",
+    "श्रवण"
+   ]
+  },
+  {
+   "q": "Bhakti aur devotion ko kaise strong kare?",
+   "any": [
+    "भक्ति",
+    "श्रद्धा",
+    "सत्संग"
+   ]
+  },
+  {
+   "q": "Naam jap ka spiritual power kya hai?",
+   "any": [
+    "नाम",
+    "जप",
+    "स्मरण"
+   ]
+  },
+  {
+   "q": "Hare Krishna mantra ka importance kya hai?",
+   "any": [
+    "कृष्ण",
+    "नाम",
+    "जप"
+   ]
+  },
+  {
+   "q": "Shiv mantra Om Namah Shivaya ka meaning kya hai?",
+   "any": [
+    "शिव",
+    "नमः",
+    "मन्त्र"
+   ]
+  },
+  {
+   "q": "Mahamrityunjaya mantra kyu kiya jata hai?",
+   "any": [
+    "मृत्युंजय",
+    "शिव",
+    "मन्त्र"
+   ]
+  },
+  {
+   "q": "Gayatri mantra ka deep meaning kya hai?",
+   "any": [
+    "गायत्री",
+    "सावित्री",
+    "सविता"
+   ]
+  },
+  {
+   "q": "Mantra chanting me pronunciation kitna important hai?",
+   "any": [
+    "उच्चारण",
+    "मन्त्र",
+    "स्वर"
+   ]
+  },
+  {
+   "q": "Kya mantra se mind healing ho sakti hai?",
+   "any": [
+    "मन्त्र",
+    "मन",
+    "शान्ति"
+   ]
+  },
+  {
+   "q": "Ramayan ke Bal Kand se kya seekh milti hai?",
+   "any": [
+    "बालकाण्ड",
+    "राम",
+    "विश्वामित्र"
+   ]
+  },
+  {
+   "q": "Shri Ram ke vanvas ka spiritual meaning kya hai?",
+   "any": [
+    "वनवास",
+    "राम",
+    "वन"
+   ]
+  },
+  {
+   "q": "Bharat ji ki bhakti aur sacrifice se kya seekh milti hai?",
+   "any": [
+    "भरत",
+    "त्याग",
+    "भक्ति"
+   ]
+  },
+  {
+   "q": "Lakshman ji ke character ka importance kya hai?",
+   "any": [
+    "लक्ष्मण",
+    "सेवा",
+    "भ्राता"
+   ]
+  },
+  {
+   "q": "Sita ji ke qualities kya thi?",
+   "any": [
+    "सीता",
+    "पतिव्रता",
+    "धैर्य"
+   ]
+  },
+  {
+   "q": "Ravana intelligent hone ke baad bhi fail kyu hua?",
+   "any": [
+    "रावण",
+    "अहंकार",
+    "मद"
+   ]
+  },
+  {
+   "q": "Ram Rajya ka concept kya hai?",
+   "any": [
+    "रामराज्य",
+    "प्रजा",
+    "राज्य"
+   ]
+  },
+  {
+   "q": "Hanuman Chalisa ka spiritual significance kya hai?",
+   "any": [
+    "हनुमान",
+    "स्तुति",
+    "पाठ"
+   ]
+  },
+  {
+   "q": "Hanuman ji ko Chiranjeevi kyu kaha jata hai?",
+   "any": [
+    "हनुमान",
+    "चिरंजीवी",
+    "अमर"
+   ]
+  },
+  {
+   "q": "Sundar Kand ka main message kya hai?",
+   "any": [
+    "सुन्दरकाण्ड",
+    "हनुमान",
+    "लंका"
+   ]
+  },
+  {
+   "q": "Mahabharat me Dharma ko kaise define kiya gaya hai?",
+   "any": [
+    "धर्म",
+    "महाभारत"
+   ]
+  },
+  {
+   "q": "Krishna ne Pandavo ka support kyu kiya?",
+   "any": [
+    "पाण्डव",
+    "कृष्ण",
+    "धर्म"
+   ]
+  },
+  {
+   "q": "Kaurav aur Pandav conflict ka inner meaning kya hai?",
+   "any": [
+    "कौरव",
+    "पाण्डव",
+    "धर्म"
+   ]
+  },
+  {
+   "q": "Mahabharat hume decision making ke bare me kya sikhata hai?",
+   "any": [
+    "निर्णय",
+    "बुद्धि",
+    "धर्म"
+   ]
+  },
+  {
+   "q": "Yudhishthir ke character se kya seekh milti hai?",
+   "any": [
+    "युधिष्ठिर",
+    "धर्म",
+    "सत्य"
+   ]
+  },
+  {
+   "q": "Arjun ek great warrior hote hue bhi confused kyu hua?",
+   "any": [
+    "अर्जुन",
+    "मोह",
+    "विषाद"
+   ]
+  },
+  {
+   "q": "Krishna ki leadership qualities kya thi?",
+   "any": [
+    "कृष्ण",
+    "नीति",
+    "बुद्धि"
+   ]
+  },
+  {
+   "q": "Bhishma Pitamah ki life se kya lesson milta hai?",
+   "any": [
+    "भीष्म",
+    "प्रतिज्ञा",
+    "ब्रह्मचर्य"
+   ]
+  },
+  {
+   "q": "Dronacharya ke character ka analysis kya hai?",
+   "any": [
+    "द्रोण",
+    "आचार्य",
+    "शिष्य"
+   ]
+  },
+  {
+   "q": "Karna ke jeevan ka spiritual lesson kya hai?",
+   "any": [
+    "कर्ण",
+    "दान",
+    "कवच"
+   ]
+  },
+  {
+   "q": "Vishnu Puran me creation ke bare me kya bataya gaya hai?",
+   "any": [
+    "सृष्टि",
+    "विष्णु",
+    "उत्पत्ति"
+   ]
+  },
+  {
+   "q": "Shiv Puran ka main message kya hai?",
+   "any": [
+    "शिव",
+    "भक्ति",
+    "लिंग"
+   ]
+  },
+  {
+   "q": "Devi Bhagwat Puran kya sikhata hai?",
+   "any": [
+    "देवी",
+    "शक्ति",
+    "भगवती"
+   ]
+  },
+  {
+   "q": "Bhagwat Puran me Krishna ke childhood ka importance kya hai?",
+   "any": [
+    "कृष्ण",
+    "बाल",
+    "गोकुल"
+   ]
+  },
+  {
+   "q": "Puran aur Itihas me kya difference hai?",
+   "any": [
+    "पुराण",
+    "इतिहास"
+   ],
+   "compare": true
+  },
+  {
+   "q": "Dashavatar ka spiritual meaning kya hai?",
+   "any": [
+    "अवतार",
+    "विष्णु",
+    "दश"
+   ]
+  },
+  {
+   "q": "Matsya Avatar ki story kya sikhati hai?",
+   "any": [
+    "मत्स्य",
+    "अवतार",
+    "प्रलय"
+   ]
+  },
+  {
+   "q": "Narasimha Avatar ka significance kya hai?",
+   "any": [
+    "नृसिंह",
+    "प्रह्लाद",
+    "अवतार"
+   ]
+  },
+  {
+   "q": "Vaman Avatar ka spiritual message kya hai?",
+   "any": [
+    "वामन",
+    "बलि",
+    "अवतार"
+   ]
+  },
+  {
+   "q": "Kalki Avatar ka concept kya hai?",
+   "any": [
+    "कल्कि",
+    "कलियुग",
+    "अवतार"
+   ]
+  },
+  {
+   "q": "Guru Granth Sahib ka main message kya hai?",
+   "any": [
+    "नानक",
+    "नाम",
+    "गुरु"
+   ]
+  },
+  {
+   "q": "Sikh Dharma me Naam Simran kya hota hai?",
+   "any": [
+    "सिमरन",
+    "नाम",
+    "स्मरण"
+   ]
+  },
+  {
+   "q": "Guru Nanak Dev ji ki teachings kya hain?",
+   "any": [
+    "नानक",
+    "नाम",
+    "सेवा"
+   ]
+  },
+  {
+   "q": "Ek Onkar ka meaning kya hai?",
+   "any": [
+    "ओंकार",
+    "एक",
+    "ॐ"
+   ]
+  },
+  {
+   "q": "Guru Granth Sahib me equality ke bare me kya kaha gaya hai?",
+   "any": [
+    "समान",
+    "जाति",
+    "एक"
+   ]
+  },
+  {
+   "q": "Seva aur Simran ka importance kya hai?",
+   "any": [
+    "सेवा",
+    "सिमरन",
+    "नाम"
+   ]
+  },
+  {
+   "q": "Yoga Vashisht kya sikhata hai?",
+   "any": [
+    "वसिष्ठ",
+    "मन",
+    "वैराग्य"
+   ]
+  },
+  {
+   "q": "Yoga Vashisht me mind ko reality ka source kyu kaha gaya hai?",
+   "any": [
+    "मन",
+    "चित्त",
+    "जगत"
+   ]
+  },
+  {
+   "q": "Yoga Vashisht ke according liberation kaise milti hai?",
+   "any": [
+    "मोक्ष",
+    "मुक्ति",
+    "वैराग्य"
+   ]
+  },
+  {
+   "q": "Consciousness aur universe ka relation kya hai?",
+   "any": [
+    "चेतन",
+    "जगत",
+    "ब्रह्म"
+   ]
+  },
+  {
+   "q": "Jyotish shastra ka spiritual purpose kya hai?",
+   "any": [
+    "ज्योतिष",
+    "ग्रह",
+    "फल"
+   ]
+  },
+  {
+   "q": "Kya astrology destiny ko change kar sakti hai?",
+   "any": [
+    "ग्रह",
+    "भाग्य",
+    "उपाय"
+   ]
+  },
+  {
+   "q": "Kundli me karma ka connection kaise dekha jata hai?",
+   "any": [
+    "कुण्डली",
+    "कर्म",
+    "ग्रह"
+   ]
+  },
+  {
+   "q": "Navgraha ka spiritual meaning kya hai?",
+   "any": [
+    "ग्रह",
+    "नवग्रह",
+    "शान्ति"
+   ]
+  },
+  {
+   "q": "Surya dev ka importance kya hai?",
+   "any": [
+    "सूर्य",
+    "आदित्य",
+    "भास्कर"
+   ]
+  },
+  {
+   "q": "Chandra grah ka mind se kya relation hai?",
+   "any": [
+    "चन्द्र",
+    "मन",
+    "सोम"
+   ]
+  },
+  {
+   "q": "Guru grah (Jupiter) ka spiritual significance kya hai?",
+   "any": [
+    "बृहस्पति",
+    "गुरु",
+    "ग्रह"
+   ]
+  },
+  {
+   "q": "Shani dev ko karma ka judge kyu kaha jata hai?",
+   "any": [
+    "शनि",
+    "कर्म",
+    "फल"
+   ]
+  },
+  {
+   "q": "Rahu aur Ketu ka spiritual meaning kya hai?",
+   "any": [
+    "राहु",
+    "केतु",
+    "ग्रह"
+   ]
+  },
+  {
+   "q": "Muhurat ka concept kya hota hai?",
+   "any": [
+    "मुहूर्त",
+    "काल",
+    "शुभ"
+   ]
+  },
+  {
+   "q": "Chanakya Niti se successful life ke kya rules milte hain?",
+   "any": [
+    "नीति",
+    "पुरुष",
+    "उद्यम"
+   ]
+  },
+  {
+   "q": "Chanakya ke according ek intelligent person ki qualities kya hoti hain?",
+   "any": [
+    "बुद्धि",
+    "पण्डित",
+    "विवेक"
+   ]
+  },
+  {
+   "q": "Chanakya Niti me friendship ke bare me kya kaha gaya hai?",
+   "any": [
+    "मित्र",
+    "सखा",
+    "विपत्ति"
+   ]
+  },
+  {
+   "q": "Chanakya ke according paisa aur dharma ka relation kya hai?",
+   "any": [
+    "धन",
+    "धर्म",
+    "अर्थ"
+   ]
+  },
+  {
+   "q": "Leadership ke liye Chanakya ke kya principles hain?",
+   "any": [
+    "राजा",
+    "नीति",
+    "शासन"
+   ]
+  },
+  {
+   "q": "Life me discipline ka importance Chanakya ke according kya hai?",
+   "any": [
+    "नियम",
+    "संयम",
+    "अनुशासन"
+   ]
+  },
+  {
+   "q": "Krodh aur ego ko control karne ke liye Chanakya kya kehte hain?",
+   "any": [
+    "क्रोध",
+    "अहंकार",
+    "संयम"
+   ]
+  },
+  {
+   "q": "Achha decision lene ke liye Chanakya ki kya advice hai?",
+   "any": [
+    "बुद्धि",
+    "विवेक",
+    "निर्णय"
+   ]
+  },
+  {
+   "q": "Spiritual aur practical life ko balance kaise kare?",
+   "any": [
+    "गृहस्थ",
+    "समता",
+    "धर्म"
+   ],
+   "compare": true
+  }
+ ],
+ "control": [
+  "SAARTHI GYAAN AI se spiritual guidance kaise le sakte hain",
+  "SAARTHI GYAAN AI ek spiritual guide ki tarah meri daily life me kaise help kar sakta hai",
+  "iPhone 15 ka price kya hai",
+  "Python mein for loop kaise likhte hain",
+  "आज बिटकॉइन का भाव क्या है",
+  "मुंबई से दिल्ली की फ्लाइट कितने की है",
+  "IPL 2026 kaun jeeta",
+  "मेरा वाई-फाई राउटर काम नहीं कर रहा",
+  "kal ka mausam kaisa rahega",
+  "train ka time table batao",
+  "sabse acchi car kaunsi hai",
+  "GST return kaise file karein",
+  "मेरे फोन की बैटरी जल्दी खत्म होती है",
+  "Instagram par followers kaise badhayein",
+  "petrol ka aaj ka rate",
+  "डॉलर का भाव क्या चल रहा है",
+  "nearest hospital kahan hai",
+  "_KHATARNAK CONTROL (2026-08-10) — ye sawaal AADHYATMIK LAGTE hain par",
+  "_hamari 24 kitaabon mein inka jawab hai HI NAHI. Purane 17 control",
+  "_(mausam, petrol, IPL) bahut aasan the — unka sabse ooncha rerank score",
+  "_0.177 tha. Gate girane ka faisla unhi par tika tha, jo kaafi nahi.",
+  "_Asli khatra yahi hai: jo sawaal granth-jaisa lagta hai, uspar model",
+  "_kisi bhi paas-paas ke ansh ko jawab maan sakta hai.",
+  "Bible me jeevan ke bare me kya likha hai",
+  "Quran ki mukhya shiksha kya hai",
+  "Gautam Buddha ne dukh ke bare me kya kaha",
+  "Jain dharma me ahimsa ka kya sthan hai",
+  "Confucius ki neeti kya sikhati hai",
+  "Socrates ke according atma kya hai",
+  "Tarot card reading kaise ki jati hai",
+  "Numerology me 7 number ka kya matlab hai",
+  "Reiki healing kaise kaam karti hai",
+  "Feng shui ke according ghar kaisa hona chahiye",
+  "Vastu me main gate kis disha me hona chahiye",
+  "Ayurveda me vata pitta kapha kya hote hain",
+  "Yoga se weight loss kaise hota hai",
+  "Meditation app kaunsa best hai",
+  "Isha Foundation ke Sadhguru kya kehte hain"
+ ],
+ "naye_granth": [
+  "Gita me Arjun ke saamne jo moral dilemma tha, uska core problem exactly kya tha?",
+  "Krishna ne Arjun ko apne swadharma ko pehchanne ke liye kya direction di?",
+  "Bhagavad Gita me sacrifice ko sirf religious ritual ke bajay kis broader sense me samjhaya gaya hai?",
+  "Gita ke according jo person apne actions ko higher purpose ke liye dedicate karta hai, uski approach kaisi hoti hai?",
+  "Krishna ne knowledge, action aur devotion ko ek dusre se kaise connect kiya?",
+  "Gita me \"field\" aur \"knower of the field\" ka concept kya hai?",
+  "Gita ke according prakriti aur Purusha ke beech kya relationship hai?",
+  "Gita me divine aur demonic qualities ko kaise distinguish kiya gaya hai?",
+  "Gita ke according faith bhi alag-alag qualities ke according kaise vary kar sakti hai?",
+  "Krishna ne Arjun ko apne doubts ko blindly suppress karne ke bajay kya approach batayi?",
+  "Rigveda me Agni ko itna important kyu mana gaya hai?",
+  "Rigveda ke hymns me Indra ka role kis context me repeatedly samne aata hai?",
+  "Rigveda me Ushas ke descriptions se kya symbolic meaning nikala ja sakta hai?",
+  "Rigveda ke hymns me nature aur divine forces ke beech kis tarah ka relationship dikhai deta hai?",
+  "Yajurveda me ritual actions ke proper execution ko itna importance kyu diya gaya?",
+  "Yajurveda me Yajna ka social aur cosmic dimension kya samjha ja sakta hai?",
+  "Yajurveda ke context me offering ka actual spiritual idea kya hai?",
+  "Yajurveda me priestly roles aur ritual responsibility ka kya significance hai?",
+  "Samaveda ke mantron ko singing form me present karne ka purpose kya tha?",
+  "Samaveda aur Rigveda ke hymns ke use me kya practical difference milta hai?",
+  "Samaveda ki tradition me musical chanting ko spiritual experience se kaise joda gaya?",
+  "Samaveda ko Indian sacred music ki foundation se connect karna kitna justified hai?",
+  "Atharvaveda me household life se related concerns kis tarah address kiye gaye hain?",
+  "Atharvaveda me protection aur wellbeing ke themes ka kya importance hai?",
+  "Atharvaveda ko baaki Vedas se alag kis type ke subject matter ki wajah se dekha jata hai?",
+  "Atharvaveda ke hymns se ancient Indian society ki daily concerns ke bare me kya pata chalta hai?",
+  "Ramayana me Kaikeyi ke decisions ke peeche ka chain of events kya tha?",
+  "Shri Ram ne vanvas ke decision ko kis attitude ke saath accept kiya?",
+  "Ramayana me Lakshman Rekha ka episode kis context me aata hai aur uska significance kya hai?",
+  "Vibhishan ne Ravana ka saath chhodne ka decision kyu liya?",
+  "Ramayana me Jatayu ka role kya tha aur uske action se kya lesson milta hai?",
+  "Sugriva aur Vali ke conflict ko Ramayana ke context me kaise samjha ja sakta hai?",
+  "Ramayana me Hanuman ko Sita ki khoj ke liye choose karne ke peeche kya qualities important thi?",
+  "Lanka pahunchne ke baad Hanuman ne Sita ko Ram ka trust establish karne ke liye kya proof diya?",
+  "Mahabharata me Yaksha Prashna episode kya hai aur Yudhishthir ne usme kya demonstrate kiya?",
+  "Krishna ne Shanti Doot ke roop me Hastinapur jaakar kya attempt kiya tha?",
+  "Vidur Niti me ek wise person ki pehchan kis tarah ki qualities se hoti hai?",
+  "Mahabharata me Shakuni ki strategy ne Kuru family ke conflict ko kaise influence kiya?",
+  "Eklavya ki story ko Mahabharata ke context me kaise samjha ja sakta hai?",
+  "Abhimanyu ke Chakravyuh episode ka exact context kya tha?",
+  "Mahabharata me Gandhari ke character se power aur family loyalty ke bare me kya questions raise hote hain?",
+  "Krishna ke bina Mahabharata ka political aur moral outcome kaise different ho sakta tha?",
+  "Dhruva ki tapasya ki story me desire aur devotion ka kya connection dikhai deta hai?",
+  "Shiva Purana me Shiva aur Parvati ke relationship ko spiritual perspective se kaise portray kiya gaya hai?",
+  "Shiva Purana me Daksha Yajna ki story ka main turning point kya tha?",
+  "Shiva Purana me Ganesha ke origin ki different traditions ko kaise explain kiya gaya hai?",
+  "Shiva Purana me Kartikeya ke birth aur role ka kya significance hai?",
+  "Vishnu Purana me Dhruva ki story ko kis spiritual perspective se dekha gaya hai?",
+  "Vishnu Purana me Prahlada aur Hiranyakashipu ka conflict kis larger principle ko represent karta hai?",
+  "Vishnu Purana me Vishnu ke avatars ka purpose kis tarah explain hota hai?",
+  "Vishnu Purana me cosmic time ko samajhne ke liye Yuga aur Manvantara ka concept kya hai?",
+  "Upanishads me \"neti neti\" approach ka kya meaning hai?",
+  "Katha Upanishad me Nachiketa ne Yamraj se kaunse deeper questions pooche the?",
+  "Upanishadic teachings me external rituals se internal realization ki movement ko kaise samjha ja sakta hai?",
+  "Guru Granth Sahib me \"Hukam\" ka concept kya hai?",
+  "Guru Granth Sahib ke according haumai human suffering ka reason kaise ban sakti hai?",
+  "Sikh spiritual teaching me Shabad ko itna central importance kyu diya gaya hai?",
+  "Guru Granth Sahib me honest earning aur sharing ke principles ko kaise connect kiya ja sakta hai?",
+  "Ramayan me Vishwamitra ji Shri Ram aur Lakshman ko apne saath kyu le gaye the?",
+  "Vishwamitra se Shri Ram ko kaun kaun si important vidya aur astron ka gyaan mila?",
+  "Ramayan me Tadaka vadh ka actual context kya tha?",
+  "Shri Ram ne Ahalya ka uddhar kis situation me kiya tha?",
+  "Janakpur me Shri Ram aur Sita ji ki pehli mulaqat ka context kya tha?",
+  "Sita swayamvar me Shiv dhanush todne ki condition kya thi?",
+  "Parshuram aur Shri Ram ka samvad Ramayan me kis wajah se hua tha?",
+  "Dashrath ji ne Ram ko vanvas dene ke baad kaunsi emotional situation face ki?",
+  "Ram ke vanvas ke samay Nishadraj ka kya role tha?",
+  "Ramayan me Kevat prasang ka spiritual message kya samjha ja sakta hai?",
+  "Bharat ji jab Ram ko wapas lane van gaye to unki Ram se kya baat hui?",
+  "Bharat ne Ram ki jagah unki khadau ko rajgaddi par kyu rakha?",
+  "Panchavati me Ram, Sita aur Lakshman ka jeevan kaisa tha?",
+  "Shurpanakha ke prasang ke baad Ramayan ki story kis direction me badhi?",
+  "Marich ne golden deer ka roop kyu liya tha?",
+  "Sita haran ke samay Ram aur Lakshman ki situation kya thi?",
+  "Sampati ne Hanuman aur vanar sena ki help kaise ki?",
+  "Hanuman ji ko samudra paar karne se pehle Jambavan ne kya yaad dilaya?",
+  "Lanka me Hanuman ji ne apni identity aur mission ko kaise manage kiya?",
+  "Hanuman ji ne Lanka me Ashok Vatika ko destroy karne ka decision kyu liya?",
+  "Bhagavad Gita me \"Akshara Brahma\" ka concept kis context me explain hua hai?",
+  "Gita ke according death ke samay consciousness ka direction kaise matter karta hai?",
+  "Bhagavad Gita me divine manifestation ko samajhne ke liye Vibhuti Yoga kya batata hai?",
+  "Krishna ki Vibhutiyon ka purpose Arjun ko kya samjhana tha?",
+  "Vishwaroop Darshan ke samay Arjun ki psychological state kaise change hui?",
+  "Gita me Vishwaroop dekhne ke liye Arjun ko divine vision ki zarurat kyu padi?",
+  "Krishna ne Arjun ko apna cosmic form dikhane se pehle kya warning ya context diya?",
+  "Gita ke Bhakti Yoga me Bhagwan ke devotee ki qualities kya batayi gayi hain?",
+  "Gita me Sagun aur Nirgun upasana ke comparison ko kaise samjha ja sakta hai?",
+  "Gita ke according ek true devotee dusre living beings ke saath kaisa behave karta hai?",
+  "Gita me field aur field-knower ka knowledge practical life me kaise useful ho sakta hai?",
+  "Gita ke Gunatraya Vibhaga me qualities ko transcend karne ka kya idea hai?",
+  "Gita ke Purushottama Yoga me Ashvattha tree ka example kyu diya gaya hai?",
+  "Gita me Daivi Sampat aur Asuri Sampat ka practical difference kya hai?",
+  "Gita ke Moksha Sannyasa Yoga me renunciation aur action ko kaise reconcile kiya gaya hai?",
+  "Gita ke according kisi action ko good ya bad judge karne ke liye kin factors ko dekhna chahiye?",
+  "Samved me Soma chants ka ritual context kya hota hai?",
+  "Samved ki chanting me svar ka kya importance hai?",
+  "Samved aur Yajurved ek Vedic ritual me kis tarah complementary ho sakte hain?",
+  "Samved ki knowledge ko sirf music ki book kehna kyu incomplete hai?",
+  "Yajurved me Shukla aur Krishna Yajurved ka basic difference kya hai?",
+  "Yajurved ke ritual instructions ka sambandh Vedic yajna ke kis parts se hai?",
+  "Yajurved me mantra aur ritual action ke beech kya relationship hai?",
+  "Yajurved ke context me Agnihotra kya hota hai?",
+  "Rigved me Varuna ko kis type ke divine principle se connect kiya gaya hai?",
+  "Rigved me Surya aur Savitr ke concepts me kya distinction samjha jata hai?",
+  "Rigved ke Purusha Sukta me social order ko kaise describe kiya gaya hai?",
+  "Rigved ke Gayatri mantra ka original Vedic context kya hai?",
+  "Atharved me marriage-related traditions ke baare me kis type ki teachings milti hain?",
+  "Atharved me medicinal herbs ko lekar kis tarah ke references milte hain?",
+  "Atharved ke protection-related mantron ka historical purpose kya tha?",
+  "Atharved me household prosperity aur wellbeing se related themes kya hain?",
+  "Vishnu Puran me Prithu Raja ki story kya sikhati hai?",
+  "Vishnu Puran me King Sagara aur unke descendants ka kya prasang hai?",
+  "Vishnu Puran me Samudra Manthan ka description kis context me aata hai?",
+  "Vishnu Puran me Lakshmi ji ke sambandh me kya important narrative milta hai?",
+  "Shiv Puran Khand 1 me Sati aur Daksha ke prasang ka detailed context kya hai?",
+  "Shiv Puran Khand 1 me Shiva ko ascetic aur householder dono forms me kaise portray kiya gaya hai?",
+  "Shiv Puran Khand 2 me Jyotirlinga traditions ka kya significance hai?",
+  "Shiv Puran me Lingodbhava prasang ka spiritual meaning kya hai?",
+  "Garud Puran me Pret avastha ke baare me kya description milta hai?",
+  "Garud Puran me mrityu ke baad ki journey ko kis tarah explain kiya gaya hai?",
+  "Garud Puran me antim sanskar ka spiritual purpose kya bataya gaya hai?",
+  "Garud Puran me karma aur afterlife ke beech kya connection explain kiya gaya hai?",
+  "Agni Puran me Dhanurveda ke baare me kya information milti hai?",
+  "Agni Puran me temple construction ya architecture se related kya knowledge milti hai?",
+  "Agni Puran me mantra aur worship procedures ka kya role hai?",
+  "Agni Puran ko encyclopedic Purana kyu kaha ja sakta hai?",
+  "Bhavishya Puran me future events ya predictions ka concept kis context me aata hai?",
+  "Bhavishya Puran me festivals aur religious observances se related kya information milti hai?",
+  "Bhavishya Puran me Surya worship ka kya importance bataya gaya hai?",
+  "Bhavishya Puran ko historical source ke roop me use karte waqt kya caution rakhna chahiye?",
+  "Narshim Puran me Narasimha Avatar ki story kis perspective se explain hoti hai?",
+  "Narshim Puran me Prahlad ki devotion ka kya importance hai?",
+  "Narshim Puran me pilgrimage aur sacred places ke baare me kya information milti hai?",
+  "Narshim Puran me Narasimha worship ke liye kya practices batayi gayi hain?",
+  "Ishadi Upanishad me karm aur renunciation ko ek saath kaise samjha gaya hai?",
+  "Ishadi Upanishad me \"Isha\" se kya philosophical idea indicate hota hai?",
+  "Ishadi Upanishad me Vidya aur Avidya ke combination ko kaise explain kiya gaya hai?",
+  "Ishadi Upanishad ke last mantras death aur immortality ke relation me kya suggest karte hain?",
+  "Katho Upanishad me Nachiketa ke three boons me sabse deep spiritual question kaunsa tha?",
+  "Katho Upanishad me Shreyas aur Preyas ka difference kya hai?",
+  "Katho Upanishad me Rath analogy human personality ko kaise explain karti hai?",
+  "Katho Upanishad ke according senses ko control karna spiritual progress ke liye kyu important hai?",
+  "Mantra Maha Sagar me different devtaon ke mantron ko kis purpose se organize kiya gaya hai?",
+  "Mantra Maha Sagar me mantra jap ka suitable time choose karne ke liye kya principles diye gaye hain?",
+  "Mantra Maha Sagar me kisi mantra ke purashcharan ka kya meaning hai?",
+  "Mantra Maha Sagar ke according mantra jap me niyam follow karna kyu important hai?",
+  "Chanakya Neeti ke according secret ko har kisi ke saath share karna risky kyu mana gaya hai?",
+  "Chanakya Neeti me difficult times me true friend ko kaise identify kiya jata hai?",
+  "Chanakya Neeti ke according enemy ko underestimate karne ka kya danger hai?",
+  "Chanakya Neeti me education aur knowledge ko wealth se kis tarah compare kiya gaya hai?",
+  "Ekadashi vrat ki tithi determine karne ke liye kya basic principle use hota hai?",
+  "Ekadashi ke vrat me Dashami aur Dwadashi ka kya relevance hota hai?",
+  "Lal Kitab ke according kundli me gharon ko samajhne ka basic approach kya hai?",
+  "Lal Kitab me grahon ke ashubh effect ko samajhne ka tareeka traditional Vedic astrology se kaise different hai?",
+  "Lal Kitab me kisi grah ke negative influence ke liye upay choose karte waqt kin cheezon ko dekha jata hai?",
+  "Lal Kitab ke upayon me daily life ki simple cheezon ka use kyu hota hai?",
+  "Lal Kitab me Surya se related problems ke liye kis type ke traditional upay milte hain?",
+  "Lal Kitab ke according Shani ke influence ko balance karne ke liye kis nature ke upay bataye jate hain?",
+  "Lal Kitab me Rahu aur Ketu ke sambandh me upay ka basic logic kya hai?",
+  "Lal Kitab ke upay karte waqt kya koi specific niyam ya savdhani follow karni chahiye?",
+  "Kya Lal Kitab ka koi upay bina kundli dekhe sabhi logon ko karna chahiye?",
+  "Lal Kitab me grah aur household objects ke beech symbolic relationship ko kaise samjha jata hai?",
+  "Sampurna Rashi Aur Muhurt Vigyan me rashi ko identify karne ke liye kya information important hoti hai?",
+  "Janma rashi aur naam rashi me kya difference hota hai?",
+  "Muhurt choose karte waqt tithi ka kya importance hota hai?",
+  "Muhurt Vigyan me nakshatra ko consider karna kyu important mana jata hai?",
+  "Kisi important kaam ke liye shubh muhurt select karne ka overall process kya hai?",
+  "Rashi aur grah ke relationship ko daily life ke context me kaise interpret kiya jata hai?",
+  "Sampurna Rashi Aur Muhurt Vigyan ke according lagna aur rashi me kya difference hai?",
+  "Shubh aur ashubh muhurt ko determine karne me weekday ka kya role hota hai?",
+  "Rahu Kaal ko muhurt selection me kyu consider kiya jata hai?",
+  "Kya har shubh tithi har type ke kaam ke liye equally suitable hoti hai?",
+  "Ekadashi vrat aur normal fasting me spiritual difference kya hai?",
+  "Ekadashi vrat ka sambandh Vishnu bhakti se kaise joda gaya hai?",
+  "Ekadashi ke din ann na khane ki parampara ka scriptural context kya hai?",
+  "Ekadashi vrat me vrat todne yani Parana ka correct concept kya hai?",
+  "Ekadashi ke alag-alag naam aur unke significance kaise samjhe ja sakte hain?",
+  "Adhik Maas me aane wali Ekadashi ko normal Ekadashi se kaise dekha jata hai?",
+  "Ekadashi vrat ke spiritual benefits ko sirf physical fasting se alag kaise samjha ja sakta hai?",
+  "Ekadashi ke din Naam Jap aur Vishnu puja ka kya sambandh hai?",
+  "Agar kisi person se Ekadashi vrat accidentally break ho jaye to traditional texts me kya approach milti hai?",
+  "Ekadashi ke rules samajhne ke liye tithi aur local sunrise ko kyu consider karna padta hai?",
+  "Ghar me daily devta archana karte waqt sankalp ka kya role hota hai?",
+  "Daily puja me diya, dhoop aur naivedya ka symbolic meaning kya hai?",
+  "Daily devta puja me mantra ke saath dhyan ya visualization ka kya purpose hai?",
+  "Ghar ki daily puja me kisi particular devta ko primary roop se worship karne ka traditional basis kya ho sakta hai?",
+  "Daily puja ko mechanical routine banne se bachane ke liye spiritual texts kya approach suggest karte hain?",
+  "Nitya Karm Pooja me morning routine ke kaunse karm traditionally important hote hain?",
+  "Nitya Karm Pooja me achaman ka purpose kya hota hai?",
+  "Sankalp lene ka actual meaning kya hai aur ise puja me kab kiya jata hai?",
+  "Nitya Karm Pooja me pranayama ko include karne ka spiritual purpose kya hai?",
+  "Sandhya vandan aur daily puja ke beech kya relation hai?",
+  "Nitya karm me Surya ko arghya dene ka traditional significance kya hai?",
+  "Puja ke samay bhagwan ko naivedya offer karne ka deeper meaning kya hai?",
+  "Nitya Karm Pooja me mantra uchcharan se pehle man ko prepare karna kyu important hai?",
+  "Agar daily puja ka complete vidhi-vidhan possible na ho to minimum spiritual routine kya rakha ja sakta hai?",
+  "Nitya Karm Pooja ko modern busy lifestyle ke saath practically kaise follow kiya ja sakta hai?",
+  "Mantra jap me mala ke 108 beads ka traditional significance kya hai?",
+  "Jap mala ko kisi aur person ke saath share na karne ki parampara ka kya reason bataya jata hai?",
+  "Mantra jap ke samay count maintain karna kyu important mana jata hai?",
+  "Kya har mantra ka jap bina guru guidance ke kiya ja sakta hai?",
+  "Mantra jap me uchcharan, rhythm aur concentration teenon ka kya role hai?",
+  "Mantra sadhana me purashcharan aur simple daily jap me kya difference hai?",
+  "Mantra sadhana ke liye Brahma Muhurta ko suitable kyu mana jata hai?",
+  "Mantra Maha Sagar me different devtaon ke Gayatri mantron ka purpose kya hota hai?",
+  "Kisi mantra ka Rishi, Chhanda aur Devata identify karne ka kya significance hai?",
+  "Mantra Maha Sagar ke context me mantra viniyoga ka meaning kya hai?",
+  "Mantra jap me nyasa kya hota hai aur iska purpose kya hai?",
+  "Mantra Maha Sagar ke according mantra sadhana me aasana ka kya importance hai?",
+  "Mantra siddhi aur mantra chanting me kya difference hai?",
+  "Kisi mantra ko kitni baar japna chahiye ye decide karne ka traditional basis kya ho sakta hai?",
+  "Mantra sadhana ke samay brahmacharya aur dietary discipline ko kyu importance di jati hai?",
+  "Mantra Maha Sagar me kavach mantra ka basic purpose kya hota hai?",
+  "Stotra, mantra aur kavach me practical difference kya hai?",
+  "Mahabharata me Sabha Parva ka main political aur moral conflict kya tha?",
+  "Yudhishthir ke Rajasuya Yajna ka Mahabharata ki story me kya importance tha?",
+  "Shishupala ne Krishna ka opposition kis context me kiya tha?",
+  "Dyut Sabha me Yudhishthir ke decisions ko Mahabharata kis tarah present karta hai?",
+  "Draupadi ke vastraharan ke samay Sabha ke elders ka response kya tha?",
+  "Vidur ne Dhritarashtra ko Draupadi ke episode aur Kuru politics ke baare me kya warning di?",
+  "Pandavon ke vanvas ke dauran unke spiritual aur practical challenges kya the?",
+  "Van Parva me Arjun ko divine weapons prapt karne ki story ka kya context hai?",
+  "Mahabharata me Kirata-Arjuna prasang kis larger spiritual theme se connected hai?",
+  "Pandavon ke Agyatvas ka purpose aur conditions kya thi?",
+  "Virata Parva me Arjun ne Brihannala ka roop kyu liya?",
+  "Keechak ke prasang me Draupadi aur Bhima ki strategy kya thi?",
+  "Udyoga Parva me Krishna ki peace mission ka detailed objective kya tha?",
+  "Krishna ne Kauravon se Pandavon ke liye minimum kya settlement maanga tha?",
+  "Mahabharata me Sanjaya ko divine vision milne ka kya significance tha?",
+  "Bhishma Parva ka naam Bhishma se kyu juda hai aur war ke kis phase ko cover karta hai?",
+  "Dronacharya ke commander banne ke baad war strategy me kya major changes aaye?",
+  "Karna ko battlefield me commander banne ka context kya tha?",
+  "Shalya ko Karna ka charioteer banane ke peeche kya circumstances the?",
+  "Mahabharata ke final war phase me Ashwatthama ka role kaise develop hota hai?",
+  "Mahabharata ke Shanti Parva me Bhishma Yudhishthir ko rajdharma ke baare me kya samjhate hain?",
+  "Mahabharata ke Anushasana Parva me daan aur dharma ko kis perspective se discuss kiya gaya hai?",
+  "Bhishma ke antim samay aur Uttarayana ka Mahabharata me kya significance hai?",
+  "Mahabharata ke Stri Parva me war ke baad women ke grief ko kis tarah portray kiya gaya hai?",
+  "Mahabharata ke Mausala Parva me Yadava dynasty ke downfall ka kya context diya gaya hai?",
+  "Mahabharata ke Svargarohana Parva me Pandavon ki final journey ka spiritual meaning kya hai?",
+  "Mahabharata me Dharma ka answer situation ke according change hota hua kyu dikhta hai?",
+  "Mahabharata ki complete story ko sirf Pandav vs Kaurav conflict samajhna kyu incomplete hai?",
+  "Shri Ramcharitmanas me Mangalacharan ka purpose kya hai aur isme kin tattvon ko pranam kiya gaya hai?",
+  "Ramcharitmanas ke Bal Kand me Shiv-Parvati samvad ka kya spiritual importance hai?",
+  "Ramcharitmanas me Narad ji ki story ka Shri Ram ke avatar se kya connection hai?",
+  "Ramcharitmanas me Manthara ka influence Kaikeyi ke decision par kaise pada?",
+  "Ramcharitmanas me Dashrath ji ki Ram ke prati attachment unke jeevan ko kaise affect karti hai?",
+  "Ramcharitmanas me Ram ke vanvas ke samay Ayodhya ki praja ka reaction kya tha?",
+  "Ramcharitmanas me Nishadraj aur Shri Ram ki friendship ko kis spiritual value ke example ke roop me dekha ja sakta hai?",
+  "Ramcharitmanas me Bharadwaj Muni ke ashram ka Ram ki journey me kya role tha?",
+  "Ramcharitmanas me Chitrakoot ka spiritual significance kya hai?",
+  "Ramcharitmanas me Bharat Milap prasang ko itna important kyu mana jata hai?",
+  "Ramcharitmanas me Anasuya ji ne Sita ko kya spiritual guidance di thi?",
+  "Ramcharitmanas me Shabari prasang ka main message kya hai?",
+  "Ramcharitmanas me Shabari ke ber ka prasang bhakti ke kis principle ko show karta hai?",
+  "Ramcharitmanas me Kabandh ke uddhar ka context kya tha?",
+  "Ramcharitmanas me Hanuman aur Sugriv ki first meeting kaise hui?",
+  "Ramcharitmanas me Ram-Sugriv friendship establish karne me Hanuman ka kya role tha?",
+  "Ramcharitmanas me Bali vadh ko lekar jo moral question uthta hai usko kaise samjha ja sakta hai?",
+  "Ramcharitmanas me Angad ko Lanka bhejne ka purpose kya tha?",
+  "Ramcharitmanas me Angad ke Lanka darbar wale prasang se kya lesson milta hai?",
+  "Ramcharitmanas me Vibhishan Sharanagati ka spiritual meaning kya hai?",
+  "Ramcharitmanas me Ram ne Vibhishan ko accept karne ka decision kis principle par liya?",
+  "Ramcharitmanas me Setu Nirman ke prasang ka devotional significance kya hai?",
+  "Ramcharitmanas me Lanka yudh ke dauran Hanuman ka Sanjeevani prasang kis situation me aata hai?",
+  "Ramcharitmanas me Lakshman ke moorchhit hone ke baad Hanuman ka response kya tha?",
+  "Ramcharitmanas me Ravan ke final moments me uske character ka kaunsa aspect samne aata hai?",
+  "Ramcharitmanas ke Uttar Kand me Ram Rajya ko kis tarah describe kiya gaya hai?",
+  "Ramcharitmanas me Kaliyug ke lakshan kis context me bataye gaye hain?",
+  "Ramcharitmanas me naam-smaran ko Kaliyug ke liye important kyu bataya gaya hai?",
+  "Lal Kitab me Surya ko father ya authority se relate karne ka traditional logic kya hai?",
+  "Lal Kitab me Chandra ko mother aur emotional nature se connect karne ka kya basis hai?",
+  "Lal Kitab me Mangal ke positive aur negative manifestations ko kaise identify kiya jata hai?",
+  "Lal Kitab me Budh ke influence ko speech aur intelligence se kaise relate kiya jata hai?",
+  "Lal Kitab me Brihaspati ke weak hone ke traditional signs kya bataye gaye hain?",
+  "Lal Kitab me Shukra ko comforts aur relationships se kaise associate kiya jata hai?",
+  "Lal Kitab me Ketu ko spirituality ke saath kaise connect kiya jata hai?",
+  "Lal Kitab me grahon ke liye upay karte waqt donation ka kya symbolic meaning ho sakta hai?",
+  "Lal Kitab ke upay me black dog, cow ya birds ko food dene jaisi practices ka traditional purpose kya bataya jata hai?",
+  "Lal Kitab me ghar ke environment ko planetary effects ke saath kaise connect kiya jata hai?",
+  "\"Meri kundli me Rahu problem de raha hai\" is query ka answer bina kundli dekhe dena kyu risky hoga?",
+  "Jyotish ke according transit aur birth-chart placement me kya difference hota hai?",
+  "Rashi aur Nakshatra dono ko personality analysis me use karne ka difference kya hai?",
+  "Muhurt me Tithi, Vara, Nakshatra aur Yoga ko collectively kyu dekha jata hai?",
+  "Choghadiya aur traditional Muhurt selection me kya difference hai?",
+  "Abhijit Muhurt kya hota hai aur ise kis type ke kaam me consider kiya jata hai?",
+  "Vivah Muhurt choose karte waqt sirf date dekhna enough kyu nahi hota?",
+  "Griha Pravesh ke liye Muhurt choose karte waqt kaunse factors important ho sakte hain?",
+  "Kisi religious ceremony ka Muhurt aur business start karne ka Muhurt same logic se kyu nahi dekha ja sakta?",
+  "Mahabharata me Pandavon ke janm ki unusual circumstances kya thi?",
+  "Kunti ko Durvasa Rishi se jo mantra mila tha uska Mahabharata ki story me kya importance hai?",
+  "Karna ke janm ka truth Kunti ne Pandavon se pehle kyu hide kiya?",
+  "Mahabharata me Pandu ke shraap ka Pandavon ke birth se kya connection tha?",
+  "Dhritarashtra ko rajgaddi milne aur na milne ka political context kya tha?",
+  "Bhishma ne lifelong celibacy ka vow kis reason se liya tha?",
+  "Satyavati ke decisions ne Kuru dynasty ki history ko kaise influence kiya?",
+  "Amba ki story Bhishma ke character aur unke vows par kya question raise karti hai?",
+  "Pandavon ko Lakshagriha bhejne ki conspiracy kaise plan ki gayi thi?",
+  "Lakshagriha se bachne me Vidur ki intelligence ka kya role tha?",
+  "Hidimba aur Bhima ke prasang se Ghatotkacha ki story kaise start hoti hai?",
+  "Draupadi ke swayamvar me Arjun ki success ka exact context kya tha?",
+  "Draupadi ka Pandavon se marriage kis unusual circumstance me hua?",
+  "Kunti ke ek statement ne Draupadi ke marriage decision ko kaise influence kiya?",
+  "Mahabharata me Indraprastha ke development ka political importance kya tha?",
+  "Mayasabha ka description Duryodhan ki jealousy se kaise connect hota hai?",
+  "Krishna aur Arjun ki friendship Mahabharata ke war se pehle kaise develop hui thi?",
+  "Subhadra aur Arjun ke marriage ka context kya tha?",
+  "Abhimanyu ke birth aur training ka Mahabharata me kya background hai?",
+  "Uttara aur Abhimanyu ke relationship ka later Mahabharata events se kya connection hai?",
+  "Bhagavata tradition me King Ambarisha ki story Ekadashi vrat se kaise connected hai?",
+  "Ambarisha aur Durvasa ke prasang me devotion aur divine protection ka kya message hai?",
+  "Gajendra ne crisis ke samay Bhagwan ko kis tarah yaad kiya?",
+  "Garud Puran me pind daan ka traditional purpose kya bataya gaya hai?",
+  "Garud Puran me Yamdoot aur Yamalok ke descriptions ka spiritual purpose kya samjha jata hai?",
+  "Garud Puran me different karmic consequences ko kis framework me explain kiya gaya hai?",
+  "Garud Puran ke descriptions ko literal aur symbolic dono perspectives se kaise study kiya ja sakta hai?",
+  "Agni Puran me Ayurveda se related kis type ka material milta hai?",
+  "Agni Puran me astrology aur divination related knowledge ka kya scope hai?",
+  "Agni Puran me iconography ya murti ke characteristics ka kya importance hai?",
+  "Agni Puran me pilgrimage ko religious life ke saath kaise connect kiya gaya hai?",
+  "Bhavishya Puran me vrata aur festival traditions ka kya role hai?",
+  "Bhavishya Puran me Surya worship ke liye kaunse traditional practices discuss hote hain?",
+  "Narasimha Puran me Prahlad ke character ki sabse important quality kya dikhai deti hai?",
+  "Narasimha Puran me bhakti aur fearlessness ke beech kya relation hai?",
+  "Vishnu Puran me Manu aur creation cycle ka kya relation hai?",
+  "Vishnu Puran me Dhruva ko spiritual elevation kaise milti hai?",
+  "Vishnu Puran me cosmic cycles ko samajhne ke liye Kalpa aur Yuga ka kya role hai?",
+  "Shiva Puran me Shiva Ling ki worship ko form aur formless reality ke context me kaise samjha jata hai?",
+  "Shiva Puran me Parvati ki tapasya ka main purpose kya tha?",
+  "Shiva Puran me Shiva-Parvati vivah ke prasang ka spiritual symbolism kya hai?",
+  "Shiva Puran aur Vishnu Puran me divine avatar ya manifestation ko explain karne ka approach kis tarah different hai?",
+  "\"Ram aur Krishna dono Bhagwan the to dono ne Dharma ko different situations me kaise apply kiya?\" iska answer kin books ko compare karke dena chahiye?",
+  "Agar user sirf \"Bharat ne raj kyu nahi liya?\" puche to answer Ramcharitmanas aur Ramayan dono ke relevant context se kaise verify hoga?",
+  "Ramcharitmanas me Hanuman ki bhakti aur Bhagavad Gita me Bhakti Yoga ko compare karke samjhao.",
+  "Gita me Nishkam Karma aur Ramcharitmanas me seva-bhav ko ek common spiritual principle ke roop me kaise samjha ja sakta hai?",
+  "\"Ravan bahut gyani tha phir bhi uska downfall kyu hua?\" iska answer Ramayan ke character events aur dharma teachings ko connect karke do.",
+  "\"Arjun confused tha aur Ram bhi difficult decisions ke saamne the\" dono situations me Dharma kaise different tarah se appear hota hai?",
+  "Mahabharata aur Ramayan me ideal king ke concepts ko compare karo.",
+  "\"Guru ki zarurat kyu hai?\" iska answer Bhagavad Gita, Katho Upanishad aur Nitya Karm Pooja ke context se kaise alag-alag explain hoga?",
+  "Gita me self-control aur Katho Upanishad ki Rath analogy ek hi idea ko kis tarah support karti hain?",
+  "Ishadi Upanishad ka renunciation concept aur Gita ka Karma Yoga ek dusre se kaise related hain?",
+  "\"Atma body nahi hai\" is concept ke liye Gita aur Katho Upanishad se kya evidence mil sakta hai?",
+  "Ishadi Upanishad ki Vidya-Avidya teaching ko Gita ke Jnana aur Karma ke concept ke saath kaise compare karenge?",
+  "Katho Upanishad ke Shreyas-Preyas aur Gita ke desirable vs harmful choices me kya conceptual similarity hai?",
+  "Beej mantra aur Gayatri mantra me purpose aur structure ka kya difference hai?",
+  "Mantra ke Rishi, Chhanda aur Devata ka reference user ko practical level par kya samjhata hai?",
+  "Agar user bole \"subah pooja ka short method batao\", to Nitya Karm Pooja se concise routine kaise retrieve kiya jana chahiye?",
+  "Puja me naivedya ka meaning aur Ekadashi me food restriction ka concept kya ek hi spiritual principle se related hai?",
+  "Ekadashi vrat aur Nitya Karm Pooja ko daily spiritual discipline ke perspective se compare karo.",
+  "\"Ekadashi kab hai?\" is query ka answer dene ke liye sirf Ekadashi book enough hai ya Muhurt/Rashi book ka context bhi check karna chahiye?",
+  "Ekadashi tithi aur Parana timing me difference ko simple Hinglish me samjhao.",
+  "Ekadashi vrat ke spiritual purpose ko Vishnu-oriented tradition ke context me kaise explain karna chahiye?",
+  "Lal Kitab ke upay aur general Jyotish ke graha remedies ko same answer samajhna kyu galat ho sakta hai?",
+  "Rashi, Lagna aur Nakshatra — in teenon ka role alag-alag kaise samjha sakte hain?",
+  "Muhurt select karte waqt Rashi ke comparison me Tithi aur Nakshatra ka kya role hota hai?",
+  "Rahu Kaal aur Muhurt ke beech relationship ko traditional astrology ke context me kaise samjha jata hai?",
+  "Lal Kitab ke upay ko blindly follow karne ke bajay personalized context kyu zaroori hai?",
+  "Garud Puran ke after-death descriptions aur Gita ke Atma teachings me kya major conceptual difference hai?",
+  "\"Death ke baad kya hota hai?\" iska balanced answer Garud Puran aur Bhagavad Gita dono ko cite karke kaise diya ja sakta hai?",
+  "Garud Puran me karma ke consequences aur Gita me karma ke principle ko compare karo.",
+  "Garud Puran ke antim sanskar concepts aur Nitya Karm Pooja ke daily rituals me kya difference hai?",
+  "Shiv Puran aur Vishnu Puran me Shiva aur Vishnu ke divine roles ko compare karte waqt sectarian bias se kaise bachna chahiye?",
+  "Vishnu Puran ke avatar concept aur Bhagavad Gita ke divine manifestation concept me kya connection hai?",
+  "Shiv Puran me tapasya aur Gita me disciplined practice ke beech kya similarity hai?",
+  "Narasimha Avatar ki story ka spiritual message Prahlad ke character ke bina incomplete kyu ho sakta hai?",
+  "Bhavishya Puran me kisi future-related statement ko answer karte waqt historical aur traditional context ko separate karna kyu zaroori hai?",
+  "Agni Puran me architecture aur worship-related knowledge ek hi text me kyu milti hai?",
+  "Rigved ke mantra aur Samved ke chanting tradition me source-level difference kya hai?",
+  "Yajurved ke Yajna concepts aur Nitya Karm Pooja ke daily rituals me kya relationship hai?",
+  "Atharved ke household-oriented material aur Nitya Karm Pooja ke household routine me kya conceptual connection ho sakta hai?",
+  "\"Vedic mantra ka actual source kaunsa hai?\" is question ka answer dete waqt Rigved, Yajurved aur Samved ko kaise distinguish karna chahiye?",
+  "\"Karna ka decision sahi tha kya?\" jaise question ka answer dene ke liye sirf ek incident retrieve karna kyu insufficient hai?",
+  "Mahabharata ke Dharma-related answers me contradictory-looking situations ko context ke saath explain karna kyu zaroori hai?",
+  "\"Ramayan me aur Ramcharitmanas me same story hai kya?\" iska accurate source-based answer kaise dena chahiye?",
+  "\"Moksha kaise milega?\" jaise broad question me Gita aur Upanishad ke answers ko ek single claim me merge karna kyu risky hai?",
+  "\"Karma ka result kab milta hai?\" ke answer me Gita aur Garud Puran ke perspectives ko kaise distinguish karna chahiye?",
+  "\"Bhagwan sabko equal dekhte hain?\" iska answer Gita, Guru Granth Sahib aur Ramcharitmanas ke relevant principles ko compare karke kaise diya ja sakta hai?",
+  "Guru Granth Sahib me Naam aur Gita me Bhakti ko compare karte waqt dono traditions ka unique context kaise preserve karenge?",
+  "\"Seva kya hai?\" ka answer Nitya Karm Pooja aur Guru Granth Sahib ke context me kaise different ho sakta hai?",
+  "\"Desire hi problem hai kya?\" is question ka answer Gita, Katho Upanishad aur Ramcharitmanas ke different contexts se kaise diya jana chahiye?",
+  "\"Bhakti aur Karma me kya better hai?\" jaise question ka answer kisi ek path ko superior declare kiye bina scriptures ke according kaise diya jana chahiye?"
+ ],
+ "naye_bahar": [
+  "Srimad Bhagavatam me Prahlada ki devotion ki story ka central message kya hai?",
+  "Bhagavatam me Raja Parikshit ko Shuka se knowledge prapt karne ka context kya tha?",
+  "Bhagavatam me Krishna ki Govardhan episode ko traditional Indra worship ke context me kaise samjhaya gaya hai?",
+  "Bhagavatam me Gopis ki Krishna bhakti ko ordinary romantic attachment se alag kaise explain kiya jata hai?",
+  "Bhagavatam me Ajamil ki story naam-smaran ke concept ko kaise illustrate karti hai?",
+  "Chandogya Upanishad me Shvetaketu ko diye gaye teachings ka central idea kya hai?",
+  "Brihadaranyaka Upanishad me Yajnavalkya aur Maitreyi ka dialogue kis question par focus karta hai?",
+  "Mandukya Upanishad ke waking, dreaming, deep sleep aur fourth state ko simple example se kaise samjhayenge?",
+  "Yoga Sutras me Abhyasa aur Vairagya ko together practice karne ka kya logic hai?",
+  "Patanjali ke according obstacles to yoga practice kaunse types ke hote hain?",
+  "Yoga Sutras me Kleshas kya hain aur ye human suffering ko kaise influence karte hain?",
+  "Avidya ko Patanjali spiritual ignorance ka root kyu mante hain?",
+  "Asmita, Raga aur Dvesha ek normal person's behaviour me kaise appear ho sakte hain?",
+  "Patanjali ke Yoga Sutras me Ishvara ka concept kis context me aata hai?",
+  "Dasam Granth me warrior spirit aur spiritual discipline ka combination kaise dikhai deta hai?",
+  "Dasam Granth ke context me courage ko sirf physical bravery se beyond kaise samjha ja sakta hai?",
+  "Dasam Granth me divine power aur righteous action ke beech kya relationship dikhai deta hai?",
+  "Dasam Granth ki compositions Sikh tradition ke broader spiritual framework me kya role play karti hain?",
+  "Dhammapada me mind ko actions ka starting point kyu kaha gaya hai?",
+  "Dhammapada me anger ko overcome karne ke liye kya practical teaching milti hai?",
+  "Dhammapada ke according careless living aur mindful living me kya difference hai?",
+  "Dhammapada me wise person aur foolish person ke behaviour ko kaise contrast kiya gaya hai?",
+  "Majjhima Nikaya me Middle Way ka practical meaning kya hai?",
+  "Majjhima Nikaya me suffering ke causes ko samajhne ka approach kya hai?",
+  "Majjhima Nikaya ke according meditation aur ethical conduct ek dusre se kaise connected hain?",
+  "Majjhima Nikaya me Buddha teacher aur student ke relationship ko kis tarah approach karte hain?",
+  "Lotus Sutra me Bodhisattva ideal ko kaise present kiya gaya hai?",
+  "Lotus Sutra me skillful means ka concept kya hai?",
+  "Lotus Sutra ki Burning House parable kya samjhati hai?",
+  "Lotus Sutra ke according different spiritual paths ke peeche deeper unity kya ho sakti hai?",
+  "Tattvartha Sutra me Jain philosophy ke core principles ko kaise organize kiya gaya hai?",
+  "Tattvartha Sutra ke according right faith, right knowledge aur right conduct ka relation kya hai?",
+  "Acharanga Sutra me Ahimsa ko daily conduct ke level par kaise samjha gaya hai?",
+  "Acharanga Sutra ke according monk ko living beings ke prati kis type ki awareness rakhni chahiye?",
+  "Tao Te Ching me Wu Wei ka actual practical meaning kya hai?",
+  "Tao Te Ching ke according leadership me excessive control problem kyu create karta hai?",
+  "Tao Te Ching me softness ko strength ke form me kaise explain kiya gaya hai?",
+  "Analects me Confucius ne ideal human being ke liye Ren ko kyu important mana?",
+  "Analects me family respect aur social harmony ke beech kya connection bataya gaya hai?",
+  "Meditations me Marcus Aurelius external events aur apne judgments ke beech kya difference batate hain?",
+  "The Prophet me Almustafa ke teachings me love aur freedom ka kya relationship hai?",
+  "The Imitation of Christ me inner humility aur worldly recognition ke beech kya contrast diya gaya hai?",
+  "Mantra Shakti ke according mantra ko activate ya siddh karne ke liye kya principles important hote hain?",
+  "Mantra Shakti me mantra jap ke liye mala ka kya significance bataya gaya hai?",
+  "Mantra Shakti ke context me beej mantra kya role play karta hai?",
+  "Mantra Shakti ke according mantra jap me sankalp ka kya importance hai?",
+  "Nitya Devta Archana me daily devta worship ko routine ka part banane ka kya purpose hai?",
+  "Nitya Karm Pooja aur Nitya Devta Archana ko daily spiritual routine me kaise integrate kiya ja sakta hai?",
+  "Nitya Devta Archana me daily devta puja ka sequence kis principle par based ho sakta hai?",
+  "Nitya Devta Archana me Panchopachar aur Shodashopachar puja me kya difference hai?",
+  "Nitya Devta Archana ke context me kalash ko sacred kyu mana jata hai?",
+  "Nitya Devta Archana me family members ek saath puja karein to kya spiritual significance ho sakta hai?",
+  "Nitya Devta Archana me puja ke samay shuddhi ka kya importance hai?",
+  "Mantra Shakti ke context me mantra, yantra aur tantra ke basic relationship ko kaise samjha jata hai?",
+  "Mantra Shakti ke according mantra jap me diksha ka kya importance hai?",
+  "Mantra Shakti ke according jap karte samay sankalp galat ya unclear ho to kya problem ho sakti hai?",
+  "Ramcharitmanas aur Valmiki Ramayan me same prasang ko padhte waqt source difference ko kaise identify karein?",
+  "Bhagavatam me Gajendra Moksha ki story ka spiritual lesson kya hai?",
+  "Bhagavatam me Ajamila ki story ko naam ke spiritual power se kaise relate kiya jata hai?",
+  "Bhagavatam me Uddhava ko Krishna ki teachings ka kya importance hai?",
+  "Uddhava Gita aur Bhagavad Gita ke purpose me kya difference hai?",
+  "Bhagavatam me Rishabhdev ke teachings ka central theme kya hai?",
+  "Bhagavatam me Jad Bharat ki story ego aur identity ke bare me kya sikhati hai?",
+  "Bhagavatam me King Parikshit ke curse ka complete context kya tha?",
+  "Ramcharitmanas aur Valmiki Ramayan me Ram ke character presentation me kya major difference milta hai?",
+  "\"Mind ko control karna hai\" — is question ka answer Gita aur Yoga Sutras dono se kaise retrieve karna chahiye?",
+  "Patanjali ke Kleshas aur Gita ke Kama-Krodha-Lobha ko compare karne par suffering ka common root kya dikhta hai?",
+  "Yoga Sutras ka Vairagya aur Gita ka Anasakti kya exactly same concept hai?",
+  "Patanjali ke Abhyasa aur Gita ke repeated spiritual discipline me kya similarity hai?",
+  "\"Mantra ka jap karne se kya hota hai?\" iska answer Mantra Shakti aur Mantra Maha Sagar se source-specific kaise diya jana chahiye?",
+  "Mantra Shakti aur Mantra Maha Sagar me mantra sadhana ke rules ko compare karne par kya common points milte hain?",
+  "Nitya Karm Pooja aur Nitya Devta Archana me kya difference hai?",
+  "Nitya Devta Archana aur Mantra Shakti me devta worship ka approach kis tarah different ho sakta hai?",
+  "Lal Kitab me diya gaya upay aur Nitya Devta Archana ki daily puja practice ek dusre se kaise different hain?",
+  "Vishnu Puran ke Dhruva aur Bhagavat tradition ke Dhruva ko retrieve karte waqt source confusion kaise avoid karna chahiye?",
+  "Rigved ke Gayatri mantra aur Mantra Shakti me milne wale Gayatri-related material ko RAG kaise distinguish kare?",
+  "\"Shiv ji ki puja ka simple tarika\" query me Shiv Puran, Nitya Devta Archana aur Nitya Karm Pooja me se relevant source kaise choose kiya jana chahiye?",
+  "\"Ego chhodna hai\" is query ko Gita ke Ahankar, Guru Granth Sahib ke Haumai aur Yoga philosophy ke Kleshas se kaise compare kiya ja sakta hai?"
+ ],
+ "naye_design": [
+  "Mahabharata ke different volumes ko padhte waqt Parva sequence ko samajhna RAG retrieval ke liye kyu important hai?",
+  "Agar Mahabharata me ek hi character ka reference alag-alag Parva me aaye to SAARTHI ko relevant context kaise identify karna chahiye?",
+  "Agar user sirf \"Ram ji ne Shabari ke ber kyu khaye?\" puche to RAG ko kaunsi book ke context ko priority deni chahiye?",
+  "\"Shani kharab hai kya karu?\" jaise vague user question ko answer karne se pehle SAARTHI ko kya information leni chahiye?",
+  "Agar user puche \"Ramayan me Ram ka ideal aur Gita me Krishna ka ideal kya same hai?\" to SAARTHI ko dono books se evidence lekar comparison kaise karna chahiye?",
+  "Agar main puchu \"Ram ji ne apne father ki baat kyu maani jabki unka koi fault nahi tha?\" to SAARTHI ko Ramayan ke kis context ko retrieve karna chahiye?",
+  "Mahabharata ke Krishna aur Bhagavad Gita ke Krishna ko alag context me identify karna RAG ke liye kyu important hai?",
+  "Agar user puche \"108 baar mantra kyu japte hain?\" to SAARTHI ko kis book me exact explanation available hai ye kaise identify karna chahiye?",
+  "\"Mantra siddh karna hai\" aur \"daily mantra jap karna hai\" in dono queries me retrieval intent ka kya difference hai?",
+  "Agar user mantra ka exact naam galat spelling me likhe to RAG ko relevant mantra kaise identify karna chahiye?",
+  "\"Om Namah Shivay ka jap kaise karu?\" is query me SAARTHI ko mantra knowledge aur daily puja knowledge dono ko kaise combine karna chahiye?",
+  "Daily puja me sankalp aur mantra jap ka sequence samajhne ke liye SAARTHI ko kaunsi book priority deni chahiye?",
+  "Agar do alag sources me Ekadashi date different mile to SAARTHI ko answer dene se pehle kya verify karna chahiye?",
+  "\"Shani kharab hai kya?\" aur \"Shani ke liye upay batao\" in dono queries ke retrieval requirements kya different hain?",
+  "\"Meri kundli me Rahu hai\" itni incomplete query ko SAARTHI ko directly remedy dene ke bajay kya clarify karna chahiye?",
+  "\"Shaadi ke liye shubh date batao\" ek responsible spiritual AI ko user se kaunsi additional information leni chahiye?",
+  "Agar user sirf \"Surya weak hai\" bole to SAARTHI ko astrology book aur Lal Kitab ke source ko kaise distinguish karna chahiye?",
+  "Prahlad ki story agar Vishnu Puran aur Narshim Puran dono me aaye to SAARTHI ko source attribution kaise karna chahiye?",
+  "Bhavishya Puran ke festival references aur Ekadashi book ke vrat rules me information overlap ho to source kaise identify karenge?",
+  "Agni Puran ke mantra-related material ko Mantra Maha Sagar se compare karte waqt exact source attribution kyu important hai?",
+  "Garud Puran aur Agni Puran dono me rituals mil sakte hain to RAG ko relevant passage kaise distinguish karna chahiye?",
+  "\"Puja kaise karni chahiye?\" jaise broad question ke liye SAARTHI ko ek hi book ka answer dena chahiye ya user intent identify karna chahiye?",
+  "Agar ek mantra different books me slightly different form me mile to SAARTHI ko kya show karna chahiye?",
+  "Mahabharata Volume 1 aur Volume 2 me content transition ko identify karna RAG testing ke liye kyu important hai?",
+  "Mahabharata Volume 3 aur Volume 4 ke questions ko sirf \"Mahabharata\" tag se store karna retrieval me kya problem create kar sakta hai?",
+  "Mahabharata ke kisi event ka exact volume identify karne ke liye metadata me kaunse fields useful honge?",
+  "Agar user puche \"Draupadi ka cheer haran kis volume me hai?\" to semantic search ke saath metadata filtering kyu useful hogi?",
+  "\"Bhishma ne kya kaha tha?\" jaise ambiguous question me SAARTHI ko clarification kab maangni chahiye?",
+  "Mahabharata me Krishna ke multiple roles ko retrieve karne ke liye character-based indexing ka kya benefit hoga?",
+  "Mahabharata me same character ke childhood aur war-period references ko RAG kaise separate kare?",
+  "Agar user \"Chakravyuh me kya hua tha?\" puche to SAARTHI ko event ke pehle aur baad ka context bhi retrieve karna chahiye?",
+  "Ramcharitmanas ke doha/chaupai aur Bhagavad Gita ke shlok ko RAG metadata me alag kaise identify karna chahiye?",
+  "Agar user exact chaupai ka half part type kare to semantic retrieval kaise help karega?",
+  "\"Mantra ka meaning batao\" jaise query me exact mantra identify kiye bina answer dena RAG quality ko kaise damage kar sakta hai?",
+  "Agar user kisi mantra ka pronunciation galat type kare to fuzzy search aur semantic search ka combination kaise useful hoga?",
+  "Agar user Guru Granth Sahib ka exact passage nahi jaanta aur sirf meaning batata hai to RAG ko source retrieve karne ke liye kya strategy use karni chahiye?",
+  "Agar user kisi book ka naam nahi batata aur question multiple books me answer ho sakta hai to SAARTHI ko source kaise select karna chahiye?",
+  "Agar retrieved passages ek dusre se apparently contradict karte hain to AI ko ek answer invent karne ke bajay kya karna chahiye?",
+  "RAG system ko kaise test karenge ki AI correct answer ke saath correct book name bhi bata raha hai?",
+  "Agar user question ka answer uploaded 31 books me available hi nahi hai to SAARTHI ko hallucination se kaise bachna chahiye?",
+  "SAARTHI GYAAN ko kaise ensure karna chahiye ki spiritual answer dete waqt woh apni personal opinion ke bajay uploaded books ke verified context par based answer de?"
+ ]
 }

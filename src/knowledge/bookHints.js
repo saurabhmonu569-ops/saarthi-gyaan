@@ -101,17 +101,30 @@ export const BOOK_HINTS = {
 
   "garud": "garuda_purana_1", "garuda": "garuda_purana_1",
   "गरुड़ पुराण": "garuda_purana_1", "गरुड पुराण": "garuda_purana_1",
+  // ⚠️ Khand 2 wale naam PEHLE — warna generic "shiv puran" unhe khand 1
+  // par bhej deta hai (naapa gaya: "Shiv Puran Khand 2" → shiva_purana_1).
+  "shiv puran khand 2": "shiva_purana_2", "shiva purana khand 2": "shiva_purana_2",
+  "शिव पुराण खण्ड २": "shiva_purana_2", "शिव पुराण खंड 2": "shiva_purana_2",
+  "jyotirlinga": "shiva_purana_2", "ज्योतिर्लिंग": "shiva_purana_2",
   "shiv puran": "shiva_purana_1", "shiva puran": "shiva_purana_1", "शिव पुराण": "shiva_purana_1",
   "vishnu puran": "vishnu_purana_1", "विष्णु पुराण": "vishnu_purana_1",
   "agni": "agni_purana", "अग्नि पुराण": "agni_purana",
   "narsimha": "narasimha_purana", "narasimha": "narasimha_purana", "नरसिंह पुराण": "narasimha_purana",
+  // "Narshim Puran" — user ki apni PDF ka naam yahi hai, aur is spelling
+  // par pehle koi hint nahi lagta tha.
+  "narshim": "narasimha_purana", "narsingh": "narasimha_purana", "नृसिंह": "narasimha_purana",
   "bhavishya": "bhavishya_purana", "भविष्य पुराण": "bhavishya_purana",
   "rigved": "rigveda_1", "rigveda": "rigveda_1", "ऋग्वेद": "rigveda_1",
   "samved": "samaveda", "samaveda": "samaveda", "सामवेद": "samaveda",
   "yajurved": "yajurveda", "yajurveda": "yajurveda", "यजुर्वेद": "yajurveda",
   "atharv": "atharvaveda_1", "atharva": "atharvaveda_1", "अथर्ववेद": "atharvaveda_1",
   // Batch 2
+  // ⚠️ "katha upanishad" YAHAN, generic "upanishad" se PEHLE. Naapa gaya:
+  // pehle "Katha Upanishad me kya hai" → ishadi_upanishad chala jaata tha,
+  // kyunki neeche wala generic "upanishad" pehle match kar leta tha.
   "kathopanishad": "kathopanishad", "katho": "kathopanishad", "nachiketa": "kathopanishad",
+  "katha upanishad": "kathopanishad", "kath upanishad": "kathopanishad",
+  "yamraj": "kathopanishad", "shreyas": "kathopanishad", "preyas": "kathopanishad",
   "कठोपनिषद": "kathopanishad", "नचिकेता": "kathopanishad",
   "upanishad": "ishadi_upanishad", "upnishad": "ishadi_upanishad", "उपनिषद": "ishadi_upanishad", "ईशादि": "ishadi_upanishad",
   "granth sahib": "guru_granth_sahib", "gurbani": "guru_granth_sahib", "guru nanak": "guru_granth_sahib",
@@ -126,6 +139,13 @@ export const BOOK_HINTS = {
   "योगवासिष्ठ": "yoga_vasishtha", "योग वासिष्ठ": "yoga_vasishtha",
   "योगवाशिष्ठ": "yoga_vasishtha", "वसिष्ठ": "yoga_vasishtha", "वशिष्ठ": "yoga_vasishtha",
   "महारामायण": "yoga_vasishtha", "वैराग्य": "yoga_vasishtha",
+  // ⚠️ Is granth ka ROMAN naam hint-list me tha hi nahi — sirf Devanagari
+  // aur "pooja vidhi". "Nitya Karm Pooja me achaman ka purpose kya hai?"
+  // jaise seedhe sawaal par koi granth hinted nahi hota tha.
+  "nitya karm pooja": "nitya_karm_pooja", "nitya karm": "nitya_karm_pooja",
+  "nityakarm": "nitya_karm_pooja", "sandhya vandan": "nitya_karm_pooja",
+  "achaman": "nitya_karm_pooja", "arghya": "nitya_karm_pooja",
+  "naivedya": "nitya_karm_pooja", "sankalp": "nitya_karm_pooja",
   "pooja vidhi": "nitya_karm_pooja", "नित्य कर्म पूजा": "nitya_karm_pooja", "नित्य पूजा": "nitya_karm_pooja",
   "ramcharitmanas": "ramcharitmanas", "ramcharit manas": "ramcharitmanas",
   "रामचरितमानस": "ramcharitmanas", "रामचरित मानस": "ramcharitmanas",
