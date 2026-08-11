@@ -487,6 +487,57 @@ export function useChat({
         : null;
       console.log(`[Aadhaar] ${_why ? "footer NAHI laga — " + _why : `footer lagega — ${groundedChunks.length} grounded chunks`}`);
 
+      // ── ANDAR KE NIRDESH JAWAB SE HATAO (2026-08-11) ─────────────────
+      //
+      // ASLI GHATNA: har jawab ke ant mein user ko ye dikh raha tha —
+      //     [REPLY LANGUAGE: shuddh saral HINDI (Devanagari)]
+      // Ye tag gemini.js user-message ke ant mein jodta hai taaki model
+      // sahi bhasha chune (languagePinned). SYSTEM_PROMPT mein saaf likha
+      // hai ki ye SYSTEM ka nirdesh hai — par model use jawab mein likh
+      // deta hai. Wahi purana sabak: prompt KEHTA hai, code NIBHATA hai.
+      //
+      // Yahan uske do roop pakadte hain: bracket wala tag, aur agar model
+      // use bina bracket ke likh de.
+      if (responseText) {
+        const pehle = responseText;
+        responseText = responseText
+          .replace(/\n*\s*\[?\s*REPLY\s+LANGUAGE\s*:[^\]\n]*\]?\s*/gi, "\n")
+          .replace(/\n{3,}/g, "\n\n")
+          .trim();
+        if (pehle !== responseText) console.log("[Aadhaar] andar ka [REPLY LANGUAGE] tag hataya");
+      }
+
+      // ── ADHOORI BHOOMIKA HATAO ───────────────────────────────────────
+      //
+      // verifyAnswer() gadha hua UDDHARAN hata deta hai — ye sahi kaam hai.
+      // Par uski BHOOMIKA wali line reh jaati thi, aur jawab mein aisa
+      // dikhta tha:
+      //     "गीता के दूसरे अध्याय में भगवान श्रीकृष्ण कहते हैं:"   ← phir kuch nahi
+      //     "यह श्लोक बताता है कि संस्कारों से…"                  ← koi shlok hi nahi
+      // Jhoothi citation se kam gambhir hai, par user ko adhoora aur
+      // laparwah dikhta hai.
+      //
+      // Ilaaj: agar jawab mein koi uddharan bacha hi nahi (📜 ya quote),
+      // to uski taraf ishara karne wali line bhi hata do.
+      if (responseText && !/📜|["""«»]/.test(responseText)) {
+        const pehle = responseText;
+        responseText = responseText
+          .split("\n")
+          .filter(line => {
+            const t = line.trim();
+            if (!t) return true;
+            // "…कहते हैं:" / "…कहा गया है:" — bhoomika jiska uddharan gaya
+            if (/(?:कहते\s*हैं|कहा\s*गया\s*है|likha\s*hai|कहा\s*है)\s*[:：]\s*$/.test(t)) return false;
+            // "यह श्लोक बताता है…" / "इस श्लोक का अर्थ…" — jab shlok hai hi nahi
+            if (/^(?:यह|इस|उपर्युक्त)\s*श्लोक/.test(t)) return false;
+            return true;
+          })
+          .join("\n")
+          .replace(/\n{3,}/g, "\n\n")
+          .trim();
+        if (pehle !== responseText) console.log("[Aadhaar] adhoori bhoomika hatai (uddharan hat chuka tha)");
+      }
+
       // PANNA HATAO — prompt kehta hai, CODE nibhata hai (2026-08-10).
       //
       // SYSTEM_PROMPT me "panna kabhi mat likho" saaf likha hai. Par is app

@@ -97,3 +97,57 @@ describe("grounded ka faisla — client server se NAHI takraye (2026-08-10)", ()
     expect(grounded({ grounded: true, rerank: 0.99, text: kachra })).toBe(false);
   });
 });
+
+describe("jawab ki safai — andar ke nirdesh aur adhoori bhoomika (2026-08-11)", () => {
+  // Ye wahi do saaf-dikhne wali galtiyan hain jo live app par mili:
+  //
+  //   1. Har jawab ke ant mein user ko dikh raha tha:
+  //        [REPLY LANGUAGE: shuddh saral HINDI (Devanagari)]
+  //      Ye gemini.js ka andar ka tag hai. SYSTEM_PROMPT me saaf mana hai,
+  //      par model phir bhi likh deta hai — isliye ilaaj code me.
+  //
+  //   2. verifyAnswer() gadha hua uddharan hata deta hai (sahi kaam), par
+  //      uski bhoomika reh jaati thi:
+  //        "…श्रीकृष्ण कहते हैं:"        ← phir kuch nahi
+  //        "यह श्लोक बताता है कि…"       ← koi shlok hi nahi
+  //
+  // Yahan wahi do safai-niyam hain jo useChat.js me lage hain.
+
+  const hataoTag = (t) => t
+    .replace(/\n*\s*\[?\s*REPLY\s+LANGUAGE\s*:[^\]\n]*\]?\s*/gi, "\n")
+    .replace(/\n{3,}/g, "\n\n").trim();
+
+  const hataoBhoomika = (t) => {
+    if (/📜|["""«»]/.test(t)) return t;   // uddharan bacha hai — chhoona nahi
+    return t.split("\n").filter(line => {
+      const s = line.trim();
+      if (!s) return true;
+      if (/(?:कहते\s*हैं|कहा\s*गया\s*है|likha\s*hai|कहा\s*है)\s*[:：]\s*$/.test(s)) return false;
+      if (/^(?:यह|इस|उपर्युक्त)\s*श्लोक/.test(s)) return false;
+      return true;
+    }).join("\n").replace(/\n{3,}/g, "\n\n").trim();
+  };
+
+  it("[REPLY LANGUAGE] tag jawab se hat jaata hai", () => {
+    const t = "मोक्ष के चार मार्ग हैं।\n\n[REPLY LANGUAGE: shuddh saral HINDI (Devanagari)]";
+    expect(hataoTag(t)).toBe("मोक्ष के चार मार्ग हैं।");
+    expect(hataoTag(t)).not.toMatch(/REPLY LANGUAGE/i);
+  });
+
+  it("bina bracket ke likha ho tab bhi hatta hai", () => {
+    expect(hataoTag("जवाब।\nREPLY LANGUAGE: HINDI")).toBe("जवाब।");
+  });
+
+  it("adhoori bhoomika hatti hai jab uddharan bacha hi nahi", () => {
+    const t = "संस्कार महत्वपूर्ण हैं।\nगीता में श्रीकृष्ण कहते हैं:\nयह श्लोक बताता है कि संस्कार शुद्ध करते हैं।";
+    const out = hataoBhoomika(t);
+    expect(out).toBe("संस्कार महत्वपूर्ण हैं।");
+  });
+
+  it("ASLI uddharan ho to bhoomika ko HAATH NAHI lagata", () => {
+    // Ye sabse zaroori jaanch hai — safai ka kaam sirf TOOTI cheez hatana
+    // hai, sahi jawab ko chhaantna nahi.
+    const t = 'गीता में श्रीकृष्ण कहते हैं:\n📜 "कर्मण्येवाधिकारस्ते मा फलेषु कदाचन"\nयह श्लोक कर्म का महत्व बताता है।';
+    expect(hataoBhoomika(t)).toBe(t);
+  });
+});
