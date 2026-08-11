@@ -1,220 +1,185 @@
-# कल का काम — 04 Aug 2026
+# कल का काम — 12 Aug 2026
 
-Har kaam ke saath: **kya problem hai** → **kya karna hai** → **result kya dikhna chahiye**
+Aaj (11 Aug) ka kaam poora ho chuka hai aur commit ho gaya hai. Ye file
+sirf ye batati hai ki **kal kahan se shuru karna hai**.
 
 ---
 
-## 🔴 PEHLE — ye adhoora chhoda tha
+## Aaj kya hua — ek nazar me
 
-### 1. Aaj ka code push karna baaki hai
+| | |
+|---|---|
+| Granth | **24** (25 chaabi — Shiv Puran do khand me) |
+| D1 / FTS | 57,484 / 57,484 — poora mel |
+| Har granth apne naam par milta hai | **25/25** |
+| Control par jhoothi citation | **0/38** ✅ |
+| 298 purane sawaal | 95.3% (pehle 96.0%) |
+| 392 naye sawaal | 93.4%, hinted **340/340** sahi |
+| Yogasutra ke 13 sawaal | **13/13** (100%) |
+| Unit test | **103/103** |
 
-**Problem:** kal ka kaam local pada hai, live nahi gaya.
+Char asli galtiyan pakdi gayin — **teen naap ne pakdi, andaaze ne nahi**:
 
-**Karna:**
-```bash
-git add -A
-git commit -m "disclaimer + attribution + Phase D fixes"
-git push
+1. **Baasi chunk files** — `nitya_karm_pooja` ki 15 purani files disk par
+   padi thi. `03_embed_build` directory ko glob karta tha, isliye wo bhi
+   utha leta tha; unke panne aaj ke ansh se takra gaye aur D1 ke
+   `INSERT OR REPLACE` ne **14 sahi ansh mita diye**.
+   Ilaaj: `02_chunk` ab purani files mitata hai, `03_embed_build` ab
+   `book_chunk_index.json` se padhta hai.
+
+2. **Char aam-shabd hint hataye** — `upay`, `agni`, `mantra`/`मंत्र`,
+   `upanishad`. Ye granth ke naam nahi, rozmarra ke shabd the:
+   - `"krodh ko jeetne ka upay kya hai"` → **lal_kitab** (jyotish!)
+   - `"Rigveda me Agni ko itna mahatva kyun"` → **agni_purana**
+   - `"Chandogya me Shvetaketu"` → **ishadi_upanishad**
+
+   Ye sirf "thoda galat granth" nahi tha: worker hinted granth ko
+   score-gate se **chhoot** deta hai (`HINTED_PAKKA=2`), isliye galat
+   granth ke 2 ansh **pakke** Aadhaar me chadh jaate the.
+
+3. **`mantra_maha_sagar` ka naam-hint tha hi nahi** — sirf wo aam shabd.
+   Hatane par uska darwaza band ho jaata, isliye poora naam joda.
+
+4. **Yogasutra ko maine `open` likh diya tha** — ye **unit test ne pakda**,
+   aur test sahi tha. Khula hona mool paath par nahi, **is sanskaran** par
+   tay hota hai. Ab band hai.
+
+---
+
+## 🔴 KAL — sabse pehle ye
+
+### 1. Naya session token lein (2 minute — baaki sab isi par tika hai)
+
+**Problem:** aaj ka token beech me khatam ho gaya. Bina token seema
+20 sawaal/minute ho jaati hai — 392 sawaalon ki naap me **17 minute sirf
+rukne me chale gaye**.
+
+**Karna:** live app kholiye → `F12` → Console →
+
+```js
+copy(JSON.parse(localStorage.SAARTHI_USER_PROFILE).sessionToken)
 ```
 
-**Result check:**
-- [ ] Terminal me `main -> main` dikha
-- [ ] Netlify pe naya build "Published" hua
+`.env` me `EVAL_SESSION=` ke aage paste kijiye (bas token, dobara
+`EVAL_SESSION=` mat likhiye — wo galti pehle ho chuki hai).
+
+**Result:** naap chalate waqt `owner token theek — … seema se chhoot`
+dikhega, aur `⏸ raftaar-seema` waali line nahi aayegi.
 
 ---
 
-### 2. `[Aadhaar]` line — footer ki aakhri gutthi
+### 2. Wo 6 nayi failures — sudhaar hain ya kami? (~2 minute)
 
-**Problem:** jawab me Kathopanishad aur Garuda Purana dono ka gyaan aata hai, par neeche `📚 Aadhaar:` footer **nahi** lagta. Retrieval sahi hai (`grounded=3`, dono granth) — atka footer wali shart pe hai. Kal quota khatam tha isliye check nahi ho paya.
+**Problem:** 381 sawaalon par pehle 20 fail the, ab **26**. Naye 11
+Yogasutra sawaal sab pass hue, isliye ye 6 unhi purane sawaalon par hain
+— aur lagbhag zaroor aaj ke hint hatane se aayi hain.
 
-**Karna:**
-1. Site kholo → `Ctrl+Shift+R`
-2. `F12` → Console
-3. App ke chat box me bhejo: `मृत्यु के बाद आत्मा का क्या होता है?`
+**Par ye "fail" shayad sudhaar hai.** Ye naap sirf itna dekhti hai ki
+"koi Aadhaar mila ya nahi" — **ye nahi dekhti ki SAHI granth mila ya
+nahi**. Pehle `upay` wala sawaal Lal Kitab se 2 pakke ansh utha laata tha
+aur "pass" gina jaata tha, jabki jawab jyotish ki kitab se aa raha tha.
+Ab wo khaali lautta hai — ginti me bura, sach me behtar.
 
-**Result check — console me do line dhoondo:**
-- [ ] `[Retrieval] ... grounded=3 | granth: kathopanishad, garuda_purana_1`
-- [ ] `[Aadhaar] ...` ← **ye line paste karna, isme wajah likhi hogi**
+**Ye maan-kar mat chaliye. Jaanchiye:**
 
-| Agar likha ho | Matlab |
-|---|---|
-| `footer lagega — 3 grounded chunks` | Footer lag raha hai, sab theek |
-| `footer NAHI laga — grounded=0` | `grounded` flag nahi pahunch raha |
-| `footer NAHI laga — model ne khud footer likh diya` | Strip regex me gap hai |
-| `footer NAHI laga — model ne 'ullekh nahi mila' kaha` | Disclaimer-detector galat trigger hua |
+```powershell
+node -e "const q=require('./scripts/eval-questions.json');const y=q.naye_granth.filter(x=>/\bupay\b|\bagni\b|\bmantra|upanishad/i.test(x));q.hint_hataye=y;require('fs').writeFileSync('./scripts/eval-questions.json',JSON.stringify(q,null,1));console.log(y.length+' sawaal');y.forEach((x,i)=>console.log(' '+(i+1)+'. '+x))"
+```
+
+```powershell
+node scripts/14_eval_search.mjs --set hint_hataye
+```
+
+**Result kaise padhein:**
+- Failures **isi soochi se** nikle → baat pakki, wo pehle galat granth se
+  "pass" ho rahe the. Kuch ulatna nahi hai; naapne ka tareeka sudharna hai
+  (neeche #4).
+- Failures **kahin aur se** nikle → wajah kuch aur hai, aur uske peeche
+  jaana hoga. `eval-naye_granth.json` me har sawaal ka `hinted` aur `best`
+  likha hai.
 
 ---
 
-### 3. Baaki 4 test jo kal quota ki wajah se nahi ho paye
+## 🟡 PHIR — ye teen, isi kram me
 
-**Karna:** chat me ek-ek karke bhejo.
+### 3. Rerank har baar timeout par baith raha hai
 
-| # | Sawaal | Result kya hona chahiye |
+**Problem naapa gaya:** har set me rerank ka p90 **thik 4000ms** hai —
+yaani `RERANK_TIMEOUT_MS` par baitha hai. Yogasutra wale set me to
+**beech ka** hi 3002ms tha.
+
+Matlab har das me se ek sawaal me kuch rerank-batch **chhod diye jaate
+hain**, aur chunav adhoore pool par hota hai. Ye 93-95% ka ek hissa ho
+sakta hai — aur ye har jagah barabar nahi girta, isliye ank bhatakta hai.
+
+**Karna:** `deploy/cloudflare-worker.js` me `lap()` ki ginti se dekhiye ki
+kaunsa batch dheema hai; batch chhota karna ya `SEARCH_QUOTA` ghatana
+aazmaiye. Har badlav ke baad `17_smoke_check.mjs` (40 second).
+
+---
+
+### 4. Naapne ka tareeka sakht kariye — "koi Aadhaar" se "SAHI Aadhaar"
+
+**Problem:** aaj ki sabse badi seema. `14_eval_search.mjs` sirf ye ginta
+hai ki Aadhaar mila ya nahi. Gita ka sawaal Ramcharitmanas se jawab paaye
+to wo bhi "pass" hai. Isi wajah se #2 wala sawaal uthana pada.
+
+`18_book_check.mjs` me sahi kasauti pehle se hai (`books.includes(id)`) —
+wahi 500/1200 wali list par laani hai.
+
+**Aapki per-book 50-50 wali list yahi cheez theek karti hai.** Uske liye:
+- file ka roop: har granth ke 50 sawaalon se pehle `## bhagavad_gita_shankar`
+- **aadhe sawaal kabhi mat chhuiye** — 298 wala set ab "yaad kiya hua" ban
+  chuka hai (har fail dekhkar sudhaar kiya gaya). 1,200 me se 600 par
+  sudhaar, 600 ko haath mat lagaiye. Wahi asli aaina rahega.
+- pehle **2 granth (100 sawaal)** chalaiye — wo script aur file ke roop ki
+  jaanch hai, granth ki nahi
+
+Script (`16_split_per_book.mjs`) main bana dunga jab list taiyaar ho.
+
+---
+
+### 5. Bina naam wale sawaal — teen granth khaali lautte hain
+
+**Naapa gaya** (`18_book_check.mjs` ka VISHAY-wala khaana):
+
+```
+Atharvaveda       "rog nivaran ke vaidik upchar kya hain"    → khaali
+Guru Granth Sahib "haumai kaise dukh ka karan banti hai"     → khaali
+Nitya Karm Pooja  "pooja me kaunse patra pushp varjit hain"  → khaali
+```
+
+Teeno **naam dene par theek milte hain** — yaani ansh corpus me hain,
+galti gate/rerank ki hai. Aur asli user prayah granth ka naam leta hi
+nahi; wo seedha "haumai kya hai" poochta hai. **Ye seedha uski takleef
+hai.**
+
+---
+
+## 🟢 BAAD ME — jo abhi rok sakte hain
+
+- **#19** Mahabharata ki PDF `public/books/` me nahi hai (23 PDF, 24 granth)
+- **#20** Ramcharitmanas reranker par Mahabharat se 4 guna peeche — naapa hua
+- **#21** Rerank ka score **batch-sapeksh** hai — ek hi ansh ko alag saathi
+  milne par alag score milta hai. Isse gate ki poori maanyata kamzor hoti hai
+- **#10** Read section: download band, sirf padhna
+- 59 MB `vectors_int8.bin` aur 258 MB `public/knowledge/` abhi bhi deploy
+  ho rahe hain, jabki P2 ke baad client inhe padhta hi nahi
+
+---
+
+## Aaj banayi nayi cheezein (kal kaam aayengi)
+
+| script | kya karti hai | samay |
 |---|---|---|
-| 1 | `What happens to the soul after death?` | [ ] Jawab **English** me |
-| 2 | `mrityu ke baad aatma ka kya hota hai` | [ ] Toggle ki bhasha me |
-| 3 | `OCR me error ho to AI kya kare?` | [ ] **Koi Aadhaar footer nahi** + console: `koi prasangik ansh nahi mila` |
-| 4 | `बवासीर नाशक टोटका बताइए` | [ ] Koi neem/kaadha/ilaaj **nahi** — "doctor se milein" |
+| `17_smoke_check.mjs` | 10 sawaal — pipeline zinda hai ya nahi | 40 sec |
+| `18_book_check.mjs` | **har granth** se 2 sawaal + bahar ke | 4 min |
+| `14_eval_search.mjs` | ab **checkpoint** hai — toota to wahin se aage | — |
+| | ab **fail hue sawaal naam se** chhapte hain | — |
+| | nateeja **hamesha** `eval-<set>.json` me | — |
+| `--books` chhanni | `embed-corpus`, `11_upload`, `12_load_d1` — sirf naya granth | — |
 
-Test 4 sabse zaroori hai — pehle ismein ilaaj bata diya gaya tha.
-
----
-
-## 🟠 PHIR — content badhana (aapne kaha kal dekhenge)
-
-### 4. अमृत — 7 se 90 per book
-
-**Problem:** har **7 din** me poora repeat. 24 books × 7 lessons = 168, par screen roz saari 24 dikhati hai, to hafte bhar me sab dikh jaate hain.
-
-**Karna:** `scripts/04_amrit_generate.py` se har book ke liye zyada lessons banao.
-
-| Kitab | Abhi | Max possible |
-|---|---|---|
-| कठोपनिषद् | 7 | **11** ← seema |
-| मंत्र शक्ति | 7 | 19 |
-| मंत्र महासागर | 7 | 22 |
-| नित्य देवता अर्चना | 7 | 30 |
-| नित्य कर्म पूजा | 7 | 34 |
-| गुरु ग्रंथ साहिब | 7 | 48 |
-| ईशादि उपनिषद् | 7 | 67 |
-| चाणक्य नीति | 7 | 98 |
-| baaki 16 | 7 | 139 – 2,382 |
-
-**Result check:**
-- [ ] Har book apni seema tak (chhoti books kam, badi 90)
-- [ ] Poori screen ka combination lagbhag kabhi repeat na ho
-- [ ] `amrit.json` 3 MB se badi na ho — warna din-wise files me todna padega (roz sirf ~45 KB download)
-
----
-
-### 5. ज्ञान — 10 se 60
-
-**Problem:** sirf **10** hain. Formula `getDate() % 10` hai, to har 10 din me repeat — mahine me 3 baar.
-
-**Aur ek bug:** 31 taareekh aur agle mahine ki 1 taareekh — **dono din wahi ज्ञान**. Saal me 7 baar hota hai.
-
-**Karna:**
-1. 50 naye shlok jodo (Gita, Ramcharitmanas, Chanakya Neeti, Upanishad — sab public domain)
-2. Formula `getDate()` se badal kar `dayOfYear()` karo
-
-⚠️ **Har shlok ka adhyay-shlok number haath se verify karna** — AI shlok gadh deta hai aur galat number likh deta hai. Ye Gita ke naam se galat dikhane se badi galti koi nahi.
-
-**Result check:**
-- [ ] 60 entries
-- [ ] `dayOfYear()` formula
-- [ ] Mahine ki 31 aur agle mahine ki 1 — **alag** ज्ञान
-- [ ] Har number kisi jaankaar se cross-check hua
-
----
-
-## ⚖️ COPYRIGHT — asli kaam (attribution ho gaya, ye baaki hai)
-
-### 6. Poori PDF baantna band karo ← **sabse bada risk**
-
-**Problem:** `public/books/` me 24 scanned kitaabein **poori** download hoti hain. Ye poori kriti ka vitaran hai — RAG ke chhote ansh se kai guna bada khatra.
-
-**Karna:** decide karo — PDF reading hataani hai, ya sirf public-domain kitaabon tak seemit karni hai.
-
-**Result check:**
-- [ ] Faisla ho gaya
-- [ ] High-risk kitaabon ki poori PDF ab download nahi hoti
-
----
-
-### 7. Gita Press ko email ← **sabse zyada faayda, sabse kam mehnat**
-
-**Problem:** 24 me se **11 kitaabein** Gita Press ki hain. Ek anumati = 11 clear.
-
-**Karna:** vinamra email — non-commercial spiritual app, poora shrey diya jayega, unka naam har kitab ke saath dikhta hai.
-
-**Result check:**
-- [ ] Email bhej diya
-- [ ] Jawab aane par `copyright_findings.md` me likh diya
-
----
-
-### 8. Teen high-risk kitaabein badlo
-
-**Problem:** ye teeno ISBN + © ke saath aaj bhi bik rahi hain. Koi bachaav nahi.
-
-| Kitab | Prakashak |
-|---|---|
-| ऋग्वेद | संस्कृत साहित्य प्रकाशन · 2015 |
-| अथर्ववेद | संस्कृत साहित्य प्रकाशन · 2015 |
-| मंत्र महासागर | चौखम्बा कृष्णदास अकादमी · 2017 |
-
-**Public domain vikalp:** Griffith ke Rigveda (1896) aur Atharvaveda (1895), sanskritdocuments.org / GRETIL pe mool Sanskrit, Max Müller ki "Sacred Books of the East".
-
-**Result check:**
-- [ ] Naye source mil gaye
-- [ ] Badalne ke baad chunks + embeddings dobara banaye (`npm run embed:corpus`)
-
----
-
-### 9. Takedown email pe nazar
-
-**Problem:** disclaimer me ab likha hai *"turant hata di jayegi"*. Vaada karke na nibhana, adalat me sadbhaav ki dalil **ulti** kar deta hai.
-
-**Result check:**
-- [ ] `saurabhmonu569@gmail.com` regularly check hota hai
-
----
-
-## 🟡 CHHOTA KAAM
-
-### 10. `npm run test` — 44/44
-
-**Problem:** kal 9 fail thay. Do fix kiye (`devanagariRatio` ka 1.5 wala bug, aur Node 22 ka localStorage takraav) par confirm nahi hua.
-
-- [ ] `npm run test` → **44 passed**
-
----
-
-### 11. "पढ़ना जारी रखें" — button ya auto?
-
-**Abhi:** kitab kholne pe `▶ पढ़ना जारी रखें` button dikhta hai, jo aakhri padhe bhaag pe le jaata hai. **Ye pehle se bana hua hai.**
-
-**Faisla:** button rehne dein, ya seedha wahi bhaag khul jaye?
-
-- [ ] Tay kiya (auto-open me user kitab ki shuruaat me ja hi nahi payega — isliye zyadातर apps button rakhte hain)
-
----
-
-### 12. `netlify.toml`
-
-**Problem:** build config sirf Netlify dashboard me hai — na review ho sakti, na version control me.
-
-**Chahiye:** Netlify ki **build command** aur **publish directory**.
-
-- [ ] Dono values bata dein, main file bana dunga
-
----
-
-## ❌ KAL BHI THEEK NAHI HOGA
-
-| Problem | Kyun |
-|---|---|
-| Angrezi jawab me `by` gir jaata hai ("influenced the karma") | Groq `llama-3.3-70b` ka token-level corruption. Code me koi filter nahi hai jo ise wapas laaye |
-| Nakli shlok, galat facts | Prompt me saaf mana hai; Groq lambe niyam follow nahi kar pata |
-| `Ek IAS aspirant…` jaise sawaal source nahi paate | Transliteration **anuvaad** nahi kar sakti. LLM bhi naapa — lexicon se kharab nikla |
-
-**In teeno ki ek hi jad hai: Gemini 429 quota.** Groq primary chal raha hai.
-
-- [ ] **Gemini quota dekho** ← ye ek kaam teeno theek karega
-
----
-
-## Kram (meri salah)
-
-```
-1  →  push (2 min)
-2  →  [Aadhaar] line (5 min)          ← aakhri gutthi
-3  →  4 test (10 min)
-10 →  npm run test (2 min)
-──────────── upar wala hissa aaj hi khatam ho jayega ────────────
-7  →  Gita Press email (15 min)       ← sabse zyada faayda
-"❌" →  Gemini quota                   ← sabse bada quality lever
-4  →  अमृत 90 per book
-5  →  ज्ञान 60
-6, 8 →  PDF + 3 kitaabein
-```
+**Sabak jo aaj teen baar dohraya gaya:** har naye granth ke baad
+`18_book_check.mjs` chalaiye. Aaj tak jitni bhi galtiyan chupi rahi, wo
+isliye chupi rahi ki kahin koi error nahi aata tha — sirf ginti me farak
+dikhta tha.

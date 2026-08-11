@@ -36,7 +36,7 @@
  * --save x    nateeja JSON me likho (baad me tulna ke liye)
  */
 
-import { readFileSync, writeFileSync, existsSync } from "node:fs";
+import { readFileSync, writeFileSync, existsSync, unlinkSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -233,10 +233,40 @@ for (const s of sets) {
               : `   (bina token: seema 20/min, isliye ${PACE_MS}ms ka antar — .env me EVAL_SESSION daalein to tez hoga)`));
   console.log(`${"═".repeat(66)}\n`);
 
-  const rows = [];
+  /**
+   * CHECKPOINT — 2026-08-11
+   * ------------------------
+   * KYUN: naye_granth me 392 sawaal hain, ~22 minute lagte hain. Beech me
+   * raftaar-seema lag jaaye, ya session token khatam ho jaaye, ya laptop
+   * so jaaye — to ab tak ka poora kaam chala jaata tha aur shuru se
+   * chalana padta tha. Ek baar aisa hua bhi.
+   *
+   * Ab har sawaal ke baad nateeja file me likh diya jaata hai. Wahi
+   * command dobara chalane par jahan chhoda tha wahin se aage badhta hai.
+   *
+   * Sawaal ka POORA PAATH chaabi hai, uska number nahi — kyunki soochi
+   * badal sakti hai (aaj hi naye_granth 381 se 392 hui). Number chaabi
+   * hota to soochi badalte hi purana checkpoint galat sawaal par jud
+   * jaata, aur wo galti chupchaap nateeje me chali jaati.
+   *
+   * --naya-shuru  se checkpoint anadekha karke shuru se chalta hai.
+   */
+  const CKPT = join(ROOT, `.eval-ckpt.${s}.json`);
+  let rows = [];
+  if (!process.argv.includes("--naya-shuru") && existsSync(CKPT)) {
+    try {
+      const saved = JSON.parse(readFileSync(CKPT, "utf8"));
+      if (Array.isArray(saved)) rows = saved;
+    } catch { /* kharab file — shuru se */ }
+  }
+  const hoChuke = new Set(rows.map(r => r.q));
+  if (rows.length) console.log(`  ⏩ checkpoint: ${rows.length}/${list.length} pehle se ho chuke
+`);
+
   let waited = 0;
   for (let i = 0; i < list.length; i++) {
     const q = typeof list[i] === "string" ? list[i] : (list[i].q || list[i].question);
+    if (hoChuke.has(q)) continue;
 
     // Worker 20 request/minute deta hai (RATE_PER_MIN). 3.2s ka antar
     // rakhte hain — thoda hashiya, kyunki KV ki ginti 60s ki khidki par
@@ -260,6 +290,9 @@ for (const s of sets) {
     rows.push({ q, set: s, books, n: r.chunks.length, ms: r.ms,
                 best: r.stats?.best ?? 0, hinted: r.hintedBook, skipped: r.skipped,
                 t: r.stats?.t || null });
+    // Har sawaal ke baad likho. 392 chhoti likhaayi 22 minute me kuch nahi
+    // hai, aur isi se poora run bachta hai.
+    writeFileSync(CKPT, JSON.stringify(rows), "utf8");
 
     const mark = r.skipped ? "○" : books.length ? "✓" : "✗";
     process.stdout.write(`\r  ${mark} ${i + 1}/${list.length}  `
@@ -267,6 +300,10 @@ for (const s of sets) {
   }
   console.log("\n");
   if (waited) console.log(`  (raftaar-seema ke kaaran kul ${(waited / 1000).toFixed(0)}s ruka)\n`);
+  // Poora set ho gaya — checkpoint ki ab zaroorat nahi. Use rakhe rehne
+  // dena khatarnak hai: agli baar wahi purana nateeja utha liya jaata aur
+  // naya naap chalta hi nahi, jabki dikhta ki chal gaya.
+  if (rows.length >= list.length) { try { unlinkSync(CKPT); } catch {} }
   out.push(...rows);
 
   // ── is set ki report ────────────────────────────────────────────────
@@ -287,6 +324,28 @@ for (const s of sets) {
       + `  (${(100 * withBooks.length / rows.length).toFixed(1)}%)`);
     console.log(`  koi granth nahi : ${rows.length - withBooks.length - skipped.length}`);
     console.log(`  daayre se bahar : ${skipped.length}`);
+
+    /**
+     * FAIL HUE SAWAAL DIKHAO — 2026-08-11
+     * -----------------------------------
+     * Pehle report sirf ginti deti thi: "26 ko granth nahi mila". Us ek
+     * ank se kuch nahi hota — 26 ek hi wajah se fail ho sakte hain, ya
+     * 26 alag wajah se. Pata karne ke liye 22 minute ka poora run dobara
+     * chalana padta tha, aur beech me main andaaze lagata tha.
+     *
+     * Ab wahi sawaal chhapte hain, aur unke saath do cheezein jo wajah
+     * batati hain: hinted granth (laga ya nahi) aur best rerank score
+     * (pool tak pahuncha par gate se gira, ya pool me aaya hi nahi).
+     */
+    const fail = rows.filter(r => !r.books.length && !r.skipped);
+    if (fail.length) {
+      console.log(`\n  ── jinhe koi granth nahi mila (${fail.length}) ──`);
+      for (const r of fail.slice(0, 40)) {
+        console.log(`     • ${r.q.slice(0, 66)}`);
+        console.log(`       hinted=${r.hinted || "—"}  best=${(r.best ?? 0).toFixed?.(3) ?? r.best}  ${r.ms}ms`);
+      }
+      if (fail.length > 40) console.log(`     … aur ${fail.length - 40}`);
+    }
   }
 
   // GRANTH-VITARAN — "bar bar same book aadhar me na aaye" ki jaanch
@@ -340,6 +399,13 @@ for (const s of sets) {
     }
   }
 }
+
+// Nateeja HAMESHA likho. Pehle sirf --save par likhta tha, aur aaj 22
+// minute ka run bina byore ke khatam ho gaya — 26 fail hue, par kaunse,
+// ye jaanne ka koi tareeka nahi bacha. Naapne ka kaam dobara karwane se
+// mehnga kuch nahi.
+writeFileSync(join(ROOT, `eval-${sets.join("-")}.json`), JSON.stringify(out, null, 1), "utf8");
+console.log(`  poora byora: eval-${sets.join("-")}.json`);
 
 const saveTo = arg("save");
 if (saveTo) {
