@@ -1089,6 +1089,11 @@ const PRASHN_NIYAM = [
    "$1 का स्वरूप और वर्णन"],
 
   // 4. "X कैसे करे / छोड़े / रोके"  →  "X का उपाय और विधि"
+  // ⚠️ Beech me koi shabd AANE MAT DO ((?:\S+\s+)? mat lagao).
+  // Naapa gaya: usse "गुस्सा कैसे शांत करें" → "गुस्सा का उपाय और विधि"
+  // ban gaya — "शांत" hi gaayab. Wo sawaal PEHLE SE paas ho raha tha.
+  // Aur "…जीवन में कैसे लागू करें" → "…जीवन में का उपाय" — toota vaakya.
+  // Sirf seedhe "X कैसे करे/छोड़े" par lagta hai; baaki jyon ke tyon.
   [/^(.{2,}?)\s*कैसे\s*(?:करे|करें|छोड़े|छोड़ें|त्यागें|रोके|रोकें|बचें|पाएं|पायें|करना\s*चाहिए|कर\s*सकते\s*हैं|किया\s*जा\s*सकता\s*है)\s*\??$/,
    "$1 का उपाय और विधि"],
 
@@ -1097,7 +1102,7 @@ const PRASHN_NIYAM = [
    "$1 की प्रक्रिया और वर्णन"],
 
   // 6. "X क्यों होता है / क्यों कहा जाता है"  →  "X का कारण"
-  [/^(.{2,}?)\s*क्यों\s*(?:है|हैं|होता\s*है|होती\s*है|कहा\s*जाता\s*है|माना\s*जाता\s*है|लेते\s*हैं|हुआ\s*था|बनता\s*है)\s*\??$/,
+  [/^(.{2,}?)\s*क्यों\s*(?:है|हैं|होता\s*है|होती\s*है|कहा\s*(?:जाता|गया)\s*है|माना\s*(?:जाता|गया)\s*है|समझा\s*(?:जाता|गया)\s*है|लेते\s*हैं|हुआ\s*था|बनता\s*है|पड़ता\s*है)\s*\??$/,
    "$1 का कारण"],
 
   // 7. "क्या X ... है?"  — haan/naa wala prashn; shuru ka "क्या" bekaar hai.
@@ -1110,11 +1115,32 @@ export function questionToTopic(text) {
   const s = String(text || "").trim();
   if (!s) return s;
 
-  // JODA HUA SAWAAL CHHODO. "कृतज्ञता क्या होता है और इसका लाभ क्या है?"
-  // — ismein DO sawaal hain. Koi bhi ek niyam lagane se aadha vaakya
-  // bigadta hai (pehli koshish mein "…और इसका लाभ का स्वरूप और वर्णन"
-  // ban raha tha). Aise sawaal jyon ke tyon behtar hain.
-  if (/\sऔर\s.*(?:क्या|कैसे|क्यों)/.test(s)) return s;
+  // JODA HUA SAWAAL CHHODO — par sahi tareeke se pehchano.
+  //
+  // "कृतज्ञता क्या होता है और इसका लाभ क्या है?" — ismein DO sawaal hain.
+  // Koi bhi ek niyam lagane se aadha vaakya bigadta hai (pehli koshish
+  // mein "…और इसका लाभ का स्वरूप और वर्णन" ban raha tha).
+  //
+  // ⚠️ PEHLI JAANCH GALAT THI: maine "और" dekh kar hi chhod diya tha —
+  //     /\sऔर\s.*(?:क्या|कैसे|क्यों)/
+  // Us niyam ne "सेवा और परोपकार को धर्म क्यों माना गया है?" ko bhi joda
+  // hua sawaal maan liya. Par wo EK hi sawaal hai; "सेवा और परोपकार" bas
+  // ek joda hua NAAM hai. Nateeja: us sawaal par sudhaar laga hi nahi
+  // aur jawab "सम्पूर्ण राशि और मुहूर्त विज्ञान" se juda — ek jyotish ki
+  // kitab, seva-paropkar ke sawaal par.
+  //
+  // Asli pehchan "और" nahi, PRASHN-SHABDON KI GINTI hai. Do ya zyada
+  // (क्या/कैसे/क्यों) = do sawaal. Ek = ek sawaal, chahe usme kitne bhi
+  // "और" ho.
+  // ⚠️ YAHAN \b MAT LAGANA. JS ka \b sirf [A-Za-z0-9_] ko shabd maanta
+  // hai; Devanagari uske liye shabd hai hi nahi. Isliye /\bक्या\b/ KABHI
+  // match nahi karta — naapa gaya:
+  //     /\bक्या\b/.test("कृतज्ञता क्या होता है")  →  false
+  //     /क्या/.test("कृतज्ञता क्या होता है")        →  true
+  // Pehle yahan \b tha, isliye ginti hamesha 0 aati thi aur joda hua
+  // sawaal bhi chhan jaata tha — yaani pehra tha hi nahi.
+  const prashnShabd = (s.match(/क्या|कैसे|क्यों|कौन\b|कब\b|कहाँ/g) || []).length;
+  if (prashnShabd >= 2) return s;
 
   for (const [re, rep] of PRASHN_NIYAM) {
     const out = s.replace(re, rep).replace(/\s+/g, " ").trim();
