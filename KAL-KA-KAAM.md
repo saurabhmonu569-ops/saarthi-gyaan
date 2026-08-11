@@ -68,7 +68,65 @@ dikhega, aur `⏸ raftaar-seema` waali line nahi aayegi.
 
 ---
 
-### 2. Wo 6 nayi failures — sudhaar hain ya kami? (~2 minute)
+### 2. `mantra` hint wapas laiye — par sirf sadhana wale roop me (~15 min)
+
+**Ye jaanch ho chuki hai (11 Aug shaam).** `hint_hataye` set — 68 wo sawaal
+jinpar aaj hint hataya gaya — chalaya: **60/68 pass, 8 fail**. Aur aatho
+failures ek hi kism ke nikle:
+
+```
+Upanishads me "neti neti" ka meaning
+Upanishadic teachings me rituals se realization
+Daily devta puja me mantra ke saath dhyan ka purpose
+Mantra jap me mala ke 108 beads ka significance
+Mantra jap ke samay count maintain karna kyu zaroori
+Kya har mantra ka jap bina guru ke kiya ja sakta hai
+Kisi mantra ko kitni baar japna chahiye
+Mantra sadhana me brahmacharya aur diet discipline kyu
+```
+
+**Sabme granth ka naam nahi hai, aur 6 seedhe mantra-sadhana ke hain.**
+
+Maine tab kaha tha ki ye failures "sudhaar" hain. **`upay` ke mamle me wo
+sach tha** — "krodh ka upay" ka jyotish se koi lena-dena nahi, aur ab wo
+theek se khaali lautta hai. **Par `mantra` ke mamle me wo galat tha.**
+"Mantra jap me 108 mala ka mahatva" ke liye Mantra Maha Sagar sach me
+sahi granth hai; wahan purana hint theek kaam kar raha tha.
+
+Ek hi kaant-chhaant ne do ulte kaam kiye: Ved wale sawaal bachaye
+(`"Samaveda ke mantron ka purpose"` ab samaveda par jaata hai), aur
+sadhana wale tod diye.
+
+**Karna:** `src/knowledge/bookHints.js` me `mantra_maha_sagar` ke liye
+sirf SADHANA wale roop jodiye — poora `mantra` shabd nahi:
+
+```
+"mantra jap", "mantra sadhana", "mantra siddhi", "purashcharan",
+"nyasa", "viniyoga", "beej mantra", "kavach mantra", "mala jap",
+"मंत्र जप", "मन्त्र जप", "मंत्र साधना", "पुरश्चरण", "न्यास", "विनियोग"
+```
+
+Ye shabd Samaveda/Atharvaveda ke sawaalon me **kabhi nahi aate**, isliye
+dono cheezein saath chal sakti hain.
+
+**Result check — dono taraf dekhna zaroori hai:**
+```powershell
+node scripts/14_eval_search.mjs --set hint_hataye
+```
+- 60/68 se badhkar **66/68** ke aas-paas aana chahiye
+- **aur** ye abhi bhi sahi rehna chahiye (warna faayda nahi):
+  `"Samaveda ke mantron ka purpose"` → samaveda,
+  `"Atharvaveda me raksha ke mantra"` → atharvaveda_1
+- `npm test` — `bookHints.test.js` me "aam shabd par hint NAHI lagta"
+  wala test abhi bhi hara rehna chahiye
+
+Bache hue 2 (`neti neti`, `Upanishadic teachings`) hint se theek nahi
+honge — `neti neti` Brihadaranyaka ka hai jo hamare paas hai hi nahi, aur
+doosra gate ka mamla hai (neeche #5 dekhiye).
+
+---
+
+### 2b. (ho chuka) Wo 6 nayi failures — sudhaar hain ya kami?
 
 **Problem:** 381 sawaalon par pehle 20 fail the, ab **26**. Naye 11
 Yogasutra sawaal sab pass hue, isliye ye 6 unhi purane sawaalon par hain
