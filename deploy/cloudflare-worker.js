@@ -1118,8 +1118,53 @@ export default {
         const floorFor = c =>
           (hinted && c.book === hinted) ? SEARCH_HINTED_MIN_RERANK : SEARCH_MIN_RERANK;
 
+        // ── NAAM LIYA HUA GRANTH: SCORE SE MAT POOCHHO ──────────────────
+        //
+        // ⚠️ YE AAJ KA SABSE ZAROORI BADLAV HAI. Iske pehle maine do baar
+        // sirf THRESHOLD ghumaya (0.30, phir hinted ke liye 0.18) — aur
+        // dono baar wahi galti dobara hui. Console ne teesri baar likha:
+        //
+        //     user ne granth kaha: ekadashi_mahatmya — pool mein 32, gate paar 0
+        //
+        // User ne Ekadashi ka vrat poochha. Hamare paas "Ekadashi Mahatmya"
+        // naam ki POORI KITAB hai. Uske 32 ansh pool mein aaye. Ek bhi
+        // 0.18 paar nahi kar paya. Jawab Garuda Puran se juda.
+        // Yahi Ramcharitmanas ke saath hua (41 mein se 0), yahi Gita ke
+        // saath (0.1885 — floor se sirf 0.0085 upar, ittefaq se bacha).
+        //
+        // JAD: threshold ka kaam hai "jab kuch prasangik NA MILE tab chup
+        // raho". Par jab user ne KHUD granth ka naam le liya ho aur us
+        // granth ke ansh saamne pade hon, tab "kuch mila ya nahi" ka
+        // sawaal hi nahi banta — user ne bata diya hai ki kahan dekhna hai.
+        // Aise mein uske granth ko chhod kar doosri kitab cite karna
+        // ULTA hai. Koi bhi number is baat ko theek nahi kar sakta.
+        //
+        // AB: naam liye gaye granth ke SABSE ACHHE 2 ansh hamesha jaate
+        // hain — score kuch bhi ho. Baaki sab par 0.30 waisa hi lagta hai.
+        //
+        // KYUN 2, aur kyun ye surakshit hai:
+        //   • 2 hi — taaki wo granth poora jawab na bhar de; baaki jagah
+        //     un ansho ki rehti hai jinhone sach mein gate paar kiya.
+        //   • hasSentences/looksGarbled ab bhi lagte hain (`usable`), yaani
+        //     table, suchi aur OCR-kachra phir bhi bahar hi rehta hai.
+        //   • JHOOTHI CITATION ka khatra nahi badhta: 38 control sawaalon
+        //     mein se EK par bhi koi granth hinted nahi hota (wo "kal ka
+        //     mausam", "petrol ka rate", "Bible" jaise hain). Hint tabhi
+        //     lagta hai jab user granth ya uske paatr ka naam le — aur tab
+        //     us granth ko dikhana jhooth nahi, wahi to maanga gaya tha.
+        //
+        // Ise badalne se pehle: node scripts/14_eval_search.mjs --set control
+        // Dekhna sirf ek cheez — JHOOTHI CITATION 0 rahi ya nahi.
+        const HINTED_PAKKA = 2;
+        const hintedBest = hinted
+          ? usable.filter(c => c.book === hinted)
+              .sort((a, b) => b.rerank - a.rerank)
+              .slice(0, HINTED_PAKKA)
+          : [];
+        const pakkaIds = new Set(hintedBest.map(c => c.id));
+
         const passed = usable
-          .filter(c => c.rerank >= floorFor(c))
+          .filter(c => pakkaIds.has(c.id) || c.rerank >= floorFor(c))
           .sort((a, b) => {
             if (hinted) {
               const ab = a.book === hinted, bb = b.book === hinted;
@@ -1242,6 +1287,8 @@ export default {
             hinted: hinted || null,
             hintedInPool: hinted ? withText.filter(c => c.book === hinted).length : null,
             hintedPassed: hinted ? passed.filter(c => c.book === hinted).length : null,
+            // kitne ansh SIRF 'naam liya hua granth' ke naate aaye (score se nahi)
+            hintedPakka: pakkaIds.size || 0,
             // kadam-dar-kadam samay — sabse bada kaun, ye saaf dikhta hai
             t: T,
             // kitne rerank batch chhoot gaye (timeout) — 0 hona chahiye
