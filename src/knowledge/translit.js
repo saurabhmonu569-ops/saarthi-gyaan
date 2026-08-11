@@ -323,6 +323,20 @@ const WORDS = {
 
   // "yaad dilaya" poora toot raha tha — yaad -> यदा (jab!) aur dilaya
   // Latin mein hi. Do aam kriya, aur dono galat.
+  // ── TITHI ke naam (2026-08-11) ──────────────────────────────────────
+  // "Ekadashi ke vrat me Dashami aur Dwadashi ka kya relevance?" par
+  // "Dashami" Latin mein hi ja raha tha. Corpus mein दशमी 53, द्वादशी 96,
+  // एकादशी 99 ansh mein hai — content tha, shabd nahi pahunch raha tha.
+  // Ye vrat/upvaas ke sawaalon ki reedh hain, isliye poori list.
+  pratipada: "प्रतिपदा", dwitiya: "द्वितीया", tritiya: "तृतीया",
+  chaturthi: "चतुर्थी", panchami: "पंचमी", shashthi: "षष्ठी",
+  saptami: "सप्तमी", ashtami: "अष्टमी", navami: "नवमी",
+  dashami: "दशमी", ekadashi: "एकादशी", dwadashi: "द्वादशी",
+  trayodashi: "त्रयोदशी", chaturdashi: "चतुर्दशी",
+  purnima: "पूर्णिमा", poornima: "पूर्णिमा", amavasya: "अमावस्या",
+  paran: "पारण", parana: "पारण", vrat: "व्रत", upvas: "उपवास",
+  shukla: "शुक्ल", krishna_paksh: "कृष्ण", paksh: "पक्ष",
+
   yaad: "याद", yad: "याद", dilaya: "दिलाया", dilana: "दिलाना",
   dilai: "दिलाई", yaadgar: "यादगार",
   sanjeevani: "संजीवनी", sanjivani: "संजीवनी",
@@ -999,6 +1013,22 @@ export const EN_CONCEPT = {
   // rerankQ bhi yehi hota hai, aur cross-encoder ko aadha-Latin sawaal
   // dene se uska faisla bigadta hai. Us sawaal par best-rerank 0.3447
   // aaya aur SIRF 1 ansh gate paar kar paya.
+  // ── 2026-08-11: live app par bache hue Latin shabd (doosra daur) ────
+  // "Gita ke according death ke samay consciousness ka direction kaise
+  // matter karta hai?" → findQ bana:
+  //     "गीता के मृत्यु के समय चेतना का direction कैसे matter करता है?"
+  // Us sawaal ka Aadhaar Yoga Vasishtha nikla, Gita nahi.
+  //
+  // ⚠️ CHUNAAV CORPUS SE, SHABDKOSH SE NAHI. "risky" ka seedha anuvaad
+  // "जोखिम" hai — par corpus mein wo sirf 6 ansh mein hai. "गोपनीय" 160
+  // aur "रहस्य" 865 mein hai. Isliye "risky" ko "जोखिम" mat bhejo; jo
+  // shabd granthon mein sach mein likha hai, wahi bhejo. Yahi soch
+  // GRANTH_PARYAY ke peeche bhi hai.
+  direction: "दिशा",            // दिशा 2,741
+  matter: "महत्व", matters: "महत्व", relevance: "महत्व",   // महत्व 157
+  share: "बाँटना", sharing: "बाँटना",                       // बाँट 111
+  risky: "गोपनीय", secret: "रहस्य", secrecy: "गोपनीय",      // गोपनीय 160, रहस्य 865
+
   practical: "व्यावहारिक", theoretical: "सैद्धान्तिक",
   destroy: "नाश", destruction: "विनाश", destroyed: "नष्ट",
   promise: "प्रतिज्ञा", curse: "शाप",   // decision pehle se maujood
