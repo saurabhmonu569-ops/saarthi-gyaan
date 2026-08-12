@@ -25,6 +25,13 @@ export const BOOK_HINTS = {
   // ab Ramcharitmanas par — wahi granth ab saara vishay theek se cover
   // karta hai (saare 7 kand, हनुमान 356). "वाल्मीकि" bhi yahin isliye ki
   // user wo naam le to use Ramayan hi chahiye, aur wo ab yahi hai.
+  // ⚠️ "maharamayan" YAHAN, "ramayan" SE PEHLE — 2026-08-12.
+  // Yoga Vasishtha ka poora naam "Yoga Vasishtha MAHARAMAYANA" hai, aur
+  // usme "ramayan" chhupa hai. Neeche wala "ramayan" hint pehle match kar
+  // leta tha, isliye us granth ka apna poora naam use RAMCHARITMANAS par
+  // bhej deta tha. 20_hint_coverage.mjs ne ye pakda.
+  "maharamayan": "yoga_vasishtha", "maha ramayan": "yoga_vasishtha",
+  "महारामायण": "yoga_vasishtha",
   "ramayan": "ramcharitmanas", "ramayana": "ramcharitmanas",
   "रामायण": "ramcharitmanas", "वाल्मीकि": "ramcharitmanas",
   // Mahabharat — "गीता" upar pehle aati hai (Object.entries ka kram =
@@ -103,7 +110,12 @@ export const BOOK_HINTS = {
   "गरुड़ पुराण": "garuda_purana_1", "गरुड पुराण": "garuda_purana_1",
   // ⚠️ Khand 2 wale naam PEHLE — warna generic "shiv puran" unhe khand 1
   // par bhej deta hai (naapa gaya: "Shiv Puran Khand 2" → shiva_purana_1).
+  // "shiva puran khand 2" (shiva, shiv nahi) pehle CHOOK jaata tha aur
+  // neeche wala generic "shiv puran" use KHAND 1 par bhej deta tha —
+  // yaani user khand 2 poochta tha aur khand 1 milta tha. Naapa gaya.
   "shiv puran khand 2": "shiva_purana_2", "shiva purana khand 2": "shiva_purana_2",
+  "shiva puran khand 2": "shiva_purana_2", "shiv purana khand 2": "shiva_purana_2",
+  "shiv puran khand2": "shiva_purana_2", "shiva puran 2": "shiva_purana_2",
   "शिव पुराण खण्ड २": "shiva_purana_2", "शिव पुराण खंड 2": "shiva_purana_2",
   "jyotirlinga": "shiva_purana_2", "ज्योतिर्लिंग": "shiva_purana_2",
   "shiv puran": "shiva_purana_1", "shiva puran": "shiva_purana_1", "शिव पुराण": "shiva_purana_1",
@@ -193,10 +205,24 @@ export const BOOK_HINTS = {
   "asmita": "yoga_sutra", "अस्मिता": "yoga_sutra",
   "abhinivesh": "yoga_sutra", "अभिनिवेश": "yoga_sutra",
   "ashtanga yoga": "yoga_sutra", "अष्टांग योग": "yoga_sutra", "अष्टाङ्ग योग": "yoga_sutra",
-  "yoga vasishtha": "yoga_vasishtha", "yog vashisth": "yoga_vasishtha",
+  // ── HIJJE KE ROOP (2026-08-12) ──────────────────────────────────────
+  // 1,250 sawaalon ki naap: is granth ne 12% kiya — 50 me se 49 sawaalon
+  // par hint LAGA HI NAHI, jabki granth ka naam sawaal me saaf likha tha.
+  // Wajah ek akshar thi:
+  //     hamara hint  "yoga vasishtha"   (t-h-a)
+  //     sawaal me    "Yoga Vasishta"    (t-a)
+  // Milaan seedha substring hai, isliye 'h' ka farak poora hint chook
+  // gaya. Ab dono roop hain — aur "sh"/"s", "v"/"w" wale bhi, kyunki
+  // Sanskrit naam Roman me likhne ke ye teen farak sabse aam hain.
+  "yoga vasishtha": "yoga_vasishtha", "yoga vasishta": "yoga_vasishtha",
+  "yoga vasistha": "yoga_vasishtha",  "yoga vasista": "yoga_vasishtha",
+  "yog vasishtha": "yoga_vasishtha",  "yog vasishta": "yoga_vasishtha",
+  "yog vashisth": "yoga_vasishtha",   "yog vashishth": "yoga_vasishtha",
+  "yogavasishtha": "yoga_vasishtha",  "yogavasishta": "yoga_vasishtha",
+  "yoga vashishtha": "yoga_vasishtha","yoga vashistha": "yoga_vasishtha",
   "योगवासिष्ठ": "yoga_vasishtha", "योग वासिष्ठ": "yoga_vasishtha",
-  "योगवाशिष्ठ": "yoga_vasishtha", "वसिष्ठ": "yoga_vasishtha", "वशिष्ठ": "yoga_vasishtha",
-  "महारामायण": "yoga_vasishtha", "वैराग्य": "yoga_vasishtha",
+  "योगवाशिष्ठ": "yoga_vasishtha", "वसिष्ठ": "yoga_vasishtha", "वासिष्ठ": "yoga_vasishtha",
+  "वशिष्ठ": "yoga_vasishtha", "वैराग्य": "yoga_vasishtha",
   // ⚠️ Is granth ka ROMAN naam hint-list me tha hi nahi — sirf Devanagari
   // aur "pooja vidhi". "Nitya Karm Pooja me achaman ka purpose kya hai?"
   // jaise seedhe sawaal par koi granth hinted nahi hota tha.
@@ -209,6 +235,23 @@ export const BOOK_HINTS = {
   "रामचरितमानस": "ramcharitmanas", "रामचरित मानस": "ramcharitmanas",
   "मानस": "ramcharitmanas", "तुलसीदास": "ramcharitmanas", "tulsidas": "ramcharitmanas",
   "चौपाई": "ramcharitmanas", "सुंदरकांड": "ramcharitmanas", "सुन्दरकाण्ड": "ramcharitmanas",
+
+  // ── AKELA "vasishtha" → Yoga Vasishtha  (2026-08-12) ────────────────
+  //
+  // ⚠️ YE ENTRIES RAMCHARITMANAS KE NAAM WALE HINT KE BAAD HI RAHNI
+  // CHAHIYE. Vasishtha DONO granthon me hain — Ramcharitmanas me Ram ke
+  // guru, aur Yoga Vasishtha me poore granth ke vaqta. Pehla match jeetta
+  // hai, isliye kram hi ye tay karta hai ki kaun jeete.
+  //
+  // Pehle maine ye Yoga Vasishtha ke hijje ke saath UPAR rakh diye the,
+  // aur naapne par "Ramcharitmanas me Vasishtha ji ka updesh" bhi
+  // yoga_vasishtha par chala gaya — jabki us sawaal me granth ka naam
+  // saaf likha tha. Ab kram ulta hai:
+  //     naam liya hai   → wahi granth
+  //     naam nahi liya  → Yoga Vasishtha (kyunki wo granth hi Vasishtha
+  //                       ka poora sanvaad hai)
+  "vasishtha": "yoga_vasishtha", "vasishta": "yoga_vasishtha",
+  "vashishth": "yoga_vasishtha", "vashisth": "yoga_vasishtha",
   // ⚠️ AKELA "mantra"/"मंत्र" HATAYA (2026-08-11).
   // Is granth ke paas naam wala EK BHI hint nahi tha — sirf ye aam shabd.
   // "मंत्र" charon Ved ka mool shabd hai (Samaveda to hai hi mantron ka
@@ -248,20 +291,30 @@ export const BOOK_HINTS = {
   // Isi wajah se akela "jap" bhi nahi hai ("Japan", "japna" me chhupa
   // hai) — par "jaap" hai, kyunki uska matlab hi mantra-dohraav hai.
   "mantra jap": "mantra_maha_sagar", "mantra ka jap": "mantra_maha_sagar",
+  "mantr jap": "mantra_maha_sagar", "mantron ka jap": "mantra_maha_sagar",
+  "mantron ki": "mantra_maha_sagar", "mantron ko": "mantra_maha_sagar",
+  "मंत्रों": "mantra_maha_sagar", "मन्त्रों": "mantra_maha_sagar",
   "mantra jaap": "mantra_maha_sagar", "mantra ka jaap": "mantra_maha_sagar",
   "jaap": "mantra_maha_sagar", "japna": "mantra_maha_sagar",
   "mantra sadhana": "mantra_maha_sagar", "mantra sadhna": "mantra_maha_sagar",
   "mantra siddhi": "mantra_maha_sagar",
   "purashcharan": "mantra_maha_sagar", "purascharan": "mantra_maha_sagar",
-  "beej mantra": "mantra_maha_sagar", "bij mantra": "mantra_maha_sagar",
-  "kavach mantra": "mantra_maha_sagar",
+  // ⚠️ "mantra" NAHI, "mantr" — MOOL ROOP (2026-08-12).
+  // Hindi me shabd mudta hai: mantra → mantroN, mantre, mantron ka.
+  // Substring milaan me "beej mantra" ka "a" hi use tod deta tha:
+  //     hint    "beej mantra"
+  //     sawaal  "Beej mantroN ko powerful kyun maana jata hai?"
+  // "beej mantr" dono me hai, isliye mool roop rakha hai.
+  "beej mantr": "mantra_maha_sagar", "bij mantr": "mantra_maha_sagar",
+  "बीज मंत्र": "mantra_maha_sagar", "बीज मन्त्र": "mantra_maha_sagar",
+  "kavach mantr": "mantra_maha_sagar", "mantra siddh": "mantra_maha_sagar",
   "mala jap": "mantra_maha_sagar", "mala jaap": "mantra_maha_sagar",
   "mantra viniyoga": "mantra_maha_sagar", "viniyoga": "mantra_maha_sagar",
   "mantra nyasa": "mantra_maha_sagar",
   "मंत्र जप": "mantra_maha_sagar", "मन्त्र जप": "mantra_maha_sagar",
   "मंत्र जाप": "mantra_maha_sagar", "जाप": "mantra_maha_sagar",
   "मंत्र साधना": "mantra_maha_sagar", "मन्त्र साधना": "mantra_maha_sagar",
-  "पुरश्चरण": "mantra_maha_sagar", "बीज मंत्र": "mantra_maha_sagar",
+  "पुरश्चरण": "mantra_maha_sagar",
   "माला जप": "mantra_maha_sagar", "विनियोग": "mantra_maha_sagar",
   "मंत्र न्यास": "mantra_maha_sagar",
 };

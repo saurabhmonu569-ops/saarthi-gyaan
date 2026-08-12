@@ -1,0 +1,1303 @@
+# SAARTHI — per-book sawaal (16_pdf_to_perbook.py se bani)
+# '## <book_id>' ke neeche us granth ke sawaal.
+# Sahi jawab = us granth ka Aadhaar aana. Kisi AUR granth ka Aadhaar = FAIL.
+
+## agni_purana
+Agni Puran ko encyclopedic Puranic text kyun kaha jata hai?
+Agni Puran mein dharma ke alawa kin-kin subjects ka discussion milta hai?
+Agni Puran mein Vishnu ke avataron ka kya significance hai?
+Agni Puran mein Rama avatar ko kis perspective se explain kiya gaya hai?
+Agni Puran mein Krishna sambandhi teachings ka kya context hai?
+Agni Puran mein Shiva worship ke baare mein kya guidance milti hai?
+Agni Puran mein Devi worship ka kya significance hai?
+Agni Puran mein temple construction ke sambandh mein kya knowledge milti hai?
+Agni Puran mein murti ke measurements aur proportions ka kya importance hai?
+Agni Puran mein idol installation ke liye kya principles diye gaye hain?
+Agni Puran mein architecture ko dharma ke saath kaise connect kiya gaya hai?
+Agni Puran mein different types of temples ka kya description milta hai?
+Agni Puran mein puja vidhi ke basic principles kya hain?
+Agni Puran mein mantra aur deity worship ka relationship kya hai?
+Agni Puran mein yantra ka kya role bataya gaya hai?
+Agni Puran mein meditation ke sambandh mein kya guidance milti hai?
+Agni Puran mein yoga ko kis perspective se discuss kiya gaya hai?
+Agni Puran mein pranayama se related kya teachings hain?
+Agni Puran mein dharana aur dhyana ka kya significance hai?
+Agni Puran mein moksha ke liye kaunse spiritual paths bataye gaye hain?
+Agni Puran mein knowledge aur devotion ka relationship kya hai?
+Agni Puran mein pilgrimage ka kya importance hai?
+Agni Puran mein sacred rivers aur tirthas ko kaise describe kiya gaya hai?
+Agni Puran mein fasting aur vrata ka kya role hai?
+Agni Puran mein daan ke different forms ka kya significance hai?
+Agni Puran mein karma aur rebirth ko kaise explain kiya gaya hai?
+Agni Puran mein paap ke consequences ka kya framework hai?
+Agni Puran mein prayashchitta ka kya concept hai?
+Agni Puran mein daily religious duties ke baare mein kya guidance milti hai?
+Agni Puran mein astrology/Jyotish ka kya role milta hai?
+Agni Puran mein auspicious timing ke sambandh mein kya concepts hain?
+Agni Puran mein medicine ya healing se related kya knowledge milti hai?
+Agni Puran mein Ayurveda sambandhi content ka kya nature hai?
+Agni Puran mein warfare aur military science se related kya discussion milta hai?
+Agni Puran mein king ke duties ko kaise explain kiya gaya hai?
+Agni Puran mein administration aur governance se related kya teachings milti hain?
+Agni Puran mein law aur punishment ke concepts ka kya role hai?
+Agni Puran mein geography aur sacred geography ka kya importance hai?
+Agni Puran mein cosmology ko kis tarah present kiya gaya hai?
+Agni Puran mein creation aur dissolution ke concepts kya hain?
+Agni Puran mein different rituals ke exact procedure ko retrieve karne ke liye chapter context kyun important hai?
+Agni Puran mein iconography ko samajhne ke liye textual description kyun important hai?
+Agni Puran mein spiritual practice aur worldly knowledge dono ek hi text mein kyun milte hain?
+Agni Puran ko sirf ek devotional Puran samajhna kyun incomplete hai?
+Agni Puran mein guru ki role ko kis context mein samjha ja sakta hai?
+Agni Puran mein mantra siddhi ya mantra practice se related kya concepts milte hain?
+Agni Puran mein protective rituals ka kya purpose hai?
+Agni Puran mein liberation aur righteous living ke beech kya relationship hai?
+Agar user Agni Puran se temple architecture ka exact answer pooche to RAG ko related technical section bhi retrieve karna chahiye kyun?
+Agni Puran ke multi-topic nature ki wajah se RAG system ko query ko correct chapter/domain mein route karna kyun zaroori hai?
+
+## atharvaveda_1
+Atharved mein daily life ki problems ke solution ke liye kis type ke mantron ka prayog milta hai?
+Atharved mein health aur well-being se related mantron ka kya purpose hai?
+Atharved mein disease ko lekar kis type ki spiritual understanding milti hai?
+Atharved mein healing ke liye herbs aur medicines ka kya role bataya gaya hai?
+Atharved mein औषिधयो ंko divine power se kaise connect kiya gaya hai?
+Atharved mein protection ke liye prayog hone wale mantron ka basic purpose kya hai?
+Atharved mein enemies se protection ke liye kis type ki prayers milti hain?
+Atharved mein household peace ke liye kya teachings milti hain?
+Atharved mein marriage aur husband-wife relationship se related mantron ka kya purpose hai?
+Atharved mein family harmony ke liye kis type ki prayers milti hain?
+Atharved mein long life ke liye kya prarthana ki gayi hai?
+Atharved mein prosperity aur wealth ke liye kaunse concepts milte hain?
+Atharved mein agriculture aur crops se related mantron ka kya importance hai?
+Atharved mein rain ke liye ki gayi prayers ka kya context hai?
+Atharved mein Earth ko kis spiritual perspective se dekha gaya hai?
+Atharved ke Prithvi Sukta ka main message kya hai?
+Atharved mein nature aur human life ke relationship ko kaise explain kiya gaya hai?
+Atharved mein water ko purification ke symbol ke roop mein kaise dekha gaya hai?
+Atharved mein Agni ka role sirf fire tak limited hai ya broader meaning bhi hai?
+Atharved mein Surya se related prayers ka kya significance hai?
+Atharved mein Brahmacharya ko kis context mein samjha gaya hai?
+Atharved mein student life aur knowledge ke liye kya guidance milti hai?
+Atharved mein speech aur truthful communication ka kya importance hai?
+Atharved mein mind aur thoughts ko lekar kya spiritual ideas milte hain?
+Atharved mein fear ko remove karne ke liye kis type ki prayers milti hain?
+Atharved mein nightmares ya bad dreams ke context mein kya references milte hain?
+Atharved mein evil influences se protection ki prayers ko kis context mein samajhna chahiye?
+Atharved mein peace ke liye kaunse spiritual principles milte hain?
+Atharved mein social harmony ka concept kaise express hua hai?
+Atharved mein king aur kingdom ki protection se related kya ideas hain?
+Atharved mein ruler ke liye kis type ki prayers milti hain?
+Atharved mein victory ke liye ki jaane wali prayers ka kya purpose hai?
+Atharved mein enemies ko lekar spiritual aur ritual perspective kya hai?
+Atharved mein childbirth aur safe delivery se related kya mantron ka context milta hai?
+Atharved mein unborn child ki protection ke liye kya prayers milti hain?
+Atharved mein marriage ke samay bride aur groom ke liye kis type ke blessings diye jaate hain?
+Atharved mein death aur ancestors ke sambandh mein kya ideas milte hain?
+Atharved mein Pitru ya ancestors ke liye rituals ka kya significance hai?
+Atharved mein life aur death ke cycle ko kaise samjha ja sakta hai?
+Atharved mein immortality ke concept ko kis perspective se dekha gaya hai?
+Atharved mein mantra ke sound aur intention dono ka kya importance hai?
+Atharved ke mantron mein repetition ka kya purpose ho sakta hai?
+Atharved mein sacred knowledge ko protect karne ki tradition kyun important thi?
+Atharved mein "Brahman" concept ka kya significance hai?
+Atharved mein universal peace ke liye milne wali prayers ka deeper meaning kya hai?
+Atharved mein human body aur cosmic forces ke beech kya relationship dikhai deta hai?
+Atharved mein spiritual protection aur physical protection ko kaise relate kiya gaya hai?
+Atharved mein kisi healing mantra ko samajhne ke liye uska associated ritual context kyun zaroori hai?
+Agar user Atharved se health-related mantra pooche to RAG ko sirf mantra nahi balki surrounding explanation bhi retrieve karni chahiye kyun?
+Atharved ko samajhne ke liye ise sirf "magic mantras ki book" samajhna incomplete kyun hai?
+
+## bhagavad_gita_shankar
+Gita ke according asli kartavya ko kaise pehchana ja sakta hai?
+Arjun ko yudh se pehle sabse bada confusion kis baat ko lekar tha?
+Shri Krishna ne Arjun ke shok ko kis tarah samjhaya?
+Gita mein sthitaprajna vyakti ki pehchan kya batayi gayi hai?
+Man ko control karne ke liye Gita mein kya practical guidance milti hai?
+Karm karte waqt result ki expectation ko lekar Krishna kya kehte hain?
+Nishkam karma ko simple language mein Gita ke hisab se kaise samjhen?
+Gita mein indriyon aur mann ke relation ko kaise explain kiya gaya hai?
+Arjun ke vishad ko spiritual turning point kyun maana ja sakta hai?
+Gita mein atma ke amar hone ka concept kis logic se samjhaya gaya hai?
+Karmayog aur Sannyas Yog mein actual difference kya hai?
+Gita ke according desire se anger aur anger se confusion kaise develop hota hai?
+Gita mein buddhi ko stable rakhne ka kya importance hai?
+Bhagwan Krishna ne apne divine manifestations ko kaise explain kiya?
+Gita mein daivi aur aasuri sampatti ke beech kya difference hai?
+Teen gun — sattva, rajas aur tamas — insaan ke behaviour ko kaise influence karte hain?
+Gita ke according sattvik karma ki kya characteristics hain?
+Rajasik karma aur tamasik karma ko kaise identify karein?
+Gita mein food ko bhi teen gunon se kaise relate kiya gaya hai?
+Shraddha ke teen types ka kya meaning hai?
+Gita mein yagya, daan aur tapas ko kyun important bataya gaya hai?
+Sattvik daan aur rajasik daan mein kya difference hai?
+Gita ke according tapasya sirf body ki hoti hai ya speech aur mind ki bhi?
+Om Tat Sat ka Gita mein kya significance hai?
+Gita mein moksha ke liye kaunse major spiritual principles diye gaye hain?
+Arjun ko apne swadharma par focus karne ki advice kyun di gayi?
+Dusre ke dharma ko follow karne se better apna dharma kyun kaha gaya?
+Gita mein attachment aur duty ko kaise separate kiya gaya hai?
+Krishna ke according desireless action practically kaise kiya ja sakta hai?
+Gita mein meditation karte waqt mind bhatakne par kya karna chahiye?
+Yoga mein moderation ka kya role hai?
+Gita ke according ek yogi ki lifestyle kaisi honi chahiye?
+Krishna ne apne bhakt ki kaunsi qualities ko ideal bataya?
+Bhakti aur knowledge ke relationship ko Gita kaise explain karti hai?
+Gita ke according sabhi beings mein divine presence ko kaise dekha ja sakta hai?
+Vishwaroop darshan ke samay Arjun ko kya extraordinary experience hua?
+Vishwaroop ke darshan ka spiritual meaning kya samjha ja sakta hai?
+Gita mein kaal ke concept ko Krishna kis context mein explain karte hain?
+Gita ke according fear aur attachment ka connection kya hai?
+Krodh ko control karne ke liye Gita ki teaching kya hai?
+Gita mein knowledge ko ignorance se kaise distinguish kiya gaya hai?
+Gita ke according real renunciation kya hai?
+Karmaphal tyag aur karm tyag mein kya antar hai?
+Gita mein liberation ke liye mind ki condition kaisi honi chahiye?
+Gita ke according ego spiritual progress mein obstacle kaise banta hai?
+Krishna ne Arjun ko ant mein decision lene ki freedom kaise di?
+Gita ke last chapter mein liberation ke liye kya key instructions milti hain?
+Gita mein bhakti ko sirf puja se alag kaise samjha ja sakta hai?
+Gita ke according spiritual knowledge milne ke baad vyakti ke actions mein kya change aata hai?
+Agar kisi insaan ko life mein duty aur personal emotions ke beech conflict ho to Gita ki teaching kya guidance deti hai?
+
+## bhavishya_purana
+Bhavishya Puran ka naam "Bhavishya" kis concept ki taraf indicate karta hai?
+Bhavishya Puran mein dharma aur social conduct ka kya importance hai?
+Is Puran mein vrat aur religious observances ka kya role hai?
+Bhavishya Puran mein Surya worship ka kya significance milta hai?
+Surya ko lekar Bhavishya Puran mein kaunse spiritual ideas milte hain?
+Bhavishya Puran mein festivals aur unke religious significance ko kaise explain kiya gaya hai?
+Bhavishya Puran mein daan ka kya importance bataya gaya hai?
+Is Puran ke according kis type ka daan spiritually meaningful maana gaya hai?
+Bhavishya Puran mein tirth yatra ka kya role hai?
+Bhavishya Puran mein paap aur punya ko kis framework mein samjhaya gaya hai?
+Bhavishya Puran mein karma ke consequences ko kaise explain kiya gaya hai?
+Is Puran mein vrata karne ke rules kis type ke hain?
+Bhavishya Puran mein Ekadashi ya anya vrat ke sambandh mein kya teachings milti hain?
+Bhavishya Puran mein religious purity ka kya concept hai?
+Is Puran mein grihastha dharma ke baare mein kya guidance milti hai?
+Bhavishya Puran mein marriage aur family duties ka kya importance hai?
+Is Puran mein king aur ruler ke duties ke baare mein kya bataya gaya hai?
+Bhavishya Puran mein praja ke prati raja ki responsibility kya hai?
+Bhavishya Puran mein ideal social behaviour kaisa bataya gaya hai?
+Is Puran mein pilgrimage places ka spiritual significance kaise describe hota hai?
+Bhavishya Puran mein different religious festivals ka origin ya significance kaise diya gaya hai?
+Is Puran mein puja ke samay shuddhi ka kya role hai?
+Bhavishya Puran mein mantra aur ritual ke relationship ko kaise samjha gaya hai?
+Bhavishya Puran mein devata worship ka main objective kya bataya gaya hai?
+Bhavishya Puran mein Surya Namaskar ya Surya aradhana se related kya ideas milte hain?
+Is Puran mein different months aur religious observances ka kya sambandh hai?
+Bhavishya Puran mein tithi ka religious importance kya hai?
+Is Puran mein sankranti jaise occasions ka kya significance hai?
+Bhavishya Puran mein charity aur service ko spiritual growth se kaise connect kiya gaya hai?
+Bhavishya Puran mein vrata todne ya rules follow na karne ke consequences ko kaise describe kiya gaya hai?
+Is Puran mein sacred rivers ka kya importance hai?
+Bhavishya Puran mein pilgrimage aur inner purification ke beech kya relation hai?
+Is Puran mein different yugas ko lekar kya ideas milte hain?
+Bhavishya Puran mein dharma ke decline ko kaise explain kiya gaya hai?
+Is Puran mein Kali Yuga ke characteristics ke baare mein kya descriptions milti hain?
+Bhavishya Puran mein future-related narratives ko kis context mein samajhna chahiye?
+Is Puran mein historical-looking narratives aur religious narratives ko distinguish kaise karein?
+Bhavishya Puran mein women ke religious roles ke baare mein kya teachings milti hain?
+Is Puran mein household rituals ka kya significance hai?
+Bhavishya Puran mein ancestors ke sambandh mein kaunse rituals ya teachings milti hain?
+Is Puran mein auspicious aur inauspicious occasions ko kaise differentiate kiya gaya hai?
+Bhavishya Puran mein religious calendar ka kya importance hai?
+Is Puran mein fasting ko sirf food restriction ke alawa kis spiritual purpose se joda gaya hai?
+Bhavishya Puran mein devotion aur ritual action ka kya relationship hai?
+Is Puran mein forgiveness aur moral conduct ke baare mein kya guidance hai?
+Bhavishya Puran mein temple worship ke sambandh mein kya concepts milte hain?
+Is Puran mein punya ko increase karne wale actions kaise describe kiye gaye hain?
+Bhavishya Puran mein spiritual discipline aur daily conduct ko kaise connect kiya gaya hai?
+Is Puran mein kisi festival ka exact vrat-vidhi search karte waqt RAG ko kin keywords/context ko retrieve karna chahiye?
+Bhavishya Puran ke future-related claims ko answer karte waqt source context ko verify karna kyun important hai?
+
+## chanakya_neeti
+Chanakya Neeti mein successful life ke liye sabse basic principle kya diya gaya hai?
+Chanakya ke according wise aur foolish person mein kya difference hota hai?
+Chanakya Neeti mein education ko wealth se bhi important kyun maana gaya hai?
+Knowledge ko protect aur develop karne ke baare mein Chanakya kya guidance dete hain?
+Chanakya ke according secret ko kis type ke logon se share nahi karna chahiye?
+Chanakya Neeti mein apni weaknesses ko public karne ke against kya advice hai?
+Chanakya ke according true friend ko kaise identify kiya ja sakta hai?
+Crisis ke time friend ki asli pehchan kaise hoti hai?
+Chanakya Neeti mein enemy ko underestimate karna dangerous kyun hai?
+Chanakya ke according powerful enemy se deal karte waqt kya strategy honi chahiye?
+Chanakya Neeti mein time ki value ko kaise explain kiya gaya hai?
+Lost time ko recover na kar paane ka Chanakya ke principles se kya connection hai?
+Chanakya ke according laziness success ko kaise destroy karti hai?
+Chanakya Neeti mein discipline ka kya importance hai?
+Chanakya ke according wealth ko maintain karne ke liye kya qualities chahiye?
+Chanakya Neeti mein excessive attachment to wealth ko lekar kya warning hai?
+Chanakya ke according poverty aur financial instability ke psychological effects kya ho sakte hain?
+Chanakya Neeti mein earning ke saath saving ka kya importance hai?
+Chanakya ke according emergency ke liye resources kyun preserve karne chahiye?
+Chanakya Neeti mein family members ki reliability ko lekar kya practical observations hain?
+Chanakya ke according spouse ke character ko kaise evaluate kiya ja sakta hai?
+Chanakya Neeti mein children ki education aur upbringing ka kya importance hai?
+Chanakya ke according child ko discipline kab aur kaise dena chahiye?
+Chanakya Neeti mein bad company se bachne ki advice kyun di gayi hai?
+Satsang aur good association ko Chanakya practical success se kaise connect karte hain?
+Chanakya Neeti mein fool ko advice dena kab waste ho sakta hai?
+Chanakya ke according overly simple ya overly trusting person ke saath kya risk ho sakta hai?
+Chanakya Neeti mein humility aur self-respect ke beech kya balance hai?
+Chanakya ke according excessive honesty bhi kab problem create kar sakti hai?
+Chanakya Neeti mein speech aur communication ko lekar kya precautions diye gaye hain?
+Chanakya ke according harsh words relationship ko kaise damage karte hain?
+Chanakya Neeti mein anger ko control karna kyun important hai?
+Chanakya ke according desire aur greed mein kya difference hai?
+Greed decision-making ko kaise corrupt kar sakti hai?
+Chanakya Neeti mein self-control ko success se kaise connect kiya gaya hai?
+Chanakya ke according king ko advisors choose karte waqt kin qualities ko dekhna chahiye?
+Chanakya Neeti mein ruler ke liye intelligence network ka kya importance hai?
+Chanakya ke according secret planning ko public karne ka kya risk hai?
+Chanakya Neeti mein leadership ke liye punishment aur compassion ka kya balance hona chahiye?
+Chanakya ke according incompetent ruler ka society par kya effect padta hai?
+Chanakya Neeti mein justice aur punishment ko kaise relate kiya gaya hai?
+Chanakya ke according strong leadership mein foresight ka kya role hai?
+Chanakya Neeti mein risk ko pehle identify karna kyun important hai?
+Chanakya ke according business ya livelihood mein right timing ka kya importance hai?
+Chanakya Neeti mein kisi person ke character ko sirf words se judge karna kyun risky hai?
+Chanakya ke according difficult situation mein patience ka kya role hai?
+Chanakya Neeti mein self-interest aur morality ke beech kya practical tension dikhai deti hai?
+Chanakya ke teachings ko modern corporate leadership mein apply karte waqt context kyun important hai?
+Agar user Chanakya Neeti ka exact quote ya principle pooche to RAG ko original shloka ke saath surrounding context kyun retrieve karna chahiye?
+Chanakya Neeti ko sirf "political tricks" ki book samajhna kyun incomplete hai? Book Questions Shiv Puran Khand 1 50 Vishnu Puran 50 Isha Upanishad 50 Katha Upanishad 50 Chanakya Neeti 50 TOTAL 250 QUESTION RANGE Q501–Q750 अब तक का TOTAL TOTAL = 750 NEW RAG TEST QUESTIONS  Ekadashi Full Book — 50  Nitya Karm Pooja Full Book — 50  Mantra Maha Sagar — 50  Guru Granth Sahib — 50  Lal Kitab Upay Sahit — 50 Worked for 10s
+
+## ekadashi_mahatmya
+Ekadashi kya hoti hai aur Hindu calendar mein iska kya significance hai?
+Ekadashi tithi ko spiritual practice ke liye special kyun maana jata hai?
+Ekadashi vrat ka main purpose kya hai?
+Ekadashi ka sambandh Bhagwan Vishnu se kaise hai?
+Ekadashi vrat rakhne wale vyakti ko kya basic niyam follow karne chahiye?
+Ekadashi vrat mein food restrictions ka kya significance hai?
+Ekadashi ke din anaj na khane ki parampara ka kya basis hai?
+Ekadashi vrat mein fruits aur milk lene ki parampara ka kya context hai?
+Nirjala Ekadashi kya hoti hai aur ise special kyun maana jata hai?
+Nirjala Ekadashi aur normal Ekadashi vrat mein kya difference hai?
+Ekadashi vrat todne ko Parana kyun kaha jata hai?
+Ekadashi ke Parana ka correct samay kaise determine kiya jata hai?
+Agar kisi vyakti se Ekadashi ka vrat toot jaye to kya karna chahiye?
+Ekadashi mein Dashami tithi ke niyamon ka kya importance hai?
+Ekadashi ke din kya-kya avoid karne ki parampara hai?
+Ekadashi ke din chawal na khane ki parampara ka kya significance hai?
+Ekadashi ke din puja ka basic sequence kya ho sakta hai?
+Ekadashi par Vishnu mantra jap ka kya importance hai?
+Ekadashi par Vishnu Sahasranama ka paath kyun kiya jata hai?
+Ekadashi ke din Bhagavad Gita padhne ka kya spiritual significance hai?
+Ekadashi vrat mein jagran ka kya purpose hai?
+Ekadashi ke din bhajan aur kirtan ko important kyun maana jata hai?
+Ekadashi vrat sirf food fasting hai ya mental discipline bhi hai?
+Ekadashi mein indriya-nigrah ka kya role hai?
+Ekadashi ke din anger aur negative thoughts se bachne ki advice kyun di jati hai?
+Ekadashi vrat mein daan ka kya significance hai?
+Ekadashi ke din Gau seva ya seva-karma ka kya spiritual importance hai?
+Ekadashi mein Vishnu-Lakshmi worship ka kya connection hai?
+Ekadashi ke alag-alag naam kyun hote hain?
+Saal mein kitni Ekadashiyan aati hain?
+Shukla Paksha aur Krishna Paksha ki Ekadashi mein kya difference hai?
+Ekadashi ke naam aur unke associated vrat-katha ka kya significance hai?
+Putrada Ekadashi ko kis purpose se joda jata hai?
+Mokshada Ekadashi ka naam kis spiritual objective ki taraf indicate karta hai?
+Vaikuntha Ekadashi ko itna important kyun maana jata hai?
+Devshayani Ekadashi ka Vishnu ji ke Yog Nidra se kya sambandh hai?
+Devutthani Ekadashi ka spiritual significance kya hai?
+Nirjala Ekadashi ki vrat-katha ka central lesson kya hai?
+Amalaki Ekadashi ka sambandh kis religious tradition se hai?
+Apara Ekadashi ko lekar kis type ki spiritual teachings milti hain?
+Ekadashi vrat mein sankalp ka kya importance hai?
+Vrat ke dauran niyam follow karne ka spiritual purpose kya hai?
+Ekadashi ke vrat mein intention aur discipline mein kya relationship hai?
+Ekadashi ke din sirf ritual karne aur actual spiritual practice mein kya difference hai?
+Ekadashi vrat ke benefits ko samajhte waqt religious claims aur practical discipline ko kaise separate karein?
+Agar kisi Ekadashi ki exact vrat-katha search karni ho to RAG ko tithi ke saath kya context retrieve karna chahiye?
+Agar user pooche ki kisi particular Ekadashi mein kya khana allowed hai, to RAG ko exact book section kyun retrieve karna chahiye?
+Ekadashi ke Parana ka answer bina location/date context ke dena risky kyun ho sakta hai?
+Ekadashi vrat ko sirf fasting na samajhkar spiritual self-discipline ke roop mein kaise samjha ja sakta hai?
+Ekadashi tradition ka overall spiritual objective kya maana gaya hai?
+
+## garuda_purana_1
+Garud Puran ko log mainly kis subject ke liye jaante hain?
+Garud Puran mein jeevan aur mrityu ke beech kya spiritual relationship explain kiya gaya hai?
+Garud Puran mein death ke baad soul ke journey ka concept kya hai?
+Garud Puran mein preta avastha ko kaise describe kiya gaya hai?
+Garud Puran mein Pitru karma ka kya significance hai?
+Antyeshti ke sambandh mein Garud Puran mein kya teachings milti hain?
+Shraddha karma ko Garud Puran kis purpose se explain karta hai?
+Pind daan ka spiritual significance kya bataya gaya hai?
+Garud Puran mein Yama ka kya role hai?
+Yama ke lok aur divine justice ko kaise explain kiya gaya hai?
+Garud Puran mein karma ke basis par afterlife experience kaise describe hota hai?
+Garud Puran mein narak ke descriptions ka moral purpose kya hai?
+Different narakas ko alag-alag karmic actions se kaise relate kiya gaya hai?
+Garud Puran mein punya aur paap ka measurement kis framework mein samjha jata hai?
+Garud Puran mein soul ko body se alag kaise explain kiya gaya hai?
+Garud Puran mein human birth ko valuable kyun maana gaya hai?
+Garud Puran mein moksha ke liye kya teachings milti hain?
+Garud Puran mein Vishnu bhakti ka kya importance hai?
+Garud Puran mein naam-smaran ko spiritual liberation se kaise connect kiya gaya hai?
+Garud Puran mein guru aur spiritual knowledge ka kya role hai?
+Garud Puran mein daan ko afterlife welfare se kaise relate kiya gaya hai?
+Garud Puran mein food donation ka kya significance hai?
+Garud Puran mein water donation ya jal daan ka kya importance hai?
+Garud Puran mein cows se related daan ke references ka kya context hai?
+Garud Puran mein pilgrimage ka spiritual significance kya hai?
+Garud Puran mein sacred rivers ke sambandh mein kya teachings milti hain?
+Garud Puran mein fasting aur vrata ka kya role hai?
+Garud Puran mein Ekadashi ke spiritual significance ko kaise samjha ja sakta hai?
+Garud Puran mein daily dharma aur moral conduct ka kya importance hai?
+Garud Puran mein truthfulness ko spiritual progress se kaise connect kiya gaya hai?
+Garud Puran mein violence aur non-violence ko lekar kya moral principles milte hain?
+Garud Puran mein attachment ko death aur rebirth ke context mein kaise samjha gaya hai?
+Garud Puran mein desire aur karmic consequences ke beech kya relation hai?
+Garud Puran mein human body ki impermanence ko kaise explain kiya gaya hai?
+Garud Puran mein death ko spiritual transition ke roop mein kaise dekha gaya hai?
+Garud Puran mein mrityu ke samay remembrance ka kya importance hai?
+Garud Puran mein last thoughts aur next state of existence ka kya connection bataya gaya hai?
+Garud Puran mein hell descriptions ko literal aur moral teaching dono perspectives se kaise approach karna chahiye?
+Garud Puran mein rebirth ka mechanism kis tarah describe kiya gaya hai?
+Garud Puran mein karmic purification ke liye kya methods milte hain?
+Garud Puran mein prayashchitta ka kya role hai?
+Garud Puran mein good conduct ko afterlife se kaise connect kiya gaya hai?
+Garud Puran mein Ayurveda ya medical knowledge se related content bhi milta hai kya?
+Garud Puran mein gems/ratna se related knowledge ka kya context hai?
+Garud Puran mein astrology/Jyotish sambandhi material ka kya nature hai?
+Garud Puran ko sirf "death book" kehna kyun incomplete hai?
+Garud Puran mein life ko meaningful banane ke liye kya practical spiritual lessons milte hain?
+Agar family kisi specific Shraddha ritual ka answer pooche to RAG ko exact section ke saath context retrieve kyun karna chahiye?
+Garud Puran mein death-related teachings ko fear create karne ke bajay ethical guidance ke roop mein kaise samjha ja sakta hai?
+Garud Puran ke according human life mein spiritual preparation for death ka kya importance hai?
+
+## guru_granth_sahib
+Guru Granth Sahib mein Ik Onkar ka central meaning kya hai?
+Guru Granth Sahib ke according Divine reality ko kaise samjha jata hai?
+Naam Simran ka Sikh spiritual practice mein kya importance hai?
+Guru Granth Sahib mein "Naam" ka meaning sirf kisi naam ko repeat karna hai ya deeper concept hai?
+Hukam ka kya meaning hai?
+Guru Granth Sahib ke according Hukam ko samajhne ka spiritual significance kya hai?
+Human ego aur Hukam ke beech kya relationship hai?
+Guru Granth Sahib mein Haumai ko spiritual obstacle kyun maana gaya hai?
+Haumai ko overcome karne ke liye kya teachings milti hain?
+Guru Granth Sahib mein Seva ka kya importance hai?
+Nishkam Seva ko spiritual growth se kaise connect kiya gaya hai?
+Sangat ka Sikh spiritual life mein kya role hai?
+Sadh Sangat ko important kyun maana gaya hai?
+Guru Granth Sahib mein truthful living ka kya meaning hai?
+Sirf religious rituals ke bajay righteous living par focus kyun diya gaya hai?
+Guru Granth Sahib mein caste-based superiority ko lekar kya spiritual teaching milti hai?
+Human equality ka concept Guru Granth Sahib mein kaise express hota hai?
+Guru Granth Sahib mein women ke respect aur equality ko kis perspective se samjha ja sakta hai?
+Guru Granth Sahib mein Maya ka kya meaning hai?
+Maya aur attachment ke beech kya relationship hai?
+Guru Granth Sahib mein worldly life ko completely reject kiya gaya hai ya spiritually transform karne ki teaching hai?
+Grihastha life aur spiritual life ko kaise integrate kiya gaya hai?
+Guru Granth Sahib mein desire ko lekar kya guidance milti hai?
+Anger aur greed ko spiritual obstacles ke roop mein kaise explain kiya gaya hai?
+Five thieves ka Sikh spiritual teaching mein kya significance hai?
+Kaam, Krodh, Lobh, Moh aur Ahankar ko overcome karne ke liye kya approach milti hai?
+Guru Granth Sahib mein humility ko itna important kyun maana gaya hai?
+Ego aur humility ke contrast ko Gurbani kis tarah present karti hai?
+Guru ka spiritual role kya hai?
+Guru Granth Sahib mein Shabad Guru ka kya meaning hai?
+Shabad ko spiritual transformation ka medium kaise samjha jata hai?
+Gurbani sunne aur samajhne ke beech kya difference hai?
+Guru Granth Sahib mein meditation ka kya concept hai?
+Simran aur meditation mein kya relationship hai?
+Guru Granth Sahib mein death ko kaise samjha gaya hai?
+Death ke fear ko spiritual knowledge se kaise overcome kiya ja sakta hai?
+Guru Granth Sahib mein rebirth ke concept ko kis perspective se dekha jata hai?
+Mukti ya liberation ka Guru Granth Sahib mein kya meaning hai?
+Guru Granth Sahib mein divine grace ka kya role hai?
+Kirpa aur human effort ke beech kya relationship hai?
+Guru Granth Sahib mein honest earning ka kya importance hai?
+"Kirat Karo" ko practical life mein kaise samjha ja sakta hai?
+Sharing aur generosity ke spiritual principle ko kaise explain kiya gaya hai?
+"Vand Chhako" ka deeper social aur spiritual meaning kya hai?
+Guru Granth Sahib mein truthful conduct aur social responsibility ka kya connection hai?
+Gurbani ke kisi specific Shabad ka meaning samajhne ke liye Ang, Raag aur context retrieve karna kyun zaroori hai?
+Guru Granth Sahib mein different Raags ka use spiritual expression ko kaise influence karta hai?
+Gurbani ka translation padhte waqt original Gurmukhi text ka context kyun important hai?
+Guru Granth Sahib ko sirf quotations ki book samajhna kyun incorrect hai?
+Guru Granth Sahib ki overall teaching mein Naam, Seva, Hukam aur humility ko ek saath kaise samjha ja sakta hai?
+
+## ishadi_upanishad
+Isha Upanishad ki opening teaching ka central idea kya hai?
+Isha Upanishad mein "Isha" concept ko kaise samjha ja sakta hai?
+Isha Upanishad ke according poori creation ko divine presence se connected kaise dekha jata hai?
+Isha Upanishad mein tyaga aur enjoyment ko ek saath kaise relate kiya gaya hai?
+"Tena tyaktena bhunjitha" ka practical spiritual meaning kya hai?
+Isha Upanishad mein wealth aur possession ko lekar kya warning milti hai?
+Isha Upanishad mein desireless living ka kya significance hai?
+Isha Upanishad ke according karma karte hue bhi spiritual freedom kaise maintain ki ja sakti hai?
+Isha Upanishad mein karma aur renunciation ka apparent contradiction kaise solve hota hai?
+Isha Upanishad mein vidya aur avidya ka kya meaning hai?
+Vidya aur avidya dono ko samajhna kyun important bataya gaya hai?
+Isha Upanishad mein knowledge aur ignorance ke extremes ke baare mein kya warning hai?
+Isha Upanishad mein darkness ka symbolic meaning kya ho sakta hai?
+"Andham tamah" concept ko spiritual context mein kaise samjhen?
+Isha Upanishad mein sambhuti aur asambhuti ka kya significance hai?
+Sambhuti aur asambhuti ko samajhne mein translation confusion kyun ho sakta hai?
+Isha Upanishad mein self ko body se beyond kaise explain kiya gaya hai?
+Isha Upanishad ke according Atman ko move aur non-move dono kaise kaha ja sakta hai?
+Atman ko near aur far dono kehne ka philosophical meaning kya hai?
+Isha Upanishad mein Atman ke all-pervading nature ko kaise explain kiya gaya hai?
+Isha Upanishad mein self-realization ke baad hatred kyun disappear ho jata hai?
+"Yas tu sarvani bhutani" teaching ka central message kya hai?
+Sabhi beings mein Self ko dekhne ka practical meaning kya hai?
+Self-realization aur compassion ke beech kya relationship hai?
+Isha Upanishad mein sorrow ke end ka knowledge se kya connection hai?
+Isha Upanishad mein unity consciousness ka kya concept hai?
+Isha Upanishad mein Self ko sinless aur pure kaise describe kiya gaya hai?
+Isha Upanishad mein Atman ko body ke limitations se beyond kyun maana gaya hai?
+Isha Upanishad mein Surya se related final prayers ka kya significance hai?
+Upanishad ke concluding verses mein Sun ko address karne ka spiritual purpose kya hai?
+"Hiranmaya patra" ka philosophical symbolism kya hai?
+Truth ko reveal karne ke liye covering hatane ki prayer ka kya meaning hai?
+Isha Upanishad mein Agni ko final prayer mein kis context mein address kiya gaya hai?
+Human actions aur divine consciousness ke beech kya relationship dikhaya gaya hai?
+Isha Upanishad mein death ko lekar final verses kya perspective dete hain?
+"Vayu" aur body ke dissolution ka concept kis context mein aata hai?
+Isha Upanishad mein Om ka kya significance hai?
+Isha Upanishad ka short size hone ke bawajood philosophical depth itni high kyun hai?
+Isha Upanishad ko sirf renunciation text kehna kyun incomplete hai?
+Isha Upanishad ko sirf karma text kehna bhi kyun incomplete hai?
+Isha Upanishad mein worldly life aur spiritual life ko kaise integrate kiya ja sakta hai?
+Possession aur stewardship mein Isha Upanishad ke according kya difference ho sakta hai?
+Isha Upanishad ki teaching modern material attachment ko samajhne mein kaise help kar sakti hai?
+Isha Upanishad mein self-knowledge ka ethical behaviour se kya connection hai?
+Isha Upanishad mein duality ko overcome karne ka kya philosophical basis hai?
+Isha Upanishad ke verses ko context ke bina interpret karna risky kyun ho sakta hai?
+Agar user "vidya vs avidya" ka answer pooche to RAG ko related verses ka complete context kyun retrieve karna chahiye?
+Isha Upanishad ke different translations mein meaning difference kyun aa sakta hai?
+Isha Upanishad mein tyaga ka matlab kya sab kuch physically chhod dena hai?
+Isha Upanishad ka overall practical message ek modern seeker ke liye kya ho sakta hai?
+
+## kathopanishad
+Katha Upanishad ki central story kis character ke around hai?
+Nachiketa ko apne father se kis baat ka conflict hua?
+Nachiketa ko Yama ke paas bhejne ki story ka spiritual significance kya hai?
+Nachiketa Yama ke ghar par kitni der wait karta hai aur us waiting ka significance kya hai?
+Yama Nachiketa ko teen boons kyun offer karte hain?
+Nachiketa ka first boon kya tha aur uska purpose kya tha?
+Nachiketa ke second boon mein kis spiritual knowledge ki request thi?
+Nachiketa ne fire knowledge ko kyun seekhna chaha?
+Nachiketa Agni Vidya ko kis context mein receive karta hai?
+Nachiketa ka third boon kya tha?
+Death ke baad kya hota hai — Nachiketa ka ye question itna important kyun hai?
+Yama ne Nachiketa ke third question ka answer dene mein hesitation kyun dikhayi?
+Preyas aur Shreyas mein kya difference hai?
+Yama ke according intelligent person Shreyas ko kyun choose karta hai?
+Preyas aur Shreyas ka modern life mein practical example kya ho sakta hai?
+Nachiketa ne worldly pleasures ko reject kyun kiya?
+Yama ne Nachiketa ko wealth, long life aur pleasures offer karke kya test liya?
+Nachiketa ki desirelessness uske spiritual maturity ko kaise show karti hai?
+Katha Upanishad mein Atman ko body se different kaise explain kiya gaya hai?
+Katha Upanishad mein chariot analogy kya hai?
+Chariot analogy mein body ko kis cheez se compare kiya gaya hai?
+Chariot analogy mein senses ka kya role hai?
+Chariot analogy mein mind aur intellect ko kaise distinguish kiya gaya hai?
+Chariot analogy ka practical lesson self-control ke liye kya hai?
+Agar intellect strong ho lekin mind uncontrolled ho to Katha Upanishad ke analogy ke according kya problem hogi?
+Katha Upanishad mein senses ko horses kehne ka kya meaning hai?
+Katha Upanishad mein "Atman as rider" concept kya explain karta hai?
+Katha Upanishad mein mind aur senses ko control karna spiritual progress ke liye kyun important hai?
+Katha Upanishad mein supreme state ko kaise describe kiya gaya hai?
+Atman ko unborn aur eternal kehne ka philosophical basis kya hai?
+Katha Upanishad mein death aur immortality ko kaise connect kiya gaya hai?
+Yama ke according Atman ko weapons destroy kyun nahi kar sakte?
+Katha Upanishad mein "anu" ya subtle nature of Self ka kya meaning hai?
+Self-realization ke liye mind ko inward turn karna kyun important hai?
+Katha Upanishad mein senses naturally outward kyun jaate hain?
+"Avritta chakshu" ya inward vision ka kya spiritual meaning hai?
+Katha Upanishad mein Om ko Brahman ka symbol kaise explain kiya gaya hai?
+Om meditation aur realization ke beech kya connection bataya gaya hai?
+Katha Upanishad mein ultimate goal ko "param gati" ke roop mein kaise samjha jata hai?
+Katha Upanishad mein ignorance aur immortality ke beech kya relationship hai?
+Katha Upanishad mein knowledge sirf intellectual information kyun nahi hai?
+Nachiketa ki story mein guru-shishya relationship ka kya importance hai?
+Yama ko teacher ke roop mein dekhne ka deeper meaning kya hai?
+Katha Upanishad mein spiritual seeker ke liye discipline kyun necessary hai?
+Katha Upanishad mein desire ka Self-realization par kya effect hai?
+Katha Upanishad mein death ka dar knowledge se kaise overcome kiya ja sakta hai?
+Agar user chariot analogy ka exact meaning pooche to RAG ko related complete sequence retrieve karna kyun zaroori hai?
+Katha Upanishad mein Nachiketa ko ideal seeker kyun maana ja sakta hai?
+Katha Upanishad ke according true immortality ka meaning kya hai?
+Katha Upanishad ka central message ek modern person ke fear of death ke context mein kya ho sakta hai?
+
+## lal_kitab
+Lal Kitab ka basic approach traditional Jyotish se kis tarah different maana jata hai?
+Lal Kitab mein grahon ko samajhne ka basic framework kya hai?
+Lal Kitab mein houses aur planets ke relationship ko kaise interpret kiya jata hai?
+Lal Kitab mein remedies ko itna important kyun maana jata hai?
+Lal Kitab ke upay ka basic purpose kya hota hai?
+Lal Kitab mein Surya ke sambandh mein kis type ke upay milte hain?
+Lal Kitab mein Chandra ke liye kaunse traditional upay diye ja sakte hain?
+Mangal se related Lal Kitab remedies kis type ki situations mein discuss hoti hain?
+Budh ke liye Lal Kitab mein kis type ke upay milte hain?
+Guru ke weak placement ke context mein Lal Kitab kya traditional remedies batati hai?
+Shukra se related remedies ka kya purpose hota hai?
+Shani ke sambandh mein Lal Kitab ke traditional upay kya kehte hain?
+Rahu ke liye Lal Kitab remedies kis type ki problems se associate ki jati hain?
+Ketu ke sambandh mein traditional Lal Kitab upay ka kya context hai?
+Lal Kitab mein house-wise remedies ka kya importance hai?
+First house mein kisi planet ke placement ko Lal Kitab kis perspective se dekhti hai?
+Second house ka sambandh family aur speech se kaise relate kiya jata hai?
+Third house ko courage aur siblings ke context mein kaise interpret kiya jata hai?
+Fourth house ko mother, home aur emotional comfort se kaise relate kiya jata hai?
+Fifth house ka sambandh education, intelligence aur children se kaise dekha jata hai?
+Sixth house ko enemies, disease aur service ke context mein kaise samjha jata hai?
+Seventh house relationship aur partnership ke liye kyun important hai?
+Eighth house ko sudden events aur transformation se kaise relate kiya jata hai?
+Ninth house ko luck, dharma aur higher guidance se kaise interpret kiya jata hai?
+Tenth house career aur karma ke context mein kya indicate karta hai?
+Eleventh house income aur gains se kaise related hai?
+Twelfth house expenses aur detachment se kaise connect kiya jata hai?
+Lal Kitab mein ghar ke environment ka planetary influence se kya relationship maana jata hai?
+Lal Kitab mein vastu-type observations aur planetary remedies ka kya connection hai?
+Lal Kitab mein charity ko planetary remedies ke roop mein kyun use kiya jata hai?
+Lal Kitab mein food donation ke traditional remedies kya indicate karte hain?
+Lal Kitab mein animals ko food dene wale upayon ka kya traditional logic hai?
+Lal Kitab mein birds ko dana dene ko kis type ke remedy framework mein dekha jata hai?
+Lal Kitab mein copper, silver ya other metals ke remedies ka kya context hai?
+Lal Kitab mein colors ko planets ke saath kaise associate kiya jata hai?
+Lal Kitab mein water-related remedies ka kya purpose bataya jata hai?
+Lal Kitab mein trees ya plants se related remedies kis context mein milti hain?
+Lal Kitab mein parents aur elders ki seva ko planetary remedy se kaise connect kiya jata hai?
+Lal Kitab mein family relationships ko improve karna remedies ka part kyun ho sakta hai?
+Lal Kitab mein alcohol, meat ya other habits ko lekar remedies ya cautions ka kya context milta hai?
+Lal Kitab mein kisi remedy ko choose karne se pehle complete horoscope context kyun zaroori hai?
+Sirf ek planet dekhkar remedy suggest karna Lal Kitab ke context mein misleading kyun ho sakta hai?
+Lal Kitab ke upay ko exact source se verify karna kyun important hai?
+Agar same planet ke liye multiple remedies milen to RAG ko kis basis par relevant passage retrieve karna chahiye?
+Lal Kitab mein remedy ke saath duration ya method diya ho to us context ko preserve karna kyun zaroori hai?
+Lal Kitab ke traditional remedies ko guaranteed result ke roop mein present karna kyun appropriate nahi hai?
+Lal Kitab mein karma aur planetary indications ke beech kya relationship discuss kiya jata hai?
+Lal Kitab ke according practical behaviour change aur ritual remedy mein kya difference hai?
+Kisi user ki kundli-based Lal Kitab query ke liye RAG ko planet, house, conjunction aur remedy context sab retrieve kyun karna chahiye?
+Lal Kitab ka overall approach sirf grahon ko "theek" karne tak limited hai ya behaviour, charity aur responsibility ko bhi include karta hai? Book Questions Ekadashi Full Book 50 Nitya Karm Pooja Full Book 50 Mantra Maha Sagar Full Book 50 Guru Granth Sahib 50 Lal Kitab Upay Sahit 50 TOTAL 250 QUESTION RANGE Q751–Q1000 MASTER DATASET STATUS  Batch 1: Q1–Q250  Batch 2: Q251–Q500  Batch 3: Q501–Q750  Batch 4: Q751–Q1000 TOTAL = 1,000 NEW RAG TEST QUESTIONS Aur ab final 24-book structure ke according next batches mein remaining books, including Sampurna Rashi Aur Muhurt Vigyan, Shri Ramcharitmanas, Yoga Vasishta, Mahabharata (Vol. 1–6 as one source), aur Patanjali Yog Sutra, cover kiye jayenge. Batch 5 PLS
+
+## mahabharata
+Mahabharata ki central conflict kis do major family groups ke beech hai?
+Kuru dynasty ka Mahabharata ki story mein kya significance hai?
+Shantanu aur Ganga ki story ka Mahabharata mein kya context hai?
+Devavrata ne Bhishma Pratigya kyun li?
+Bhishma ki terrible vow ka future Kuru dynasty par kya effect hua?
+Satyavati ka Mahabharata ke dynastic events mein kya role hai?
+Dhritarashtra, Pandu aur Vidur ke birth circumstances kya the?
+Dhritarashtra king hote hue bhi Pandu ko ruler kyun banaya gaya?
+Pandu ke curse ka Pandavon ke birth par kya effect hua?
+Kunti ko divine mantron ka knowledge kaise mila?
+Karna ke birth ki story kya hai?
+Kunti ne Karna ko janm ke baad kyun chhoda?
+Karna ki upbringing ne uske character ko kaise shape kiya?
+Pandavon aur Kauravon ki childhood rivalry ka main cause kya tha?
+Dronacharya ka Pandavon aur Kauravon ki education mein kya role tha?
+Arjuna ko Drona ka favourite student kyun maana gaya?
+Ekalavya ki story ka central ethical question kya hai?
+Ekalavya aur Dronacharya ke episode ko different perspectives se kaise samjha ja sakta hai?
+Lakshagriha conspiracy kya thi?
+Pandav Lakshagriha se kaise bache?
+Hidimba aur Bhima ki story ka kya significance hai?
+Draupadi ka swayamvar Mahabharata ke larger conflict ko kaise influence karta hai?
+Arjuna ne Draupadi ko swayamvar mein kaise win kiya?
+Draupadi ka five Pandavon se marriage ka context kya hai?
+Indraprastha ke development mein Pandavon ki kya role thi?
+Maya Sabha ka Mahabharata mein kya significance hai?
+Duryodhana ko Maya Sabha mein humiliation ka experience kyun important hai?
+Shakuni ka Kuru conflict mein kya role tha?
+Dice game ki planning kaise hui?
+Yudhishthira ne dice game accept kyun kiya?
+Dice game mein Pandavon ne kya-kya lose kiya?
+Draupadi ko Sabha mein bulane ka episode Mahabharata ka major ethical turning point kyun hai?
+Draupadi ne Sabha mein kaunsa fundamental question uthaya?
+Bhishma ka Draupadi Sabha episode mein silence kyun controversial hai?
+Vidur ne dice Sabha mein kya warnings di?
+Dhritarashtra ne Draupadi ko boons kyun diye?
+Pandavon ka vanvas aur agyatvas kis agreement ke result mein hua?
+Vanvas ke dauran Arjuna ko divine weapons kaise prapt hue?
+Yaksha Prashna episode ka central philosophical lesson kya hai?
+Yudhishthira ke answers se Dharma ke baare mein kya understanding milti hai?
+Virata Parva mein Pandavon ne apni identities kyun hide ki?
+Kurukshetra war ke pehle Krishna ka peace mission kya tha?
+Krishna ne Duryodhana ke saamne kya proposal rakha?
+Duryodhana ne peace proposal reject kyun kiya?
+Mahabharata war mein Bhishma ki role kya thi?
+Bhishma ko battlefield mein defeat karna itna difficult kyun tha?
+Shikhandi ka Bhishma ke fall mein kya role tha?
+Abhimanyu Chakravyuha mein kyun gaya aur uski death ka ethical significance kya hai?
+Karna aur Arjuna ke conflict mein personal identity aur loyalty ka kya role tha?
+Mahabharata ka overall lesson Dharma, duty, attachment, power aur consequences ke perspective se kya samjha ja sakta hai?
+
+## mantra_maha_sagar
+Mantra kya hota hai aur ise normal prayer se kaise differentiate kiya ja sakta hai?
+Mantra ke shabda, sound aur intention mein kya relationship hai?
+Mantra jap mein pronunciation ki accuracy kyun important hai?
+Mantra ko baar-baar repeat karne ka spiritual purpose kya hai?
+Japa aur mantra chanting mein kya difference hai?
+Mantra jap mein mala ka kya importance hai?
+Mala mein 108 beads ka traditional significance kya hai?
+Meru bead ko cross na karne ki parampara ka kya context hai?
+Mantra jap ke liye sankalp ka kya role hai?
+Mantra siddhi ka traditional concept kya hai?
+Mantra siddhi aur sirf mantra repeat karne mein kya difference hai?
+Beej mantra kya hota hai?
+Beej mantron ko powerful kyun maana jata hai?
+Om ko sabse fundamental mantron mein se ek kyun maana jata hai?
+Gayatri mantra ka basic spiritual purpose kya hai?
+Mahamrityunjaya mantra kis spiritual context mein prayog kiya jata hai?
+Panchakshari mantra ka kya significance hai?
+Ashtakshari mantra ka traditional significance kya hai?
+Dwadashakshari mantra ko Vishnu bhakti ke context mein kaise samjha jata hai?
+Mantra aur Ishta Devata ke beech kya relationship hai?
+Mantra jap ke liye guru-diksha ko important kyun maana jata hai?
+Kya har mantra ko koi bhi vyakti bina guidance ke kar sakta hai?
+Mantra jap ke samay mala, aasana aur direction ka kya significance ho sakta hai?
+Mantra jap ke liye specific time choose karne ka kya purpose hai?
+Brahma Muhurta mein mantra jap ko beneficial kyun maana jata hai?
+Mantra jap mein count maintain karne ke liye mala kaise use hoti hai?
+Mantra ke teen forms — manasik, upanshu aur vachik — mein kya difference hai?
+Manasik jap ko silent chanting kyun kaha jata hai?
+Upanshu jap kya hota hai?
+Vachik jap aur manasik jap ke practice method mein kya difference hai?
+Mantra jap ke samay concentration break ho jaye to kya karna chahiye?
+Mantra aur meditation ko ek saath kaise practice kiya ja sakta hai?
+Mantra jap mein bhavana ka kya importance hai?
+Sirf pronunciation correct hone se mantra practice complete kyun nahi maana ja sakta?
+Mantra jap aur breath awareness ke beech kya connection ho sakta hai?
+Mantra ke associated devata ko samajhna practice mein kyun important hai?
+Mantra ke Rishi, Chhanda aur Devata identify karne ka kya purpose hai?
+Viniyoga ka mantra practice mein kya meaning hai?
+Nyasa kya hota hai aur iska mantra practice se kya sambandh hai?
+Kavach mantra ka traditional purpose kya hota hai?
+Stotra aur mantra mein kya difference hai?
+Mantra aur yantra ka kya relationship hai?
+Mantra practice mein purification rituals ka kya role ho sakta hai?
+Mantra jap ke traditional benefits ko scientific claims se alag kaise samjha jana chahiye?
+Kisi specific mantra ka exact prayog batane se pehle source text verify karna kyun zaroori hai?
+Agar ek mantra ke multiple versions mil rahe hon to RAG ko kya retrieve karna chahiye?
+Mantra ka correct pronunciation search karne ke liye transliteration ke saath original text kyun important hai?
+Mantra ke meaning aur mantra ke ritual application mein kya difference hai?
+Kisi mantra ko sirf desired result ke liye use karne aur spiritual practice ke roop mein karne mein kya difference hai?
+Mantra Maha Sagar ko effectively search karne ke liye RAG ko mantra name ke saath deity, purpose aur procedure ko bhi retrieve kyun karna chahiye?
+
+## narasimha_purana
+Narasimha Puran ka main spiritual focus kya hai?
+Bhagwan Narasimha ke avatar ka primary purpose kya bataya gaya hai?
+Hiranyakashipu aur Prahlad ki story ka central spiritual lesson kya hai?
+Prahlad ki bhakti ko Narasimha Puran kis tarah present karta hai?
+Hiranyakashipu ko vardaan milne ke baad bhi uska vinash kaise possible hua?
+Narasimha avatar ka half-man half-lion form kya symbolic meaning rakhta hai?
+Bhagwan Narasimha ne Hiranyakashipu ko exactly kis situation mein destroy kiya?
+Prahlad ke character mein kaunsi qualities sabse important hain?
+Narasimha Puran mein bhakti aur fearlessness ka kya connection hai?
+Narasimha Bhagwan ko ugra aur shanta dono roopon mein kaise samjha ja sakta hai?
+Prahlad ke liye Bhagwan ki presence ka kya meaning tha?
+Narasimha Puran mein Vishnu ke avatar concept ko kaise explain kiya gaya hai?
+Narasimha avatar ka relation dharma protection se kya hai?
+Hiranyakashipu ke ego ko spiritual warning ke roop mein kaise samjhen?
+Prahlad ke against ki gayi punishments ke bawajood uski bhakti kyun nahi tooti?
+Narasimha Puran mein naam-smaran ya devotion ka kya importance hai?
+Bhagwan ko difficult circumstances mein yaad karne ka Prahlad se kya lesson milta hai?
+Narasimha Puran mein guru aur spiritual education ka kya role hai?
+Prahlad ki education ko lekar kya important episode milta hai?
+Hiranyakashipu ko apne son ki bhakti se problem kyun thi?
+Narasimha avatar ke appearance ka exact symbolic context kya hai?
+Pillar se Narasimha ke prakat hone ki story ka spiritual interpretation kya hai?
+Narasimha Puran mein Bhagwan ki omnipresence ko kaise express kiya gaya hai?
+Prahlad ke according Bhagwan ko kahan-kahan dekha ja sakta hai?
+Narasimha Puran mein bhakti ko external ritual se kaise alag samjha ja sakta hai?
+Narasimha Bhagwan ke protective aspect ko Puran mein kaise describe kiya gaya hai?
+Narasimha worship mein mantra ka kya role hai?
+Narasimha Puran mein sacred places ya tirth ka kya significance hai?
+Narasimha Puran mein vrata aur puja sambandhi kya teachings milti hain?
+Narasimha Jayanti ke spiritual significance ko Puranic context mein kaise samjhen?
+Narasimha Puran mein Vishnu aur Lakshmi ke sambandh ko kis context mein dekha jata hai?
+Lakshmi-Narasimha concept ka deeper spiritual meaning kya ho sakta hai?
+Ugra Narasimha aur Lakshmi Narasimha imagery mein kya conceptual difference hai?
+Narasimha Puran mein dharma aur adharma ke conflict ko kaise represent kiya gaya hai?
+Prahlad ki bhakti aur Hiranyakashipu ke power obsession mein kya contrast hai?
+Narasimha Puran mein divine intervention ko karma ke context mein kaise samjha ja sakta hai?
+Narasimha avatar ko anya Vishnu avatars se kis basis par distinguish kiya ja sakta hai?
+Puran mein bhakt ki protection ko lekar kya principle milta hai?
+Narasimha Puran mein fear ko overcome karne ke spiritual methods kya milte hain?
+Bhagwan Narasimha ka naam japne ka purpose kya bataya gaya hai?
+Narasimha Puran mein paap aur punya ka kya framework milta hai?
+Is Puran mein daan aur religious observances ka kya importance hai?
+Narasimha Puran mein tirth snan ka kya significance hai?
+Narasimha Puran mein Vishnu bhakti ko moksha se kaise connect kiya gaya hai?
+Prahlad ki story ko modern life ke pressure aur fear ke context mein kaise samjha ja sakta hai?
+Narasimha Puran mein devotion aur knowledge ka kya relationship hai?
+Is Puran mein Bhagwan ke roop aur nirakar divine principle ko lekar kya ideas milte hain?
+Narasimha Puran mein ek true devotee ki pehchan kya batayi ja sakti hai?
+Agar user Narasimha mantra ka source pooche to RAG ko sirf mantra nahi balki uska associated context kyun retrieve karna chahiye?
+Narasimha Puran se Prahlad ki bhakti ka sabse important practical lesson kya nikala ja sakta hai?
+
+## nitya_karm_pooja
+Nitya Karma ka basic meaning kya hai?
+Nitya karm aur naimittik karm mein kya difference hai?
+Daily puja ko routine ka part banane ka spiritual purpose kya hai?
+Nitya karm shuru karne se pehle shuddhi ka kya importance hai?
+Snan ke baad puja karne ki parampara ka kya significance hai?
+Achaman kya hota hai aur puja mein iska kya role hai?
+Sankalp lene ka puja mein kya purpose hai?
+Sankalp mein apna naam aur intention bolne ka kya significance hai?
+Puja ke samay aasana ka kya importance hai?
+Puja mein diya jalane ka spiritual meaning kya hai?
+Agarbatti ya dhoop ka traditional purpose kya hai?
+Ghanti bajane ka puja mein kya significance hai?
+Kalash sthapana ka basic purpose kya hai?
+Kalash mein jal bharne ki parampara ka kya symbolic meaning hai?
+Puja mein Ganesh ji ka smaran sabse pehle kyun kiya jata hai?
+Guru vandana ka daily puja mein kya importance hai?
+Ishta Devata ki puja ka kya meaning hai?
+Panchopachar puja kya hoti hai?
+Shodashopachar puja aur simple daily puja mein kya difference hai?
+Puja mein avahan ka kya meaning hai?
+Asana arpan karne ka kya significance hai?
+Padya aur Arghya ka puja mein kya purpose hai?
+Achamaniya jal aur snan arpan mein kya difference hai?
+Vastra aur Abhushan arpan ka symbolic meaning kya hai?
+Gandha ya chandan lagane ka kya significance hai?
+Pushpa arpan karne ka spiritual meaning kya hai?
+Naivedya arpan karne ka kya purpose hai?
+Naivedya ko Prasad mein transform hone ka traditional concept kya hai?
+Aarti ka daily puja mein kya role hai?
+Aarti ke baad Pradakshina karne ka kya significance hai?
+Namaskar aur pranam ka spiritual meaning kya hai?
+Puja ke end mein kshama-prarthana kyun ki jati hai?
+Mantra pushpanjali ka kya significance hai?
+Visarjan ka puja mein kya meaning hai?
+Sandhyavandan ya Sandhya practice ka kya importance hai?
+Surya ko Arghya dene ki parampara ka kya spiritual significance hai?
+Gayatri mantra ka daily practice mein kya role hai?
+Brahma Yajna kya hota hai?
+Deva Yajna ka daily karm se kya sambandh hai?
+Pitru Yajna ko Nitya Karma ke framework mein kaise samjha ja sakta hai?
+Atithi seva ko traditional daily duties mein kyun important maana gaya hai?
+Bhuta Yajna ka kya meaning hai?
+Nitya karm mein daan aur seva ko kaise include kiya ja sakta hai?
+Daily puja mein mantra, dhyan aur bhakti ka balance kaise rakha ja sakta hai?
+Agar kisi vyakti ke paas bahut kam time ho to Nitya Puja ka essential sequence kya ho sakta hai?
+Nitya Karma mein morning aur evening practices mein kya difference ho sakta hai?
+Puja vidhi ke exact steps search karte waqt RAG ko surrounding instructions bhi retrieve kyun karni chahiye?
+Kisi specific devata ki puja mein samagri list alag ho sakti hai to RAG ko devata context kyun identify karna chahiye?
+Puja ke rules ko blindly follow karne ke bajay unke intended spiritual purpose ko samajhna kyun useful hai?
+Nitya Karm Pooja ka overall objective sirf ritual completion hai ya daily spiritual discipline bhi?
+
+## ramcharitmanas
+Ramcharitmanas ki rachna Goswami Tulsidas ne kis bhasha mein ki?
+Ramcharitmanas mein Shri Ram ko kis spiritual perspective se present kiya gaya hai?
+Ramcharitmanas ke Bal Kand ka central focus kya hai?
+Shri Ram ke janm ka spiritual significance kya hai?
+Dasharath ji ke putra-prapti episode ka kya context hai?
+Vishwamitra Shri Ram aur Lakshman ko apne saath kyun le gaye?
+Tataka vadh ki story ka spiritual lesson kya hai?
+Ram aur Sita ke first meeting ka Ramcharitmanas mein kya significance hai?
+Sita Swayamvar ka main episode kya sikhata hai?
+Shiva Dhanush todne ki story ka deeper meaning kya hai?
+Ram-Sita vivah ka spiritual significance kya hai?
+Kaikeyi ke varadaan ka Ram ke vanvas se kya sambandh hai?
+Ram ne vanvas ko bina resistance accept kyun kiya?
+Ram ke vanvas acceptance mein Pitru Bhakti ka kya role hai?
+Lakshman ka Ram ke saath van jaane ka decision kya demonstrate karta hai?
+Sita ji ne Ram ke saath van jaane par insist kyun kiya?
+Ram, Sita aur Lakshman ka forest life dharma ke kis principle ko show karta hai?
+Nishadraj Guha ke saath Ram ka relationship kya lesson deta hai?
+Kevat Prasang ka central spiritual message kya hai?
+Bharat ko Ramcharitmanas mein ideal brother kyun maana jata hai?
+Bharat ka Ram ki paduka ko Ayodhya le jana kya symbolize karta hai?
+Chitrakoot episode ka Ramcharitmanas mein kya significance hai?
+Ahalya uddhar ki story ka spiritual meaning kya hai?
+Shabari ki bhakti ko Ramcharitmanas kis tarah present karta hai?
+Shabari ke ber ka prasang bhakti ke baare mein kya sikhata hai?
+Hanuman ji ka Shri Ram se first meeting ka episode kya hai?
+Hanuman ko Ram ka sabse ideal sevak kyun maana jata hai?
+Sugriv aur Ram ke alliance ka kya context hai?
+Bali vadh ko lekar Ramcharitmanas mein kya explanation milta hai?
+Hanuman ji ka Lanka jaana kis purpose se tha?
+Hanuman ji ke Lanka gaman mein unke character ki kaunsi qualities saamne aati hain?
+Ashok Vatika mein Hanuman aur Sita ji ki meeting ka kya significance hai?
+Hanuman ji ne Sita ko Ram ki kaunsi nishani di?
+Lanka Dahan ka symbolic meaning kya samjha ja sakta hai?
+Vibhishan ka Ram ki sharan mein aana kya lesson deta hai?
+Ram Setu construction ka Ramcharitmanas mein kya significance hai?
+Lanka yudh mein Ram aur Ravan ke conflict ko dharma-adharma ke context mein kaise samjhen?
+Ravan ke character mein knowledge aur ego ka kya contrast hai?
+Meghnad/Indrajit ki role ko Ramcharitmanas ke yudh context mein kaise samjha ja sakta hai?
+Kumbhakarna ke character se kya moral lesson milta hai?
+Ravan vadh ka central spiritual message kya hai?
+Sita ji ki Agni Pariksha ke prasang ko Ramcharitmanas ke context mein kaise samajhna chahiye?
+Ram ka Ayodhya wapas aana aur Rajyabhishek ka kya significance hai?
+Ram Rajya ki characteristics kya batayi gayi hain?
+Ramcharitmanas mein Hanuman Bhakti ka kya special importance hai?
+Ramcharitmanas mein Naam Mahima ko kis tarah explain kiya gaya hai?
+Ramcharitmanas mein Ram Naam aur Ram ke roop mein kya relationship dikhaya gaya hai?
+Ramcharitmanas mein Vinay, Bhakti aur Seva ko kaise connect kiya gaya hai?
+Agar user kisi specific Chaupai ka meaning pooche to RAG ko sirf Chaupai nahi balki uske pehle-baad ke context ko retrieve kyun karna chahiye?
+Ramcharitmanas ka overall central message modern life mein Dharma, Maryada aur Bhakti ke context mein kya ho sakta hai?
+
+## rashi_muhurt_vigyan
+Rashi aur Nakshatra mein basic difference kya hota hai?
+Janma Rashi kaise determine ki jaati hai?
+Chandra Rashi ko personality analysis mein important kyun maana jata hai?
+Lagna aur Chandra Rashi mein kya difference hai?
+Lagna ko kundli ka starting point kyun maana jata hai?
+12 Rashiyon ki basic characteristics kya hoti hain?
+Mesh Rashi ko kis type ke personality traits se associate kiya jata hai?
+Vrishabh Rashi ki traditional characteristics kya hain?
+Mithun Rashi ko communication se kaise relate kiya jata hai?
+Kark Rashi ka emotional nature kis tarah describe kiya jata hai?
+Singh Rashi ki traditional qualities kya hain?
+Kanya Rashi ko analytical nature se kaise relate kiya jata hai?
+Tula Rashi mein balance aur partnership ka kya significance hai?
+Vrishchik Rashi ki traditional characteristics kya hain?
+Dhanu Rashi ko knowledge aur exploration se kaise relate kiya jata hai?
+Makar Rashi ke practical traits kya bataye jate hain?
+Kumbh Rashi ko innovation aur social thinking se kaise connect kiya jata hai?
+Meen Rashi ki spiritual characteristics kya hain?
+Rashi ke element — Agni, Prithvi, Vayu aur Jal — ka kya significance hai?
+Movable, fixed aur dual rashiyon mein kya difference hai?
+Graha aur Rashi ke relationship ko Jyotish mein kaise samjha jata hai?
+Muhurt kya hota hai?
+Muhurt choose karne ka basic purpose kya hai?
+Shubh Muhurt aur normal time mein Jyotish ke according kya difference hai?
+Kisi important kaam ke liye Muhurt select karte waqt kin factors ko dekha jata hai?
+Tithi ka Muhurt selection mein kya role hai?
+Vara ya weekday ko Muhurt mein kyun consider kiya jata hai?
+Nakshatra ka Muhurt ke selection mein kya importance hai?
+Yoga aur Karana kya hote hain?
+Panchang ke five components kaunse hain?
+Panchang ka use Muhurt nikalne mein kaise hota hai?
+Rahu Kaal ko auspicious activity se kyun avoid kiya jata hai?
+Abhijit Muhurt kya hota hai?
+Brahma Muhurt aur Abhijit Muhurt mein kya difference hai?
+Choghadiya kya hota hai?
+Choghadiya ko daily activities ke liye kaise use kiya jata hai?
+Marriage Muhurt select karte waqt kaunse factors important hote hain?
+Griha Pravesh ke liye Muhurt choose karne ka traditional framework kya hai?
+Business opening ke liye shubh Muhurt kaise consider kiya jata hai?
+Vehicle purchase ya delivery ke liye Muhurt ka kya concept hai?
+Naamkaran Sanskar ke liye Muhurt aur Nakshatra ka kya importance hai?
+Mundan Sanskar ke Muhurt mein kin factors ko consider kiya jata hai?
+Upanayan Sanskar ke liye shubh samay select karne ka kya traditional basis hai?
+Amavasya aur Purnima ka Muhurt selection mein kya role ho sakta hai?
+Ek hi Muhurt sabhi logon ke liye equally suitable kyun nahi maana jata?
+Muhurt aur individual birth chart ko saath mein consider karna kyun useful hai?
+Agar user kisi specific date ka shubh Muhurt pooche to RAG ko Panchang-related exact context kyun retrieve karna chahiye?
+Muhurt ke answer mein location important kyun hoti hai?
+Muhurt calculation mein sunrise/sunset timing ka kya importance hai?
+Rashi aur Muhurt Vigyan ko practical decision-making mein use karte waqt exact source aur date verification kyun zaroori hai?
+
+## rigveda_1
+Rigved ko Vedic literature mein sabse important early texts mein se ek kyun maana jata hai?
+Rigved ke hymns ka primary purpose kya tha?
+Rigved mein Agni ko sabse important deities mein kyun maana gaya?
+Rigved mein Agni ko messenger ke roop mein kaise describe kiya gaya hai?
+Rigved mein Indra ki primary role kya hai?
+Indra aur Vritra ki story ka central meaning kya hai?
+Rigved mein Vritra ko defeat karne ka symbolism kya ho sakta hai?
+Rigved mein Soma ka kya importance hai?
+Rigved mein Soma ko deity aur ritual substance dono ke roop mein kaise samjha jata hai?
+Rigved mein Varuna ka role kya hai?
+Varuna aur cosmic order ke beech kya relationship hai?
+Rigved mein Mitra-Varuna ko saath mein kyun invoke kiya jata hai?
+Rigved mein Ushas ko kis form mein describe kiya gaya hai?
+Ushas hymns mein dawn ka spiritual symbolism kya hai?
+Rigved mein Surya ka kya significance hai?
+Rigved mein Savitr aur Surya ke concepts mein kya distinction hai?
+Rigved mein Ashvin twins ka kya role hai?
+Ashvins ko healing aur rescue se kaise relate kiya gaya hai?
+Rigved mein Maruts kaun hain aur unka kya significance hai?
+Rigved mein Vayu ko kis context mein invoke kiya gaya hai?
+Rigved mein Sarasvati ka kya importance hai?
+Rigved mein Sarasvati ko river aur divine power dono perspectives se kaise dekha ja sakta hai?
+Rigved ke Purusha Sukta ka central concept kya hai?
+Purusha Sukta mein cosmic being se creation ko kaise explain kiya gaya hai?
+Rigved ke Nasadiya Sukta ka main philosophical question kya hai?
+Nasadiya Sukta creation ke origin ko lekar kya uncertainty express karta hai?
+Rigved mein Hiranyagarbha concept ka kya significance hai?
+Rigved mein cosmic creation ke different explanations kyun milte hain?
+Rigved mein Rta ka kya meaning hai?
+Rta aur later concept of Dharma mein kya connection samjha ja sakta hai?
+Rigved mein yajna aur cosmic order ke beech kya relation hai?
+Rigved ke hymns mein human beings devataon se kya seekhte ya expect karte hain?
+Rigved mein prosperity aur cattle wealth ka baar-baar mention kyun milta hai?
+Rigved ke hymns mein rain aur agricultural prosperity ka kya importance hai?
+Rigved mein rivers ko lekar kya spiritual imagery milti hai?
+Rigved ke River Hymn ka main significance kya hai?
+Rigved mein speech ko divine power ke roop mein kaise samjha gaya hai?
+Rigved mein Vak ka philosophical significance kya hai?
+Rigved mein knowledge aur illumination ke references kis form mein aate hain?
+Rigved mein darkness aur light ke symbolic meanings kya ho sakte hain?
+Rigved mein dawn ka baar-baar celebration kis spiritual idea ko represent karta hai?
+Rigved mein death ke baad ki existence ko lekar kya ideas milte hain?
+Rigved mein Yama ka kya role hai?
+Rigved mein ancestors aur Pitru tradition ka kya context hai?
+Rigved mein marriage hymns ka kya significance hai?
+Rigved mein bride aur groom ke sambandh mein kis type ki blessings di gayi hain?
+Rigved mein gambling ke against kya moral teaching milti hai?
+Rigved ke Gambler's Hymn ka practical lesson kya hai?
+Rigved mein nature worship ko sirf "nature worship" kehna incomplete kyun ho sakta hai?
+Agar user Rigved ke kisi specific mantra ka meaning pooche to RAG system ko deity, Sukta aur Mandala context kyun retrieve karna chahiye?
+
+## samaveda
+Samved ko Vedic tradition mein kis special purpose ke liye jaana jata hai?
+Samved aur Rigved ke mantron ke use mein kya important difference hai?
+Samved mein mantra aur singing ka kya relationship hai?
+Samved ka sambandh yajna ke kis aspect se hai?
+Samved ke mantron ka uchcharan normal mantra-paath se kaise different ho sakta hai?
+Samved mein musical notation ya swar-parampara ka kya importance hai?
+Samved ke mantron mein Agni ka kya role hai?
+Indra se sambandhit Samvedic mantron ka primary spiritual context kya hai?
+Soma ka Samved mein kya significance hai?
+Samved ke mantra kis prakaar ke Vedic rituals mein use hote the?
+Samved ke according devataon ko invoke karne ka purpose kya hai?
+Samved mein yajna aur cosmic order ka kya connection hai?
+Samved ke chanting tradition ko preserve karna kyun important hai?
+Samved ke mantraon mein prakriti ke kaunse aspects baar-baar milte hain?
+Samved mein Agni ko mediator ke roop mein kaise dekha jata hai?
+Indra ke sambandh mein Samved ki hymns kya spiritual imagery present karti hain?
+Soma sambandhi mantron ka Vedic ritual mein kya role tha?
+Samved mein stuti aur prarthana ke beech kya distinction samjha ja sakta hai?
+Samved ke chanting mein swar badalne se mantra recitation par kya effect padta hai?
+Samved ko "Veda of melodies" kehne ka basis kya hai?
+Samved ke mantraon ka source anya Vedic texts se kaise related hai?
+Samved mein yajamana aur hota jaise ritual roles ka kya context hai?
+Samved ke chanting ka spiritual objective sirf music tha ya kuch aur?
+Samved mein devata-stuti ka psychological effect kya samjha ja sakta hai?
+Samved mein Agni ke different symbolic aspects kya ho sakte hain?
+Samved mein Indra ko kis type ki divine qualities ke saath invoke kiya jata hai?
+Samved ke Soma hymns ko spiritual perspective se kaise samjha ja sakta hai?
+Samved mein ritual aur mantra ke correct pronunciation ka kya importance hai?
+Samved ke chanting tradition mein guru-shishya parampara ka kya role raha?
+Samved ke mantra ko bina swar ke padhne aur traditional singing mein kya difference hoga?
+Samved mein divine power aur human effort ka relationship kaise dikhai deta hai?
+Samved ke hymns mein victory aur protection ki prarthana kis context mein milti hai?
+Samved mein prosperity ke liye ki gayi invocations ka nature kya hai?
+Samved ke mantraon mein light aur darkness ke symbolic references ka kya meaning ho sakta hai?
+Samved mein rain ya natural forces ko spiritual context mein kaise address kiya jata hai?
+Samved ke hymns mein knowledge aur illumination ka concept kaise aata hai?
+Samved mein Vedic sacrifice ko cosmic harmony se kaise connect kiya gaya hai?
+Samved ke chanting ke liye swar-gyan kyun zaroori hai?
+Samved ki recitation tradition mein textual accuracy kyun critical hai?
+Samved mein devata aur yajna ke beech reciprocity ka concept kya hai?
+Samved ke mantraon mein warrior-like imagery ka kya context hai?
+Samved mein Agni ko physical fire ke alawa kis symbolic roop mein samjha ja sakta hai?
+Samved mein Soma ko lekar ritual aur symbolic meaning mein kya difference hai?
+Samved ke hymns mein nature aur divinity ko kis tarah connect kiya gaya hai?
+Samved ke mantraon ka collective chanting kis type ka spiritual environment create karta hai?
+Samved mein praise ko divine favour ke saath kaise relate kiya jata hai?
+Samved ke Vedic chants ka later Indian musical tradition se kya sambandh maana jata hai?
+Samved ko samajhne ke liye mantra ke words ke saath swar ko samajhna kyun important hai?
+Samved mein yajna ke samay chant kiya gaya mantra ritual ko kaise support karta hai?
+Agar kisi Samvedic mantra ka meaning samajhna ho to sirf translation dekhna enough kyun nahi ho sakta?
+
+## shiva_purana_1
+Shiv Puran mein Bhagwan Shiva ke origin ya eternal nature ko kis tarah explain kiya gaya hai?
+Shiv Puran ke according Shiva ko Brahma aur Vishnu se kis perspective mein relate kiya gaya hai?
+Brahma aur Vishnu ke beech superiority ka dispute aur Shiva ke intervention ki story kya sikhati hai?
+Anant Jyoti ke roop mein Shiva ka concept kya hai?
+Jyotirlinga ki origin story ka Shiv Puran mein kya significance hai?
+Brahma aur Vishnu ko Shiva ke infinite form ka ant kyun nahi mila?
+Shiva ke anadi aur ananta hone ka concept kya meaning rakhta hai?
+Shiv Puran mein creation mein Shiva ki kya role batayi gayi hai?
+Shiva aur Prakriti ke relationship ko Shiv Puran kis tarah present karta hai?
+Shiv Puran mein Shakti ke bina Shiva ke concept ko kaise samjha ja sakta hai?
+Sati ke janm ki story kya hai?
+Sati aur Shiva ke vivah ka spiritual significance kya hai?
+Daksha Prajapati ko Shiva se problem kyun thi?
+Daksha Yajna mein Shiva ka apmaan kis conflict ko represent karta hai?
+Sati ne Daksha ke yajna mein apna sharir tyag kyun kiya?
+Sati ke tyag ke baad Shiva ka reaction kya tha?
+Virabhadra ka manifestation kis purpose se hua?
+Daksha Yajna ki story mein ego aur divine respect ka kya lesson hai?
+Sati ke baad Parvati ke roop mein Shakti ka manifestation kaise explain hota hai?
+Parvati ke janm ka Shiv Puranic context kya hai?
+Parvati ki tapasya ka detailed purpose kya tha?
+Shiva ko prapt karne ke liye Parvati ne kis type ka spiritual discipline follow kiya?
+Parvati ki tapasya se devotion aur determination ka kya lesson milta hai?
+Shiva aur Parvati ke vivah ko cosmic union kyun maana ja sakta hai?
+Shiva ke marriage ko lekar Puran mein jo divine procession describe hoti hai uska kya significance hai?
+Shiva ke ganas ka kya role hai?
+Nandi ka Shiva ke saath sambandh Shiv Puran mein kis tarah explain hota hai?
+Nandi ko Shiva ka vahana banne ka kya context hai?
+Shiva ke ganas ko normal social standards se different kyun describe kiya jata hai?
+Shiva ke cremation-ground symbolism ka deeper meaning kya hai?
+Shiva ka vairagya aur unka grihastha roop ek saath kaise samjha ja sakta hai?
+Shiva ko "Bholenath" kehne ka Puranic context kya hai?
+Shiva ke devotees mein bhakti ki sabse important quality kya batayi gayi hai?
+Shiv Puran mein Shiva naam ka smaran kitna important hai?
+Shiva Sahasranama ka spiritual purpose kya hai?
+Shiv Puran mein Rudra naam ki significance kya hai?
+Shiva ke multiple names unke different aspects ko kaise represent karte hain?
+Shiva ke third eye ki origin ya significance ko Shiv Puranic context mein kaise samjha jata hai?
+Kamadeva ke Shiva ke third eye se bhasm hone ki story kya lesson deti hai?
+Kamadeva ko Shiva ke meditation ko disturb karne ki zarurat kyun padi?
+Kamadeva destruction story mein desire aur self-control ka kya relationship hai?
+Shiva ke meditation ki power ko Shiv Puran kaise demonstrate karta hai?
+Shiva aur Ganga ki story mein Ganga ko Shiva ki jata mein rokne ka kya significance hai?
+Bhagiratha ki tapasya aur Ganga avataran ki story ka central lesson kya hai?
+Shiva ne Ganga ke force ko apni jata mein kyun hold kiya?
+Ganga avataran story mein Shiva ki compassion ka kya role hai?
+Shiv Puran mein pilgrimage aur sacred places ka kya importance hai?
+Shiva temples aur ling worship ko Puranic tradition mein important kyun maana gaya hai?
+Shiv Puran Khand 1 mein kisi specific story ka exact source locate karne ke liye chapter-level retrieval kyun zaroori hai?
+Shiv Puran ke according Shiva bhakti mein sirf external puja se zyada inner devotion ka kya importance hai?
+
+## shiva_purana_2
+Shiv Puran ke Khand 2 mein Bhagwan Shiva ke kaunse major aspects par focus milta hai?
+Shiva ko Mahadev ke roop mein samajhne ke liye Puran mein kya teachings milti hain?
+Shiva aur Shakti ke relationship ko Shiv Puran kaise explain karta hai?
+Parvati ji ka Shiva ke saath sambandh spiritual perspective se kya significance rakhta hai?
+Shiva-Parvati vivah ka deeper symbolic meaning kya hai?
+Shiva ke vairagya aur grihastha roop mein kya apparent contrast hai?
+Shiva ko ascetic aur family deity dono roopon mein kaise samjha ja sakta hai?
+Shiv Puran mein Shiva ling ka kya significance hai?
+Ling aur Yoni symbolism ko Puranic context mein kaise samjha jata hai?
+Shivling worship ke basic spiritual principles kya hain?
+Abhishek ka Shiv worship mein kya significance hai?
+Jalabhishek aur Shivling ke sambandh mein kya teachings milti hain?
+Bilva patra ko Shiva puja mein itna important kyun maana jata hai?
+Bhasma ka Shiva tradition mein kya symbolic meaning hai?
+Rudraksha ka Shiv Puranic context mein kya importance hai?
+Shiva mantra aur naam-smaran ka kya spiritual role hai?
+"Om Namah Shivaya" ke spiritual meaning ko kaise samjha ja sakta hai?
+Panchakshari mantra ko Shiv bhakti mein important kyun maana jata hai?
+Mahashivratri ka Shiva worship mein kya significance hai?
+Shivratri mein jagran ka deeper spiritual purpose kya hai?
+Shiv Puran mein fasting aur Shivratri vrat ka kya role hai?
+Shiva ko "Ashutosh" kehne ka kya meaning hai?
+Shiva ke bhakt ki kaunsi qualities Puran mein ideal batayi ja sakti hain?
+Shiva ki karuna aur Rudra roop ke beech kya relationship hai?
+Rudra ke fierce form ka spiritual meaning kya hai?
+Shiva ke tandava ko sirf dance na samajhkar kaise interpret kiya ja sakta hai?
+Nataraja concept ka Shiva philosophy mein kya significance hai?
+Shiva ke trinetra ka kya symbolic meaning hai?
+Shiva ke third eye ko knowledge aur destruction se kaise relate kiya jata hai?
+Shiva ke gale mein snake ka kya symbolism hai?
+Shiva ke jata mein Ganga ka kya significance hai?
+Ganga ke Shiva ki jata mein aane ki story ka spiritual lesson kya hai?
+Shiva ke damru ka kya symbolic significance hai?
+Shiva ke trishul ke teen prongs ko kaise interpret kiya ja sakta hai?
+Nandi ka Shiva worship mein kya role hai?
+Nandi aur Shiva ke relationship ka spiritual symbolism kya hai?
+Shiv Puran mein Kartikeya ke birth aur role ka kya significance hai?
+Ganesha ke birth ki Puranic story ka central spiritual lesson kya hai?
+Ganesha aur Shiva ke relationship ko Shiv Puran kis perspective se present karta hai?
+Shiva ke family stories ka spiritual teaching mein kya purpose hai?
+Daksha Yajna aur Sati ki story ka central lesson kya hai?
+Sati ke self-sacrifice ke episode ko Puranic context mein kaise samjhen?
+Parvati ke tapasya ka spiritual significance kya hai?
+Parvati ne Shiva ko prapt karne ke liye tapasya kyun ki?
+Shiva aur Parvati ki story mein tapasya aur devotion ka kya relationship hai?
+Shiv Puran mein pilgrimage aur Jyotirlinga tradition ka kya significance hai?
+Jyotirlinga concept ko Shiva ke infinite nature se kaise connect kiya jata hai?
+Shiv Puran mein Shiva bhakti aur moksha ka kya connection hai?
+Agar user kisi specific Shivling puja vidhi ka exact answer pooche to RAG ko sirf keyword nahi balki related chapter/vidhi section retrieve kyun karna chahiye?
+Shiv Puran ke according Shiva bhakti ka ultimate purpose sirf worldly blessings hai ya spiritual liberation bhi?
+
+## vishnu_purana_1
+Vishnu Puran mein Vishnu ko supreme reality ke roop mein kaise present kiya gaya hai?
+Vishnu Puran ke according creation ka process kis tarah explain hota hai?
+Prakriti aur Purusha ka Vishnu Puran mein kya relationship hai?
+Vishnu ki cosmic role ko preservation se aage kaise samjha ja sakta hai?
+Vishnu Puran mein Brahma ka creation mein kya role hai?
+Vishnu Puran mein Shiva aur Vishnu ke relationship ko kis perspective se samjha gaya hai?
+Vishnu Puran mein cosmic dissolution ka kya concept hai?
+Vishnu Puran ke according universe cycles mein create aur dissolve kyun hota hai?
+Vishnu Puran mein Manvantara kya hota hai?
+Vishnu Puran mein different Manus ka kya significance hai?
+Vishnu Puran mein Kalpa aur Manvantara mein kya difference hai?
+Vishnu Puran mein yuga cycle ko kaise explain kiya gaya hai?
+Satya, Treta, Dvapara aur Kali Yuga ki characteristics kya batayi gayi hain?
+Vishnu Puran mein Kali Yuga ke decline ko kaise describe kiya gaya hai?
+Vishnu Puran mein Surya dynasty ka kya significance hai?
+Vishnu Puran mein Chandra dynasty ka kya importance hai?
+Vishnu Puran mein Raja Prithu ki story ka kya lesson hai?
+Prithu ko ideal ruler ke roop mein kyun present kiya gaya?
+Dhruva ki story ka Vishnu Puran mein kya spiritual message hai?
+Dhruva ki tapasya se determination aur bhakti ke baare mein kya seekh milti hai?
+Prahlad ki story Vishnu Puran mein kis form mein present hoti hai?
+Prahlad aur Hiranyakashipu ke conflict ka central spiritual lesson kya hai?
+Vishnu Puran mein Vamana avatar ka purpose kya bataya gaya hai?
+Bali aur Vamana ki story mein humility aur devotion ka kya role hai?
+Vishnu Puran mein Matsya avatar ki story ka kya significance hai?
+Kurma avatar ka cosmic symbolism kya hai?
+Varaha avatar mein Earth ko rescue karne ka spiritual meaning kya hai?
+Narasimha avatar ko Vishnu Puran mein kis context mein explain kiya gaya hai?
+Parashurama avatar ka purpose kya bataya gaya hai?
+Rama avatar ko Vishnu Puran kis perspective se present karta hai?
+Krishna avatar ka Vishnu Puran mein kya significance hai?
+Vishnu ke avatars ka primary objective kya bataya gaya hai?
+Vishnu Puran mein Lakshmi ka kya significance hai?
+Lakshmi aur Vishnu ke eternal relationship ko kaise explain kiya gaya hai?
+Samudra Manthan mein Lakshmi ke appearance ka kya context hai?
+Samudra Manthan ke spiritual lessons kya hain?
+Vishnu Puran mein Garuda ka kya role hai?
+Garuda aur Vishnu ke relationship ko kis perspective se samjha ja sakta hai?
+Vishnu Puran mein bhakti aur moksha ka kya relationship hai?
+Vishnu Puran mein knowledge ko liberation ka means kaise bataya gaya hai?
+Vishnu Puran mein karma aur rebirth ko kis framework mein explain kiya gaya hai?
+Vishnu Puran mein dharma aur righteous living ka kya importance hai?
+Vishnu Puran mein king ke duties ke baare mein kya guidance milti hai?
+Vishnu Puran mein ideal social order ko kaise describe kiya gaya hai?
+Vishnu Puran mein geography aur sacred regions ka kya significance hai?
+Vishnu Puran mein Bharatvarsha ko kis spiritual perspective se dekha gaya hai?
+Vishnu Puran mein pilgrimage ko spiritual merit se kaise connect kiya gaya hai?
+Vishnu Puran mein moksha ke liye attachment ko chhodna kyun important hai?
+Vishnu Puran mein bhakti, karma aur jnana ko ek doosre se kaise relate kiya ja sakta hai?
+Agar user Vishnu Puran se kisi avatar ki exact story pooche to RAG ko avatar ke saath related genealogy aur chapter context kyun retrieve karna chahiye?
+
+## yajurveda
+Yajurved ka primary focus kya hai?
+Yajurved aur Rigved mein basic difference kya hai?
+Yajurved ka yajna ke saath direct connection kya hai?
+Yajurved mein ritual instructions ka kya importance hai?
+Shukla Yajurved aur Krishna Yajurved mein kya difference hai?
+Yajurved mein yajamana ka kya role hota hai?
+Yajna mein Agni ka role Yajurvedic tradition ke according kya hai?
+Yajurved ke according mantra aur ritual action ko saath mein kyun perform kiya jata hai?
+Yajurved mein purification ka concept kaise aata hai?
+Yajurvedic rituals mein samagri ka kya importance hai?
+Yajurved mein Vedic sacrifice ko cosmic order se kaise connect kiya jata hai?
+Yajurved mein Brahman aur ritual knowledge ka kya relationship hai?
+Yajurved ke rituals mein correct procedure ka importance kya hai?
+Yajurved mein offerings ko devataon tak pahunchane ka concept kaise explain hota hai?
+Yajurved mein Agnihotra ka kya significance hai?
+Yajurved mein Darsha-Purnamasa type rituals ka kya purpose hai?
+Yajurved mein Soma sacrifice ka kya context hai?
+Yajurved mein animal sacrifice related references ko kis ritual context mein samajhna chahiye?
+Yajurved mein peace aur prosperity ke liye kaise ritual intentions milte hain?
+Yajurved mein universal welfare ka concept kis tarah express hota hai?
+Yajurved ke mantron mein Prithvi aur Antariksha ka kya significance hai?
+Yajurved mein Surya ke sambandh mein kaunse spiritual ideas milte hain?
+Yajurved mein Vayu aur Agni jaise natural forces ko kaise address kiya gaya hai?
+Yajurved mein diksha ka kya meaning hai?
+Yajurved mein vrata aur discipline ka kya role hai?
+Yajurved mein yajna ke different stages ko kaise samjha ja sakta hai?
+Yajurved ke ritual system mein priestly roles ka kya significance hai?
+Yajurved mein mantra pronunciation ki accuracy kyun important hai?
+Yajurved mein offering ke samay mantra bolne ka purpose kya hai?
+Yajurved ke according yajna sirf external ritual hai ya deeper symbolic meaning bhi rakhta hai?
+Yajurved mein food aur life-force ka kya relation hai?
+Yajurved mein water purification ke references ka kya significance hai?
+Yajurved mein creation aur cosmic structure se related ideas kahan milte hain?
+Yajurved mein Prajapati ka kya importance hai?
+Yajurved mein Rudra ko lekar kya important ritual references milte hain?
+Yajurved ke Shri Rudram tradition ka spiritual significance kya hai?
+Rudra ke fierce aur auspicious dono aspects ko Yajurvedic tradition kaise dekhti hai?
+Yajurved mein protection ke liye ki jaane wali invocations ka kya purpose hai?
+Yajurved mein health aur well-being ke liye kis type ki prayers milti hain?
+Yajurved mein ancestors ya Pitru sambandhi ritual ideas kya hain?
+Yajurved mein yajna aur social responsibility ka kya relation hai?
+Yajurved mein cosmic balance ko maintain karne ke liye ritual ka kya role maana gaya?
+Yajurved mein "Idam Na Mama" jaise tyag-bhav ka kya significance hai?
+Yajurvedic yajna mein personal desire aur universal welfare ke beech kya difference hai?
+Yajurved mein spiritual discipline aur ritual discipline ka kya connection hai?
+Yajurved ke rituals mein time aur proper occasion ka kya importance hai?
+Yajurved mein mantra ke saath physical action kyun prescribed hota hai?
+Yajurved ko sirf religious ritual book samajhna incomplete kyun ho sakta hai?
+Yajurved ke ritual concepts ko modern spiritual practice se kaise cautiously relate kiya ja sakta hai?
+Agar user kisi Yajurvedic mantra ka exact prayog pooche to RAG system ko kis type ka context retrieve karna chahiye?
+
+## yoga_sutra
+Patanjali Yog Sutra ka primary objective kya hai?
+"Yoga" ko Patanjali kis definition se explain karte hain?
+"Chitta Vritti Nirodha" ka simple meaning kya hai?
+Chitta kya hai aur uski vrittis kya hoti hain?
+Patanjali ke according mind ki five major vrittis kaun si hain?
+Pramana ko Yog Sutra mein kya maana gaya hai?
+Viparyaya aur correct knowledge mein kya difference hai?
+Vikalpa kya hota hai?
+Nidra ko bhi ek vritti kyun maana gaya hai?
+Smriti ka Yog Sutra mein kya role hai?
+Abhyasa aur Vairagya ko mind control ke two major methods kyun kaha gaya hai?
+Abhyasa ka real meaning sirf repetition hai ya disciplined practice?
+Vairagya ko Patanjali kis perspective se explain karte hain?
+Abhyasa strong hone ke liye kaunse factors important hain?
+Patanjali ke according practice long time tak karna kyun important hai?
+Klesha kya hote hain?
+Patanjali ke five Kleshas kaunse hain?
+Avidya ko sabse fundamental Klesha kyun maana gaya hai?
+Asmita ka kya meaning hai?
+Raga aur Dvesha mein kya difference hai?
+Abhinivesha ko Patanjali kis type ke fear ke roop mein explain karte hain?
+Kleshas karma ko kaise influence karte hain?
+Karmashaya ka kya meaning hai?
+Patanjali ke according karma aur future experience ka kya relationship hai?
+Ashtanga Yoga kya hai?
+Yama aur Niyama mein kya difference hai?
+Ahimsa ko first Yama kyun rakha gaya hai?
+Satya ka practical meaning Yog Sutra mein kya hai?
+Asteya ka kya meaning hai?
+Brahmacharya ko Yog Sutra ke context mein kaise samjha ja sakta hai?
+Aparigraha ka practical significance kya hai?
+Shaucha ka Niyama ke roop mein kya meaning hai?
+Santosha ko spiritual practice kyun maana gaya hai?
+Tapas ka Yog Sutra mein kya role hai?
+Svadhyaya kya hai?
+Ishvara Pranidhana ka kya meaning hai?
+Yama aur Niyama ko meditation se pehle kyun rakha gaya?
+Asana ko Patanjali kitna importance dete hain?
+Patanjali ke according ideal Asana ki quality kya honi chahiye?
+Pranayama ka basic purpose kya hai?
+Pratyahara ka kya meaning hai?
+Pratyahara ko senses ke control se kaise relate kiya gaya hai?
+Dharana, Dhyana aur Samadhi mein kya difference hai?
+Samyama kya hota hai?
+Samyama ke through knowledge ke development ko Patanjali kaise explain karte hain?
+Siddhis ka Yog Sutra mein kya context hai?
+Patanjali siddhis ko spiritual goal kyun nahi maante?
+Kaivalya ka Yog Sutra mein kya meaning hai?
+Agar user kisi specific Yog Sutra ka meaning pooche to RAG ko sirf ek Sutra nahi balki uske Pada aur surrounding Sutras ka context kyun retrieve karna chahiye?
+Patanjali Yog Sutra ka ultimate goal physical fitness hai, meditation hai, ya Kaivalya — aur text ke overall context mein ise kaise samjha jana chahiye? Book / Source Questions Sampurna Rashi Aur Muhurt Vigyan 50 Shri Ramcharitmanas 50 Yoga Vasishta 50 Mahabharata Vol. 1–6 — ONE SOURCE 50 Patanjali Yog Sutra 50 TOTAL 250 QUESTION RANGE Q1001–Q1250 CURRENT MASTER DATASET TOTAL = 1,250 NEW RAG TEST QUESTIONS Note: Aapke screenshot mein Mahabharata ke 6 volumes ko ek single source maana gaya hai, jaisa aapne specifically mark kiya tha. Is batch mein usi tarah Mahabharata = 1 book/source rakha gaya hai.
+
+## yoga_vasishtha
+Yoga Vasishta ki teaching ka central focus kya hai?
+Yoga Vasishta mein Shri Ram ki spiritual questioning ka kya importance hai?
+Ram ko world ke prati vairagya kab aur kyun develop hua?
+Vasishta ji Ram ke vairagya ko kaise address karte hain?
+Yoga Vasishta mein mind ko reality ka central factor kyun maana jata hai?
+"Mind itself is the cause" type teaching ko Yoga Vasishta ke context mein kaise samjhen?
+Yoga Vasishta mein consciousness aur world ke relationship ko kaise explain kiya gaya hai?
+Maya aur mind ke relationship ko Yoga Vasishta kis tarah present karta hai?
+Vairagya ka Yoga Vasishta mein kya meaning hai?
+Vairagya aur depression mein kya difference hai?
+Yoga Vasishta mein self-inquiry ka kya role hai?
+Atma-vichar ko practical life mein kaise apply kiya ja sakta hai?
+Yoga Vasishta mein liberation ko knowledge ke saath kaise connect kiya gaya hai?
+Jnana aur karma ke relationship ko Yoga Vasishta kaise explain karta hai?
+Kya Yoga Vasishta action ko reject karta hai ya action ke attitude ko transform karta hai?
+Jeevanmukti ka Yoga Vasishta mein kya meaning hai?
+Jeevanmukta vyakti ki characteristics kya batayi gayi hain?
+Yoga Vasishta mein dream aur waking state ke examples kyun diye jate hain?
+Dream analogy se reality ke nature ko kaise explain kiya jata hai?
+World ko mind-created ya consciousness-based kehne ka philosophical meaning kya hai?
+Yoga Vasishta mein sankalpa ka kya role hai?
+Thought aur experience ke beech kya relationship explain kiya gaya hai?
+Desire mind ko kaise bind karti hai?
+Desireless state ko Yoga Vasishta mein freedom se kaise connect kiya gaya hai?
+Yoga Vasishta mein vasana kya hoti hai?
+Vasana aur repeated behaviour ke beech kya connection hai?
+Vasana ko weaken karne ke liye kya spiritual approach batayi gayi hai?
+Yoga Vasishta mein meditation ka kya importance hai?
+Mind ko quiet karna aur Self-realization mein kya relationship hai?
+Yoga Vasishta mein effort aur destiny ke beech kya debate hai?
+Purushartha ko Yoga Vasishta kis perspective se explain karta hai?
+Fate par excessive dependence ko Yoga Vasishta kyun discourage karta hai?
+Self-effort spiritual progress mein kyun important hai?
+Yoga Vasishta mein guru ka role kya hai?
+Guru ki teaching aur seeker ki own realization mein kya relationship hai?
+Yoga Vasishta ki stories philosophical teaching ko explain karne mein kaise help karti hain?
+Lila ki stories ka purpose sirf entertainment hai ya philosophical instruction?
+Yoga Vasishta mein time aur space ko lekar kya unusual philosophical ideas milte hain?
+Consciousness aur perception ke relationship ko Yoga Vasishta kaise explain karta hai?
+Yoga Vasishta mein suffering ka root cause kya bataya gaya hai?
+Suffering ko eliminate karne ke liye external circumstances change karna zaroori hai kya?
+Yoga Vasishta mein equanimity ka kya significance hai?
+Jeevan mein duty perform karte hue inner freedom kaise maintain ki ja sakti hai?
+Yoga Vasishta mein enlightenment ko sudden event ke bajay understanding ke transformation ke roop mein kaise dekha ja sakta hai?
+Yoga Vasishta mein non-duality ka kya philosophical basis hai?
+Agar user kisi Yoga Vasishta story ka moral pooche to RAG ko story ke saath Vasishta ji ki philosophical explanation bhi retrieve kyun karni chahiye?
+Yoga Vasishta mein "world is like a dream" teaching ko literal interpretation se bachna kyun zaroori hai?
+Yoga Vasishta aur ordinary motivational teachings mein kya fundamental difference hai?
+Yoga Vasishta ke according liberation ke liye mind ko samajhna kyun central hai?
+Yoga Vasishta ka overall message ek modern person ke stress, attachment aur overthinking ke context mein kya ho sakta hai?

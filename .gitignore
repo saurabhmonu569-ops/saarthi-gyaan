@@ -77,3 +77,5 @@ public/knowledge/embeddings/.vectorize-progress*.json
 public/knowledge/embeddings/chunk_index.*.json
 public/knowledge/embeddings/vectors_int8.*.bin
 .eval-ckpt.*.json
+eval-perbook.json
+.eval-perbook-ckpt.json
