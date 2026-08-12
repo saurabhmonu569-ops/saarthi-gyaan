@@ -56,12 +56,22 @@ describe("bookHints.js — Roman + Devanagari book detection", () => {
       "krodh ko jeetne ka upay kya hai",
       "tanav door karne ka upay",
       "shanti pane ka upay kya hai",
-      "ghar me mantra jaap kaise karein",
       "Upanishad me aatma ka varnan",
       "yagya me agni ka kya mahatva hai",
     ]) {
       expect(detectHintedBook(q)).toBeNull();
     }
+
+    // ⚠️ "ghar me mantra jaap kaise karein" pehle IS SOOCHI ME THA, aur
+    // 12 Aug ko yahan se HATAYA gaya — kyunki wo yahan galti se aa gaya
+    // tha. Wo "aam shabd" ka sawaal nahi hai; wo seedha mantra-SADHANA ka
+    // sawaal hai, aur uske liye Mantra Maha Sagar sahi granth hai.
+    //
+    // 11 Aug ko jab akela "mantra" hataya tha, tab har mantra wala sawaal
+    // "hint nahi lagna chahiye" lagta tha. Naap (hint_hataye set) ne
+    // dikhaya ki wo aadha sach tha: VED ke sawaal bachane the, SADHANA ke
+    // nahi. Ye pankti usi aadhe sach ki nishani thi.
+    expect(detectHintedBook("ghar me mantra jaap kaise karein")).toBe("mantra_maha_sagar");
   });
 
   it("granth ka naam ho to hint LAGTA hai — upar wali kaant-chhaant se toota nahi", () => {
@@ -77,6 +87,47 @@ describe("bookHints.js — Roman + Devanagari book detection", () => {
     expect(detectHintedBook("Chandogya Upanishad me Shvetaketu")).toBeNull();
     expect(detectHintedBook("Brihadaranyaka Upanishad me Yajnavalkya")).toBeNull();
     expect(detectHintedBook("Mandukya Upanishad ke chaar avastha")).toBeNull();
+  });
+
+  // ── MANTRA: SADHANA ka roop lagta hai, VED ka nahi (12 Aug 2026) ────
+  //
+  // 11 Aug ko akela "mantra" hataya tha kyunki wo Ved ke sawaal utha le
+  // jaata tha. Wo aadha sahi tha — naapa (hint_hataye, 68 sawaal):
+  // 6 mantra-SADHANA ke sawaal toot gaye, jinke liye Mantra Maha Sagar
+  // sach me sahi granth hai.
+  //
+  // Ab sirf sadhana wale roop hain. Ye test DONO taraf pakadta hai —
+  // sirf ek taraf dekhna hi wo galti thi.
+  it("mantra-sadhana ke roop Mantra Maha Sagar par jaate hain", () => {
+    for (const q of [
+      "Mantra jap me mala ke 108 beads ka significance kya hai",
+      "Kya har mantra ka jap bina guru guidance ke kiya ja sakta hai",
+      "Kisi mantra ko kitni baar japna chahiye",
+      "Mantra sadhana me brahmacharya kyu zaroori hai",
+      "beej mantra kaise kaam karte hain",
+      "purashcharan ka kya matlab hai",
+      "मंत्र जप की विधि क्या है",
+    ]) {
+      expect(detectHintedBook(q)).toBe("mantra_maha_sagar");
+    }
+  });
+
+  it("Ved ka naam ho to mantra-sadhana ke roop use nahi hara sakte", () => {
+    // Ye tabhi chalta hai jab sadhana wale hint Ved ke naam ke BAAD hon.
+    // BOOK_HINTS ka kram hi ye tay karta hai — use badalna mat.
+    expect(detectHintedBook("Samved me mantra jap ki paddhati")).toBe("samaveda");
+    expect(detectHintedBook("Samaveda ke mantron ka purpose")).toBe("samaveda");
+    expect(detectHintedBook("Atharvaveda me raksha ke mantra")).toBe("atharvaveda_1");
+    expect(detectHintedBook("Rigved ke Gayatri mantra ka Vedic context")).toBe("rigveda_1");
+    expect(detectHintedBook("Yajurved me mantra aur ritual action")).toBe("yajurveda");
+  });
+
+  it("akela 'nyasa' hint nahi hai — warna SANYAS ka har sawaal phans jaata", () => {
+    // Milaan seedha substring hai, aur "nyasa" सं-"न्यास" ke andar hai.
+    // Isi kism ka jaal "upay" aur "agni" me tha.
+    expect(detectHintedBook("Gita me sanyas aur tyag me kya antar hai")).toBe("bhagavad_gita_shankar");
+    expect(detectHintedBook("संन्यास का अर्थ क्या है")).toBeNull();
+    expect(detectHintedBook("sanyasa lene se pehle kya socha jaye")).toBeNull();
   });
 
   it("returns null when no book is named", () => {

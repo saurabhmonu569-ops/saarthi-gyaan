@@ -219,6 +219,51 @@ export const BOOK_HINTS = {
   // raha hoon — warna is granth par kabhi hint lagta hi nahi.
   "mantra maha sagar": "mantra_maha_sagar", "mantra mahasagar": "mantra_maha_sagar",
   "मंत्र महासागर": "mantra_maha_sagar", "मन्त्र महासागर": "mantra_maha_sagar",
+
+  // ── SADHANA WALE ROOP (12 Aug 2026) ─────────────────────────────────
+  //
+  // KYUN WAPAS: 11 Aug ko akela "mantra" hataya tha. Wo aadha sahi tha.
+  // Naapa (hint_hataye set, 68 sawaal → 60 pass, 8 fail): aatho failures
+  // me granth ka naam nahi tha, aur 6 seedhe mantra-SADHANA ke the —
+  //     "Mantra jap me mala ke 108 beads ka significance"
+  //     "Mantra sadhana me brahmacharya aur diet discipline kyu"
+  //     "Kya har mantra ka jap bina guru guidance ke kiya ja sakta hai"
+  // Inke liye Mantra Maha Sagar SACH ME sahi granth hai. Wahan purana
+  // hint theek kaam kar raha tha; poora hatana galti thi.
+  //
+  // Ek hi kaant-chhaant ne do ulte kaam kiye: Ved wale sawaal bachaye,
+  // sadhana wale tod diye. Isliye ab poora shabd nahi — sirf wo roop jo
+  // SIRF sadhana me aate hain aur Ved ke sawaalon me kabhi nahi.
+  //
+  // ⚠️ KRAM: ye Ved ke naam (line ~126) ke BAAD hain, isliye
+  // "Samaveda me mantra jap" par Samaveda hi jeetega. Kram badla to wo
+  // toot jaayega.
+  //
+  // ⚠️ AKELA "nyasa" JAAN-BOOJHKAR NAHI HAI. Milaan seedha substring hai
+  // (detectHintedBook neeche dekho), aur "nyasa" सं-"न्यास" ke andar bhi
+  // hai. Use jodte hi Gita/Upanishad ka sanyas wala har sawaal Mantra
+  // Sagar par chala jaata — bilkul wahi jaal jisme "upay" aur "agni"
+  // phanse the. Isliye "mantra nyasa" poora roop hi hai.
+  //
+  // Isi wajah se akela "jap" bhi nahi hai ("Japan", "japna" me chhupa
+  // hai) — par "jaap" hai, kyunki uska matlab hi mantra-dohraav hai.
+  "mantra jap": "mantra_maha_sagar", "mantra ka jap": "mantra_maha_sagar",
+  "mantra jaap": "mantra_maha_sagar", "mantra ka jaap": "mantra_maha_sagar",
+  "jaap": "mantra_maha_sagar", "japna": "mantra_maha_sagar",
+  "mantra sadhana": "mantra_maha_sagar", "mantra sadhna": "mantra_maha_sagar",
+  "mantra siddhi": "mantra_maha_sagar",
+  "purashcharan": "mantra_maha_sagar", "purascharan": "mantra_maha_sagar",
+  "beej mantra": "mantra_maha_sagar", "bij mantra": "mantra_maha_sagar",
+  "kavach mantra": "mantra_maha_sagar",
+  "mala jap": "mantra_maha_sagar", "mala jaap": "mantra_maha_sagar",
+  "mantra viniyoga": "mantra_maha_sagar", "viniyoga": "mantra_maha_sagar",
+  "mantra nyasa": "mantra_maha_sagar",
+  "मंत्र जप": "mantra_maha_sagar", "मन्त्र जप": "mantra_maha_sagar",
+  "मंत्र जाप": "mantra_maha_sagar", "जाप": "mantra_maha_sagar",
+  "मंत्र साधना": "mantra_maha_sagar", "मन्त्र साधना": "mantra_maha_sagar",
+  "पुरश्चरण": "mantra_maha_sagar", "बीज मंत्र": "mantra_maha_sagar",
+  "माला जप": "mantra_maha_sagar", "विनियोग": "mantra_maha_sagar",
+  "मंत्र न्यास": "mantra_maha_sagar",
 };
 
 /**
