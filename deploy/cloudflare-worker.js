@@ -701,6 +701,45 @@ const SEARCH_HINTED_MIN_RERANK = 0.18;
 const SEARCH_PER_BOOK_CAP = 3;
 const SEARCH_KEEP         = 12;
 const SEARCH_QUOTA        = { semantic: 45, keyword: 20, cross: 20 };
+
+/**
+ * POOL ME PER-BOOK CAP — AAZMAYA AUR HATAYA (2026-08-13)
+ * ======================================================
+ * Ye likh kar rakh raha hoon taaki koi (main bhi) ise dobara na aazmaye.
+ *
+ * SOCH THI: bina naam wale sawaalon me pool par ek granth chha jaata hai —
+ *     pool=85 → mahabharata 62 (73%)
+ * aur un sawaalon ka best rerank score 0.032 tha, yaani sahi ansh
+ * reranker ke saamne aate hi nahi the. To semantic 45→100 kiya aur pool
+ * me prati granth 8 ka cap lagaya.
+ *
+ * TARK YE THA: "aakhri jawab me kisi granth ke zyada se zyada 3 ansh ja
+ * sakte hain (SEARCH_PER_BOOK_CAP), isliye pool me 62 rakhna bekaar hai —
+ * 59 kabhi istemal ho hi nahi sakte."
+ *
+ * NAAPA GAYA (1,250 sawaal, poora set) — TEENON ANK GALAT TARAF GAYE:
+ *     SAHI    80.0% → 78.9%
+ *     ANYA     8.2% →  9.0%
+ *     KHAALI  11.8% → 12.2%
+ *     Mahabharata      76% → 70%
+ *     Shiv Puran Kh.1  74% → 68%
+ *     Shiv Puran Kh.2  72% → 66%
+ *     Mantra Maha Sagar 46% → 44%   ← jiske liye kiya tha, wahi gira
+ *
+ * TARK ME CHHED KAHAN THA: cap lagate waqt har granth ke pehle 8 ansh
+ * VECTOR KE KRAM se rakhe jaate hain. Par vector ka kram aur reranker ka
+ * kram EK NAHI HOTE — jo ansh vector me 30ve number par hai, wo reranker
+ * ke liye pehla ho sakta hai. Cap ne aise ansh us ekmatra bharosemand
+ * judge tak pahunchne se PEHLE hi phenk diye.
+ *
+ * Doosri baat (task #21 se judi): rerank ka score BATCH-SAPEKSH hai. Pool
+ * badalne se sirf "kachra" nahi hatta — saare score hil jaate hain.
+ *
+ * SEEKH: pool ko patla karna sudhaar nahi hai. Agar bina naam wale
+ * sawaalon ko theek karna hai to ilaaj RERANK ke star par hona chahiye
+ * (ya ek alag "har granth ko barabar mauka" wala raasta), pool kaat kar
+ * nahi. Byora: eval-perbook-poolcap-FAIL.json
+ */
 const SEARCH_MAX_RERANK   = 100;
 
 /** ChatView.jsx ka hasSentences() — bilkul wahi regex */
