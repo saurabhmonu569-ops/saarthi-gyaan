@@ -46,7 +46,21 @@ NEW_BOOKS = [
     {"book_id":"kathopanishad",      "source_pdf":"KATHO UPNISHAD FULL BOOK.pdf",    "title":"Kathopanishad",           "short":"Kathopanishad",  "tradition":"upanishad","language":"sa+hi"},
     {"book_id":"guru_granth_sahib",  "source_pdf":"GURU GRANTH SAHAB FULL BOOK.pdf", "title":"Guru Granth Sahib (Hindi)","short":"Guru Granth Sahib","tradition":"sikhism","language":"hi+pa"},
     {"book_id":"chanakya_neeti",     "source_pdf":"CHANAKYA NEETI FULL BOOK.pdf",    "title":"Chanakya Neeti",          "short":"Chanakya Neeti", "tradition":"niti",     "language":"hi", "force_ocr":True},  # text-layer Kruti-Dev kachra hai
-    {"book_id":"ekadashi_mahatmya",  "source_pdf":"EKADASHI FULL BOOK.pdf",          "title":"Ekadashi Vrat Mahatmya",  "short":"Ekadashi",       "tradition":"vrat",     "language":"hi"},
+    # ⚠️ force_ocr 2026-08-14 ko LAGAYA GAYA — bilkul Chanakya Neeti jaisa mamla,
+    # par 15 din tak pakda nahi gaya. Is PDF me text-layer HAI aur wo 100%
+    # Devanagari codepoints deta hai — isliye neeche wala `conf < 0.12` wala
+    # OCR-fallback KABHI nahi chala. Par us font ka glyph→Unicode naksha toota
+    # hua hai, to akshar galat jud kar nikalte hain:
+    #     "महाराज"  →  "निक माहाराज"
+    #     "तिथि"    →  "तिततिथ"
+    #     "विष्णु"  →  "तिवष्" / "विष्णुप"
+    # 25_paath_jaanch.mjs ne naapa: 155 me se 138 ansh (89%) bigde hue.
+    # Corpus ke baaki 24 granth 0.0%–2.0% par hain. Beech me kuch hai hi nahi.
+    #
+    # SEEKH: "Devanagari anupaat" paath ki shuddhi nahi naapta. Bigda paath
+    # bhi poora Devanagari hota hai. Isiliye 25_paath_jaanch.mjs banayi gayi —
+    # wo un dhaanchon ko ginti hai jo Devanagari vyakaran me ASAMBHAV hain.
+    {"book_id":"ekadashi_mahatmya",  "source_pdf":"EKADASHI FULL BOOK.pdf",          "title":"Ekadashi Vrat Mahatmya",  "short":"Ekadashi",       "tradition":"vrat",     "language":"hi", "force_ocr":True},
     {"book_id":"mantra_maha_sagar",  "source_pdf":"MANTRA MAHA SAGAR FULL BOOK.pdf", "title":"Mantra Maha Sagar",       "short":"Mantra Sagar",   "tradition":"mantra",   "language":"sa+hi"},
     # mantra_shakti HATAYA (2026-08-04) — kharab nahi tha (aaj ke OCR ne use bhi
     # saaf kar diya: Latin 3,837 → 0), par DUPLICATE tha. mantra_maha_sagar

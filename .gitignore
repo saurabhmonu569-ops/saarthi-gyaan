@@ -78,5 +78,16 @@ public/knowledge/embeddings/chunk_index.*.json
 public/knowledge/embeddings/vectors_int8.*.bin
 .eval-ckpt.*.json
 eval-perbook.json
+
+# 26_anaath_safai.mjs ka kachra (2026-08-14) — anaath id ki soochi aur
+# unhe mitane wali SQL. Dono ek hi chalne ke liye bante hain; agli baar
+# ginti alag hogi. Inhe git me rakhna sirf bhram paida karta.
+anaath-ids.txt
+anaath-delete.sql
+
+# 07_add_books.py ko --pdf-dir chahiye aur PDF ka naam registry se mel
+# khana chahiye — isliye kabhi-kabhi ek temp folder banana padta hai.
+# Usme kitab ki poori PDF hoti hai; wo git me kabhi nahi jaani chahiye.
+tmp_*/
 .eval-perbook-ckpt.json
 aadhaar-check.json
