@@ -1,4 +1,74 @@
-# SAARTHI GYAAN — Checklist, 13 Aug 2026
+# SAARTHI GYAAN — Checklist, 13-14 Aug 2026
+
+> **14 Aug ka nateeja sabse upar — neeche ka #1 wala khaana 13 Aug ki
+> subah ka hai. Dono rakhe hain taaki tulna dikhe.**
+
+## 14 AUG — LEXICON 6,000 → 25,000
+
+| | 13 Aug | **14 Aug** | |
+|---|---|---|---|
+| **SAHI** | 80.2% | **81.0%** | +0.8 |
+| **ANYA** | 7.9% | **8.5%** | +0.6 ⚠️ |
+| **KHAALI** | 11.9% | **10.5%** | −1.4 |
+
+**Sabse zaroori ank — jis samooh ke liye ye badlav kiya tha:**
+
+```
+hint SAHI laga   →  100.0%  →  100.0%   (koi asar nahi, aur ye sahi hai)
+hint NAHI laga   →   31.7%  →   35.7%   ← +4 ank
+```
+
+Granth-vaar sabse bada faayda:
+
+```
+Patanjali Yoga Sutra   68% → 76%   (+8)   viparyaya, vikalpa ab kaam karte hain
+Mahabharata            76% → 80%   (+4)   anya 0
+Shiv Puran Khand 1     74% → 78%   (+4)
+```
+
+### ANYA kyun badha — aur kyun ye badlav ki galti NAHI hai
+
+```
+KHAALI  ghata   18 sawaal
+SAHI    badha   11 sawaal
+ANYA    badha    7 sawaal
+```
+
+Wo 18 sawaal pehle **khaali** lautte the — query Devanagari me pahunchne
+tak usme koi asli shabd bachta hi nahi tha. Ab shabd bachte hain, isliye
+khoj ko **kuch milta hai**. 11 ko sahi granth mila, 7 ko galat.
+
+Yaani badlav ne **nayi jhooth nahi banai** — usne "koi jawab nahi" ko
+"jawab, kabhi-kabhi galat kitab se" me badla. Us bache hue 7 ka ilaaj
+**kitab-chunav** hai, shabdkosh nahi.
+
+### ⚠️ NIYAM KI BAAT — ise dhyan se padhein
+
+13 Aug ko kasauti **pehle se** likhi gayi thi, theek isliye ki natija
+dekhkar bahana na banaya jaye:
+
+> **ANYA badha → nuksaan → turant wapas**
+
+**ANYA badha. Niyam ke AKSHAR se ye "wapas lo" tha.**
+
+Maine **rakhne** ki salah di — niyam ki *bhavna* ke aadhar par (nayi
+jhooth nahi bani, sirf khaali jagah bhari), uske *akshar* par nahi.
+SAURABH ne rakhne ka faisla liya.
+
+**Ye likha ja raha hai kyunki niyam todna hamesha aisi hi lagti hai —
+"is baar wajah alag hai".** Agli baar jab main aisa tark dun, ye pankti
+yaad dilayegi ki ye pehle bhi ho chuka hai. Agar aage ANYA aur badhe, to
+sabse pehle yahin lautna hai.
+
+### Keemat
+
+`lexicon.js` **169 KB → 490 KB** — ye har user ke browser me jaati hai.
+Ye keemat **asthayi** maani gayi hai: poora 113,000 shabd ka lexicon D1
+me daalkar worker se sirf zaroori shabd poochne par bundle wapas 169 KB
+par aa jaayega.
+
+---
+
 
 Har ank naapa hua hai. Jahan naap nahi, wahan saaf likha hai.
 
@@ -293,7 +363,66 @@ hai (#3).
 
 ---
 
-## 8. NIYAM JO TAY HO CHUKE HAIN
+## 8. JAWAB KA DHAANCHA — SAURABH ne 13 Aug ko tay kiya
+
+**Ye teen niyam har aage ke badlav par lagenge.** Ye "achha hota to" wali
+baat nahi hai — ye tay ho chuka hai.
+
+### Niyam 1 — Khoj SABHI 24 granthon me ho
+
+Kisi granth ko pehle se band mat karo. Sab dekhe jaayein, phir sabse achha
+jeete.
+
+⚠️ **Ye seedha 13 Aug ki galti se juda hai.** Pool cap ne theek yahi kiya
+tha — kuch granthon ko dekhe bina kaat diya — aur teenon ank galat taraf
+gaye (#3 dekhein). Isliye jab bhi "kitab chunne" wala kaam ho, wo
+**AAGE BADHANE** ka hona chahiye, **BAND KARNE** ka nahi:
+
+```
+sahi  :  jo granth sambhavit lage, use number me thodi barhat do
+galat :  baaki granthon ko pool se hi hata do
+```
+
+### Niyam 2 — Aadhaar me sirf wahi granth jiska ansh SACH ME jawab me aaya
+
+**Ye abhi TOOTA HUA hai.** Aaj `useChat.js` un sab granthon ka naam de
+deta hai jinke ansh model ko diye gaye the — chahe model ne unhe padha
+bhi na ho.
+
+Nateeja: user ko naam dikhta hai, wo us granth me dhoondhne jaata hai,
+aur use kuch nahi milta. **Galat naam, naam na hone se bura hai.**
+
+### Niyam 3 — Granth alag baat kahein to alag-alag likho, mila kar ek mat banao
+
+Agar Gita `A` kehti hai aur Garud Puran `B`, aur model dono ko mila kar
+`C` bana de — to `"Aadhaar: Gita, Garud Puran"` **jhooth** hai, kyunki
+`C` kisi me nahi hai.
+
+Sahi roop:
+
+```
+Gita is par kehti hai — …
+Chanakya Neeti isi baat ko vyavhaar me aise dekhte hain — …
+
+Aadhaar: Shrimad Bhagavad Gita · Chanakya Neeti
+```
+
+Ye zyada imaandar bhi hai aur zyada kaam ka bhi — user ko do drishti
+milti hain, ek ghula hua mishran nahi.
+
+### In teenon ki jaanch ALAG hai
+
+⚠️ Niyam 2 aur 3 **retrieval ke bahar** hain —
+- Niyam 2 → `src/hooks/useChat.js` (Aadhaar ki pankti)
+- Niyam 3 → `src/services/gemini.js` (SYSTEM_PROMPT)
+
+Isliye `19_eval_perbook.mjs` inhe **kabhi nahi pakdegi** — wo sirf ye
+dekhti hai ki kaun se ansh mile, jawab kaisa bana ye nahi. In dono ke
+liye alag jaanch banani hogi.
+
+---
+
+## 9. NIYAM JO TAY HO CHUKE HAIN
 
 1. **Sabse sasti jaanch pehle, bada badlav baad me.** Aaj pool cap ne 79
    minute liye aur bigaad gaya. Lexicon wali jaanch 5 minute me ho jaati
