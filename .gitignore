@@ -79,3 +79,4 @@ public/knowledge/embeddings/vectors_int8.*.bin
 .eval-ckpt.*.json
 eval-perbook.json
 .eval-perbook-ckpt.json
+aadhaar-check.json

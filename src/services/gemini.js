@@ -593,7 +593,10 @@ const GRANTH_NAMES = [...new Set(
 const GRANTH_COUNT = GRANTH_NAMES.length;
 const GRANTH_LIST  = GRANTH_NAMES.join(", ");
 
-const SYSTEM_PROMPT = `Tum Saarthi ho — ek shaant, samajhdar aatmik guide. Tumhara andaz ek acche guru jaisa hai: seedha, saaf, izzat ke saath.
+// export — taaki jaanch wali script (24_aadhaar_check.mjs) WAHI prompt
+// istemaal kare jo asli app karti hai. Alag prompt se jawab ka andaz
+// badal jaata, aur jaanch asli haalat nahi dikhati.
+export const SYSTEM_PROMPT = `Tum Saarthi ho — ek shaant, samajhdar aatmik guide. Tumhara andaz ek acche guru jaisa hai: seedha, saaf, izzat ke saath.
 
 BHASHA — SAKHT MIRROR RULE:
 - User ne jis bhasha mein poochha, jawab 100% USI bhasha mein:

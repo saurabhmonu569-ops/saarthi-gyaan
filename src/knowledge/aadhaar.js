@@ -1,6 +1,35 @@
 /**
  * SAARTHI — Aadhaar me KAUN SA granth jaaye                  (2026-08-14)
  * =====================================================================
+ * ⚠️⚠️  YE ABHI ISTEMAAL ME NAHI HAI — AAZMAYA AUR HATAYA GAYA  ⚠️⚠️
+ *
+ * useChat.js ne ise 14 Aug ko jod kar phir hata diya. Wajah:
+ *
+ * 12 unit-test hare the, par wo test MAINE banaye the — yaani wo sirf
+ * wahi pakadte the jo maine socha. 24_aadhaar_check.mjs ne ASLI jawab
+ * par chalaya (25 sawaal, kota 5 par khatam), aur 5 me se 4 ULTE nikle:
+ *
+ *   "Agni Puran ko encyclopedic kyun kaha jata hai?"
+ *       raha: Rigveda        hata: Agni Purana    ← sahi granth hi gaya
+ *   "Gita mein indriyon aur mann ka relation"
+ *       raha: Mahabharata    hata: Bhagavad Gita  ← jawab me NAAM likha tha
+ *   "Bhavishya Puran mein marriage duties"
+ *       raha: Rashi-Muhurt   hata: Bhavishya Purana
+ *
+ * DO MAANYATAYEN GALAT NIKLI:
+ *   1. "sabse ooncha rerank = sabse zyada istemaal" — nahi. Namoona 1 me
+ *      Rigveda ka score ooncha tha, par jawab Agni Puran ka tha.
+ *   2. "jawab aur ansh me vishisht shabd milenge" — nahi. Model purani
+ *      Hindi ko aaj ki bhasha me likhta hai. Shabd-mel bahut kamzor
+ *      sanket hai aur DONO taraf fail hota hai: sacha granth kat jaata
+ *      hai, aur galat granth reh jaata hai.
+ *
+ * File isliye rakhi hai ki (a) `vishishtShabd` kahin aur kaam aa sakta
+ * hai, aur (b) koi dobara yahi tareeka na aazmaye. Niyam #2 ka sahi
+ * raasta shayad ye hai ki MODEL SE HI poochha jaye ki usne kaun se
+ * granth istemaal kiye — par wo prompt ka kaam hai aur uski apni jaanch
+ * chahiye.
+ * =====================================================================
  * NIYAM (SAURABH ne 13 Aug ko tay kiya):
  *
  *     "Naam sirf usi granth ka jiska ansh SACH ME jawab me istemaal hua."

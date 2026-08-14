@@ -17,7 +17,6 @@ import { stripCyrillic } from "@/knowledge/translit";
 // 2026-08-04 — gadhe hue uddharan aur jhoothi citation pakadne ke liye
 import { verifyAnswer } from "@/services/verifyAnswer";
 import { BOOK_META } from "@/data/bookMeta";
-import { chuneGayeGranth } from "@/knowledge/aadhaar";
 
 // ── Chat history persistence ──────────────────────────────────────────────────
 const STORAGE_KEY = "saarthi_chat_history";
@@ -580,23 +579,44 @@ export function useChat({
         // Granth ka naam hi asli pramaan hai — wo sthir hai, jaancha ja
         // sakta hai, aur Indian Copyright Act §52 ki "source acknowledgement"
         // ki maang bhi wahi poori karta hai.
-        // ── SIRF WO GRANTH JINKA ANSH SACH ME ISTEMAAL HUA (2026-08-14) ──
+        // ⚠️ SHABD-MEL WALA CHUNAV AAZMAYA AUR HATAYA — 2026-08-14
         //
-        // Pehle yahan saare grounded ansh ke granth gine jaate the (5 tak).
-        // Par "reranker ne pass kiya" aur "model ne istemaal kiya" DO ALAG
-        // baatein hain. Jawab 3 granth se banta tha, naam 5 ka jaata tha.
+        // Niyam #2 ("naam sirf usi granth ka jiska ansh sach me istemaal
+        // hua") laagu karne ke liye src/knowledge/aadhaar.js banayi thi:
+        // jawab aur ansh ke vishisht shabd milao, jinka mel na ho unhe
+        // hata do; aur sabse ooncha score wala granth hamesha rakho.
         //
-        // Nuksaan: user Aadhaar me "Garud Puran" dekhta hai, us granth me
-        // dhoondhne jaata hai, kuch nahi milta — aur phir baaki Aadhaar
-        // par bhi bharosa karna chhod deta hai.
+        // 12 unit-test hare the. Par wo test MAINE banaye the — yaani wo
+        // sirf wahi pakadte the jo maine socha. 24_aadhaar_check.mjs ne
+        // ASLI jawab par chalaya, aur 5 me se 4 ULTE nikle:
         //
-        // chuneGayeGranth() jawab aur ansh ke VISHISHT shabd milata hai.
-        // Poori tippani aur do savdhaniyan src/knowledge/aadhaar.js me —
-        // khaas kar "sabse achha granth hamesha rahega" wali, kyunki model
-        // paraphrase karta hai aur sakht niyam sacche Aadhaar bhi kaat deta.
-        const { granth: books, hataye } = chuneGayeGranth(responseText, groundedChunks);
-        if (hataye.length) {
-          console.log(`[Aadhaar] ${hataye.length} granth hataye (jawab me unka koi mel nahi): ${hataye.join(", ")}`);
+        //   "Agni Puran ko encyclopedic kyun kaha jata hai?"
+        //       AB: Rigveda        HATAYE: Agni Purana   ← sahi granth hi gaya
+        //   "Gita mein indriyon aur mann ka relation"
+        //       AB: Mahabharata    HATAYE: Bhagavad Gita ← jawab me NAAM likha tha
+        //   "Bhavishya Puran mein marriage duties"
+        //       AB: Rashi-Muhurt   HATAYE: Bhavishya Purana
+        //
+        // DO MAANYATAYEN GALAT THI:
+        //  1. "sabse ooncha score = sabse zyada istemaal" — nahi. Namoona 1
+        //     me Rigveda ka score ooncha tha, par jawab Agni Puran ka tha.
+        //  2. "jawab aur ansh me shabd milenge" — nahi. Model purani Hindi
+        //     ko aaj ki bhasha me likhta hai; shabd-mel bahut kamzor sanket
+        //     hai aur DONO taraf fail hota hai.
+        //
+        // Zyada naam dikhana ek galti hai; GALAT naam dikhana aur sahi naam
+        // chhupana usse bahut badi galti hai. Isliye purana vyavhaar wapas.
+        //
+        // aadhaar.js aur uske test rakhe hain — wo sanket khud galat nahi,
+        // bas AKELA kaafi nahi. Sahi raasta shayad ye hai ki model se hi
+        // poochha jaye ki usne kaun se granth istemaal kiye (prompt me),
+        // par wo alag kaam hai aur uski apni jaanch chahiye.
+        const books = [];
+        for (const r of groundedChunks) {
+          const bt = (r.chunk && (r.chunk.book_title || r.chunk.book)) || "";
+          if (!bt || books.includes(bt)) continue;
+          books.push(bt);
+          if (books.length >= 5) break;
         }
         if (books.length) responseText += `\n\n---\n📚 *Aadhaar: ${books.join(" · ")}*`;
       }
