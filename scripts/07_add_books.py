@@ -60,6 +60,36 @@ NEW_BOOKS = [
     # SEEKH: "Devanagari anupaat" paath ki shuddhi nahi naapta. Bigda paath
     # bhi poora Devanagari hota hai. Isiliye 25_paath_jaanch.mjs banayi gayi —
     # wo un dhaanchon ko ginti hai jo Devanagari vyakaran me ASAMBHAV hain.
+    #
+    # ⚠️ ocr_lang "hin+san" AAZMAYA AUR HATAYA — 2026-08-14
+    # ---------------------------------------------------------------------
+    # force_ocr ke baad bhi ek kami bachi thi: `र्` (repha) girta hai —
+    #     प्रार्थना → प्राथना    पदार्थ → पदाथ    गुरुवर्ग → गुरुवरग
+    # 27_repha_jaanch.mjs: Ekadashi 29.5%, jabki 20 granth ~0% par hain.
+    # Soch thi ki Sanskrit traineddata sanyukt akshar behtar padhta hai.
+    #
+    # Poori kitab par chalaya. Pehli nazar me SUDHAAR dikha — 29.5% se 23.0%.
+    # PAR WO ANK JHOOTHA THA:
+    #
+    #     hin      :  79 sahi + 33 gire  = 112 shabd pehchane
+    #     hin+san  :  67 sahi + 20 gire  =  87 shabd pehchane
+    #
+    # Ratio isliye sudhra ki DONO ginti gir gayi — 25 shabd kisi aur tarah
+    # se bigad kar jodon me pakde hi nahi gaye. Asli ginti ulta bolti hai:
+    #
+    #     र् ka ghanatv   14.4 → 12.7 prati-1000-shabd   (12% KAM repha)
+    #     nukta (ड़ ज़ क़)   160 → 98                       (62 gaye)
+    #     asambhav dhaanche 1.13 → 0.51                   (yahi ek behtar)
+    #
+    # Yaani hin+san repha ZYADA giraata hai, kam nahi. Sanskrit shlok sach
+    # me behtar hue (अश्वेमेघसहस््राणि → अश्वमेधसहस्राणि), par is kitab me
+    # gadya 95% hai — us fayde ki keemat poore gadya me chukani padti.
+    #
+    # SEEKH: anupaat sudhar sakta hai jabki uske DONO hisse bigad rahe hon.
+    # Ratio ke saath hamesha ASLI GINTI dekhni chahiye.
+    #
+    # repha ki samasya ABHI KHULI HAI (task #33). Agla vichaar OCR ki
+    # setting nahi, OCR ke BAAD sudhaar hai — par uski apni jaanch chahiye.
     {"book_id":"ekadashi_mahatmya",  "source_pdf":"EKADASHI FULL BOOK.pdf",          "title":"Ekadashi Vrat Mahatmya",  "short":"Ekadashi",       "tradition":"vrat",     "language":"hi", "force_ocr":True},
     {"book_id":"mantra_maha_sagar",  "source_pdf":"MANTRA MAHA SAGAR FULL BOOK.pdf", "title":"Mantra Maha Sagar",       "short":"Mantra Sagar",   "tradition":"mantra",   "language":"sa+hi"},
     # mantra_shakti HATAYA (2026-08-04) — kharab nahi tha (aaj ke OCR ne use bhi
@@ -216,7 +246,18 @@ OCR_DPI = 400
 OCR_PSM = "3"
 
 def ocr_lang_for(book):
-    """eng KABHI nahi — wahi 'Gitar' wali galti ki jad thi."""
+    """eng KABHI nahi — wahi 'Gitar' wali galti ki jad thi.
+
+    `ocr_lang` ek SEEDHA override hai (2026-08-14).
+
+    Iski zaroorat isliye padi ki lang ab tak `language` field se nikalti
+    thi — par wo field kitab ki ASLI bhasha batata hai (metadata me jaata
+    hai), OCR ki setting nahi. Ekadashi ko "hin+san" chahiye tha, par
+    uski bhasha sach me Hindi gadya hai. Use "sa+hi" likh dena metadata
+    me jhooth bolna hota. Ab dono baatein alag hain.
+    """
+    if book.get("ocr_lang"):
+        return book["ocr_lang"]
     lg = (book.get("language") or "hi")
     return "hin+san" if "sa" in lg else "hin"
 
