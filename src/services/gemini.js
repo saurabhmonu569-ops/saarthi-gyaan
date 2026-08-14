@@ -235,7 +235,19 @@ function makeGeminiRequest(endpointUrl /*, body */) {
 // and automatic fallback model if the primary is decommissioned (Groq
 // retires models periodically — a 404/400 "model not found" should not
 // kill the whole app).
-const GROQ_FALLBACK_MODEL = "llama-3.1-8b-instant";
+// ⚠️ 2026-08-13: "llama-3.1-8b-instant" se badla gaya. Groq ne use
+// 16 August 2026 ko band kar diya (unka apna email) aur "GPT OSS 20B"
+// sujhaya — model-id `openai/gpt-oss-20b`.
+//
+// KYUN YE ZAROORI THA, jabki 8b chalta hi nahi tha:
+// Neeche do jagah `GROQ_FALLBACK_MODEL` aata hai —
+//   1. 429 (rate limit) par  → ye QUALITY_LOCK se BAND hai, chalta hi nahi
+//   2. 404/400 "model gone" par → YE CHALTA HAI, aur yahi asli baat hai
+// Doosra wala wo suraksha-jaal hai jo tab bachata hai jab MUKHYA model
+// (llama-3.3-70b) hi band ho jaye. 16 Aug ke baad wo jaal khud mara hua
+// hota — yaani jis din 70b retire hota, us din Groq poori tarah fail
+// hota aur seedha Gemini par bojh aa jaata.
+const GROQ_FALLBACK_MODEL = "openai/gpt-oss-20b";
 
 // Aakhri jawab kis model se aaya — UI isse imaandaar tag dikhati hai
 // (8b = sankshipt/vyast-samay uttar; 70b = poora Saarthi)

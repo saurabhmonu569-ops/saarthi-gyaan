@@ -139,7 +139,17 @@ const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemi
 // Sirf yeh models manegi (koi mehenga model nahi maang sakta)
 const ALLOWED_MODELS = new Set([
   "llama-3.3-70b-versatile",
+  // 2026-08-13: "llama-3.1-8b-instant" 16 Aug ko band ho raha hai (Groq ka
+  // email). Uski jagah unka sujhaya hua "openai/gpt-oss-20b".
+  //
+  // ⚠️ Purana naam JAAN-BOOJHKAR ABHI RAKHA HAI. Client aur worker alag-alag
+  // deploy hote hain (Netlify aur Cloudflare). Agar yahan se purana naam
+  // abhi hata dein aur kisi user ke browser me purani client-file cache me
+  // padi ho, to uski request "model allowed nahi" hokar chupchaap 70b par
+  // chali jaayegi — jo theek hai — par 70b ke band hone wale din wo suraksha
+  // -jaal kaam nahi karega. 16 Aug ke baad ye pankti hata dena surakshit hai.
   "llama-3.1-8b-instant",
+  "openai/gpt-oss-20b",
 ]);
 
 const MAX_BODY_BYTES = 100_000;

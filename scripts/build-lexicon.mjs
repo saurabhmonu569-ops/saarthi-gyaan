@@ -36,7 +36,7 @@ const BOOKS = join(ROOT, "public", "knowledge", "books");
 // ke chalta hai (browser bundle aur local scripts, dono).
 const OUT   = join(ROOT, "src", "knowledge", "lexicon.js");
 
-const TOP_N   = 6000;   // bundle size vs coverage ka santulan
+const TOP_N   = 25000;  // 6000 se badhaya 2026-08-13 — naapa gaya: 149 khaali sawaalon me se 127 sirf isliye khaali the ki naam Devanagari me nahi badle (prahlad kram 13130, hiranyakashipu 9882)
 const MIN_FREQ = 4;
 const MIN_LEN  = 3;
 
