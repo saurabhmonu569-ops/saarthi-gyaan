@@ -17,6 +17,7 @@ import { stripCyrillic } from "@/knowledge/translit";
 // 2026-08-04 — gadhe hue uddharan aur jhoothi citation pakadne ke liye
 import { verifyAnswer } from "@/services/verifyAnswer";
 import { BOOK_META } from "@/data/bookMeta";
+import { chuneGayeGranth } from "@/knowledge/aadhaar";
 
 // ── Chat history persistence ──────────────────────────────────────────────────
 const STORAGE_KEY = "saarthi_chat_history";
@@ -579,19 +580,23 @@ export function useChat({
         // Granth ka naam hi asli pramaan hai — wo sthir hai, jaancha ja
         // sakta hai, aur Indian Copyright Act §52 ki "source acknowledgement"
         // ki maang bhi wahi poori karta hai.
-        const books = [];
-        // liveChunks nahi — sirf groundedChunks. Warna woh passages bhi
-        // cite ho jaate jinhe reranker ne khaarij kar diya tha.
-        for (const r of groundedChunks) {
-          const bt = (r.chunk && (r.chunk.book_title || r.chunk.book)) || "";
-          if (!bt || books.includes(bt)) continue;
-          books.push(bt);
-          // 4 → 5 (2026-08-11). Jawab 12 ansh se banta hai jo aksar 5-6
-          // granthon se aate hain; sirf 4 dikhana un granthon ko chhupa
-          // deta hai jinse jawab sach mein bana. User ne "Atma aur body"
-          // wale sawaal par yahi poochha tha ki paanchvi kitab kahan gayi.
-          // 5 se aage nahi ja rahe — footer padhne layak rehna chahiye.
-          if (books.length >= 5) break;
+        // ── SIRF WO GRANTH JINKA ANSH SACH ME ISTEMAAL HUA (2026-08-14) ──
+        //
+        // Pehle yahan saare grounded ansh ke granth gine jaate the (5 tak).
+        // Par "reranker ne pass kiya" aur "model ne istemaal kiya" DO ALAG
+        // baatein hain. Jawab 3 granth se banta tha, naam 5 ka jaata tha.
+        //
+        // Nuksaan: user Aadhaar me "Garud Puran" dekhta hai, us granth me
+        // dhoondhne jaata hai, kuch nahi milta — aur phir baaki Aadhaar
+        // par bhi bharosa karna chhod deta hai.
+        //
+        // chuneGayeGranth() jawab aur ansh ke VISHISHT shabd milata hai.
+        // Poori tippani aur do savdhaniyan src/knowledge/aadhaar.js me —
+        // khaas kar "sabse achha granth hamesha rahega" wali, kyunki model
+        // paraphrase karta hai aur sakht niyam sacche Aadhaar bhi kaat deta.
+        const { granth: books, hataye } = chuneGayeGranth(responseText, groundedChunks);
+        if (hataye.length) {
+          console.log(`[Aadhaar] ${hataye.length} granth hataye (jawab me unka koi mel nahi): ${hataye.join(", ")}`);
         }
         if (books.length) responseText += `\n\n---\n📚 *Aadhaar: ${books.join(" · ")}*`;
       }
