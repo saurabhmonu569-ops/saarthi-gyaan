@@ -60,11 +60,39 @@ const { normalizeQueryForSearch, expandQueryWithParyay, questionToTopic, stripMe
 // rahe hain — poora module import karne par wo crash ho jaata.
 const gsrc = readFileSync(join(ROOT, "src", "services", "gemini.js"), "utf8");
 const SYSTEM_PROMPT = (() => {
-  const a = gsrc.indexOf("export const SYSTEM_PROMPT = `") + "export const SYSTEM_PROMPT = `".length;
-  const b = gsrc.indexOf("`;", a);
-  return gsrc.slice(a, b)
+  const SHURU = "export const SYSTEM_PROMPT = `";
+  const a = gsrc.indexOf(SHURU) + SHURU.length;
+  if (a < SHURU.length) throw new Error("gemini.js me SYSTEM_PROMPT nahi mila");
+
+  // ⚠️ ANT `\`;` SE MAT DHOONDHNA — 14 Aug ko yahi galti pakdi gayi.
+  // SYSTEM_PROMPT sirf ek backtick par khatam hota hai, uske baad seedhe
+  // nayi line aur comment aata hai — `\`;` kahin nahi hai. Isliye khoj
+  // aage badhti rahi aur AGLA `\`;` mila, jo 2,278 akshar BAAD tha.
+  // Natija: un 2,278 akshar ka JAVASCRIPT SOURCE (polishSacredText ka
+  // poora function) system prompt me chala jaata tha — chup-chaap, bina
+  // kisi error ke. 13 Aug ki Aadhaar-jaanch ISI dooshit prompt par chali
+  // thi, aur uske "5 me se 4 ulte" wale nateeje us shor ke saath naape
+  // gaye the.
+  //
+  // Ab pehla BINA-ESCAPE backtick dhoondhte hain — yahi asli ant hai.
+  let b = a;
+  for (;;) {
+    b = gsrc.indexOf("`", b);
+    if (b < 0) throw new Error("SYSTEM_PROMPT ka band karne wala backtick nahi mila");
+    if (gsrc[b - 1] !== "\\") break;
+    b++;
+  }
+
+  const p = gsrc.slice(a, b)
     .replace(/\$\{GRANTH_COUNT\}/g, "24")
     .replace(/\$\{GRANTH_LIST\}/g, Object.values(BOOK_META).map(m => m.en || m.title).join(", "));
+
+  // Pehra: agar kabhi phir code ghus gaya, ye turant pakdega.
+  if (/\bexport (async )?function\b|\bconst \w+ = \(/.test(p))
+    throw new Error("SYSTEM_PROMPT me JS code ghus gaya — nikalne ka tareeka dobara dekhiye");
+
+  console.log(`  SYSTEM_PROMPT: ${p.length.toLocaleString()} akshar`);
+  return p;
 })();
 
 const naam = id => (BOOK_META[id]?.en || BOOK_META[id]?.title || id);
