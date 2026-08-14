@@ -1,0 +1,121 @@
+/**
+ * SAARTHI — OCR `र्` (repha) giraata hai ya nahi                (2026-08-14)
+ * =====================================================================
+ * YE NAAP HAI. Corpus me kuch nahi badalta.
+ *
+ * KYUN — 25_paath_jaanch.mjs ISE NAHI PAKAD SAKTI
+ * ------------------------------------------------
+ * Wo naap un dhaanchon ko ginti hai jo Devanagari vyakaran me ASAMBHAV
+ * hain (matra se shuru hone wala shabd, do matra, do halant). Par jab
+ * OCR `र्` GIRA deta hai:
+ *
+ *     प्रार्थना  →  प्राथना
+ *     पदार्थ    →  पदाथ
+ *
+ * to jo bacha, wo poori tarah vaidh Devanagari hai. Koi niyam nahi
+ * tootta. Isliye 25_paath_jaanch Ekadashi ko "1.1 — theek" batati hai,
+ * jabki uske har teen me se ek repha gir chuka hai.
+ *
+ * Yahi wajah hai ki ye alag file hai, us file me ek aur jaanch nahi.
+ * Do alag kism ki kharabi hain aur unke pakadne ke tareeke bhi alag hain.
+ *
+ * TAREEKA — GINE HUE JODE, ANDAZA NAHI
+ * -------------------------------------
+ * Har jode me: [sahi shabd, repha-gira hua roop]. Phir dono ki ginti se
+ * galti ka anupaat.
+ *
+ * ⚠️ JODE CHUNNE KA NIYAM — gira hua roop koi ASLI SHABD NA HO.
+ * Isiliye ye teen jaan-boojhkar CHHODE gaye hain:
+ *       कर्म → कम    ("kam" asli shabd hai)
+ *       अर्थ → अथ    ("ath" Sanskrit ka asli shabd hai)
+ *       कार्य → काय  ("kaay" asli shabd hai — shareer)
+ * Inhe rakhne par har granth jhootha "bigda" dikhta.
+ *
+ * ⚠️ Aur `(?<![ऀ-ॿ])...(?![ऀ-ॿ])` zaroori hai — warna "वष" शब्द "वर्षा" ke
+ *    andar bhi gin jaata aur ginti oopar chali jaati.
+ *
+ * NAAPA HUA (14 Aug, Ekadashi ke naye OCR ke baad):
+ *       ekadashi_mahatmya      29.5%   ← naya OCR
+ *       bhagavad_gita_shankar   8.7%
+ *       kathopanishad           7.6%
+ *       narasimha_purana        5.7%
+ *       guru_granth_sahib       2.8%
+ *       baaki 20 granth        ~0.0%
+ *
+ * CHALAO:
+ *   node scripts/27_repha_jaanch.mjs
+ *   node scripts/27_repha_jaanch.mjs --namoone      # asli vaakya dikhao
+ *   node scripts/27_repha_jaanch.mjs --seema 10     # exit 1 iske oopar
+ */
+
+import { readFileSync, readdirSync, existsSync } from "node:fs";
+import { join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
+const DIR  = join(ROOT, "public", "knowledge", "books");
+if (!existsSync(DIR)) { console.error(`❌ ${DIR} nahi mili`); process.exit(2); }
+
+const arg = (n, d) => { const i = process.argv.indexOf(`--${n}`); return i > -1 ? process.argv[i + 1] : d; };
+const SEEMA   = parseFloat(arg("seema", "10"));
+const NAMOONE = process.argv.includes("--namoone");
+
+/** [sahi, repha-gira]. Gira hua roop asli shabd NAHI hona chahiye. */
+const JODE = [
+  ["प्रार्थना", "प्राथना"], ["पदार्थ", "पदाथ"],   ["सूर्य", "सूय"],
+  ["पूर्ण", "पूण"],        ["मार्ग", "माग"],     ["वर्णन", "वणन"],
+  ["वर्तमान", "वतमान"],    ["सर्वत्र", "सवत्र"],  ["आश्चर्य", "आश्चय"],
+  ["कार्तिक", "कातिक"],    ["परिवर्तन", "परिवतन"], ["स्वर्ग", "स्वग"],
+  ["दुर्लभ", "दुलभ"],      ["निर्णय", "निणय"],    ["आचार्य", "आचाय"],
+  ["वर्ष", "वष"],
+];
+
+const rows = [];
+for (const f of readdirSync(DIR).filter(f => f.endsWith(".json"))) {
+  const j = JSON.parse(readFileSync(join(DIR, f), "utf8"));
+  const t = (j.chunks || []).map(c => c.text || "").join("\n");
+  let ok = 0, bad = 0;
+  const mile = [];
+  for (const [s, g] of JODE) {
+    ok  += (t.match(new RegExp(s, "g")) || []).length;
+    const m = t.match(new RegExp(`(?<![ऀ-ॿ])${g}(?![ऀ-ॿ])`, "g")) || [];
+    bad += m.length;
+    if (m.length && mile.length < 4) {
+      const i = t.indexOf(g);
+      mile.push(`${s} → ${g}   …${t.slice(Math.max(0, i - 34), i + 34).replace(/\s+/g, " ")}…`);
+    }
+  }
+  // 10 se kam mile to anupaat bharosemand nahi — chhod do
+  if (ok + bad >= 10) rows.push({ book: j.book, ok, bad, pct: 100 * bad / (ok + bad), mile });
+}
+
+rows.sort((a, b) => b.pct - a.pct);
+
+console.log(`\n  REPHA (र्) KI JAANCH — ${rows.length} granth, seema ${SEEMA}%\n`);
+console.log("  " + "granth".padEnd(23) + "sahi".padStart(8) + "gira".padStart(7) + "galti".padStart(9) + "   haal");
+console.log("  " + "─".repeat(60));
+let fail = 0;
+for (const r of rows) {
+  const ok = r.pct <= SEEMA;
+  if (!ok) fail++;
+  console.log("  " + r.book.padEnd(23) + String(r.ok).padStart(8) + String(r.bad).padStart(7) +
+              (r.pct.toFixed(1) + "%").padStart(9) + "   " + (ok ? "theek" : "❌ SEEMA PAAR"));
+}
+
+if (NAMOONE) for (const r of rows.filter(x => x.bad)) {
+  console.log(`\n  ── ${r.book} ──`);
+  for (const m of r.mile) console.log("    " + m);
+}
+
+console.log(`
+  ${"═".repeat(60)}
+  ⚠️ YE NAAP POORI NAHI HAI. Sirf ${JODE.length} gine hue jode dekhti hai,
+     poora shabdkosh nahi. Anupaat sahi disha batata hai, thik-thik
+     ginti nahi. Aur jin granthon me 10 se kam jode mile, wo soochi me
+     hain hi nahi.
+
+  Galti mile to pehla kadam: us granth par tesseract "-l hin+san" aazmao
+  (07_add_books.py me us granth ka "language" field "sa+hi" karke).
+  Sanskrit wala model sanyukt akshar behtar padhta hai.
+`);
+if (fail) process.exit(1);

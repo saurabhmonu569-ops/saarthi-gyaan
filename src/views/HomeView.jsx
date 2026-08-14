@@ -11,6 +11,7 @@ import { useAuth } from "@/context/AuthContext";
 import { C, F, serif } from "@/styles/theme";
 import { AudioEngine } from "@/services/audioEngine";
 import { GlobalLangToggle, ReminderToggle } from "@/views/AuthWidgets";
+import { READ_TAB_DIKHAO } from "@/featureFlags";
 
 export function HomeView({ onNav }) {
   const t = useT();
@@ -147,10 +148,14 @@ export function HomeView({ onNav }) {
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 22 }}>
           {[
             { ic:"💬", t:t('qcAskTitle'),   d:t('qcAskDesc'),   pg:"chat",   ac:C.saffron, bg:"#FEF3EC" },
+            // ⚠️ Books wala card READ_TAB_DIKHAO ke peeche hai (14 Aug). Bina
+            // iske ye card ek aise tab par bhejta jo bottom nav me hai hi
+            // nahi — user wahan pahunch kar wapas nahi aa paata.
             { ic:"📚", t:t('qcBooksTitle'),    d:t('qcBooksDesc'),  pg:"books",  ac:"#2563EB", bg:"#EFF6FF" },
             { ic:"🎧", t:t('qcListenTitle'),        d:t('qcListenDesc'),     pg:"audio",  ac:"#15803D", bg:"#F0FDF4" },
             { ic:"📄", t:t('qcPdfTitle'),      d:t('qcPdfDesc'),     pg:"upload", ac:"#7C3AED", bg:"#F5F3FF" },
-          ].map(a => <QuickCard key={a.t} {...a} onClick={() => onNav(a.pg)} />)}
+          ].filter(a => a.pg !== "books" || READ_TAB_DIKHAO)
+           .map(a => <QuickCard key={a.t} {...a} onClick={() => onNav(a.pg)} />)}
         </div>
 
         {/* (Continue-reading grid removed — Books tab is the single home of all granths) */}

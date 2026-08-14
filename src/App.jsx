@@ -12,6 +12,7 @@ import { useT, useUiLang } from "@/i18n";
 import { useAuth } from "@/context/AuthContext";
 import { C, F, serif } from "@/styles/theme";
 import { AudioEngine } from "@/services/audioEngine";
+import { READ_TAB_DIKHAO } from "@/featureFlags";
 
 import { ChatView } from "@/views/ChatView";
 import { BooksView } from "@/views/BooksView";
@@ -96,6 +97,9 @@ function Splash({ onStart }) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 
+// ⚠️ `books` (Read) tab READ_TAB_DIKHAO ke peeche hai — 14 Aug se band.
+// Poori wajah src/featureFlags.js me likhi hai. Wahan `true` karne par
+// tab bina kisi aur badlaav ke wapas aa jaata hai.
 const TABS = [
   { id:"home",   icon:"◯",  label:"Home",   sub:"होम"    },
   { id:"chat",   icon:"◌",  label:"Ask",    sub:"पूछें"  },
@@ -103,7 +107,7 @@ const TABS = [
   { id:"search", icon:"⊙",  label:"Search", sub:"खोज"   },
   { id:"audio",  icon:"◎",  label:"Listen", sub:"सुनें"  },
   { id:"upload", icon:"⊕",  label:"Upload", sub:"PDF"    },
-];
+].filter(x => x.id !== "books" || READ_TAB_DIKHAO);
 
 const GLOBAL_CSS = `
   *, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
