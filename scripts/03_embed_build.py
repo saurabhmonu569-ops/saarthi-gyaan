@@ -1,12 +1,19 @@
 #!/usr/bin/env python3
 """
 SAARTHI v2 — Knowledge Engine
-Script 03: Gemini Embedding Generation
+Script 03: knowledge.json + manifest banata hai
+
+⚠️ NAAM DHOKHA DETA HAI. Ye script "Gemini Embedding Generation" thi, par
+   ab EMBEDDING NAHI BANATI. Hamesha `--skip-embeddings` ke saath chalti
+   hai. Asli vector `embed-corpus.mjs` banata hai — Cloudflare Workers AI
+   par @cf/baai/bge-m3 (1024 aayaam) — aur wo seedhe Vectorize me jaate
+   hain, kisi JSON me nahi.
+
+   Iska ab EK hi kaam hai: 02_chunk.py ke ansh se knowledge.json aur teen
+   manifest banana. Gemini wala code neeche maujood hai par chalta nahi.
 
 Reads chunks from Script 02.
-Calls Gemini text-embedding-004 for each chunk.
-Rate-limits to stay within free-tier: 1500 RPD, 100 RPM.
-Writes embedding to chunk files and builds knowledge.json.
+Rate-limits to stay within free-tier: 1500 RPD, 100 RPM.  (Gemini path only)
 
 Input:  data/chunks/{book_id}/chunk_{NNNNNN}.json
 Output: data/knowledge/knowledge.json   (browser search store)
@@ -27,11 +34,34 @@ KNOWLEDGE_DIR = BASE_DIR / "knowledge"
 KNOWLEDGE_DIR.mkdir(parents=True, exist_ok=True)
 
 # ─── GEMINI CONFIG ────────────────────────────────────────────────────────────
+# ⚠️ YE RAASTA AB ISTEMAAL ME NAHI HAI (2026-08-17 par likha gaya).
+# Ye script hamesha `--skip-embeddings` ke saath chalti hai — wo isliye ki
+# asli vector ab `embed-corpus.mjs` banata hai (Cloudflare Workers AI par
+# @cf/baai/bge-m3, 1024 aayaam) aur wo seedhe Vectorize me jaate hain.
+# Is script ka ab EK hi kaam bacha hai: knowledge.json aur manifest banana.
+# Neeche ka Gemini code chhoda hai (hataya nahi) taaki agar kabhi wapas
+# jaana pade to maujood rahe — par wo chalta nahi.
 GEMINI_API_KEY  = os.environ.get("GEMINI_API_KEY", "")
-EMBED_MODEL     = "models/text-embedding-004"
+GEMINI_MODEL    = "models/text-embedding-004"
+GEMINI_DIM      = 768
 EMBED_ENDPOINT  = (f"https://generativelanguage.googleapis.com/v1beta/"
-                   f"{EMBED_MODEL}:embedContent?key={GEMINI_API_KEY}")
-EMBED_DIM       = 768
+                   f"{GEMINI_MODEL}:embedContent?key={GEMINI_API_KEY}")
+
+# ─── STORE KA META — YE knowledge.json / meta.json ME LIKHA JAATA HAI ─────────
+# ⚠️ 17 Aug tak yahan Gemini wale hi do ank likhe jaate the, aur meta.json
+# duniya ko batati thi ki corpus "text-embedding-004 / 768 dim" par bana
+# hai. Wo TEEN saal se galat tha:
+#
+#   1. Is JSON me embedding hai hi NAHI (`--skip-embeddings` hamesha lagta
+#      hai) — books/*.json ke chunk me koi `embedding` field nahi hai.
+#   2. Asli vector bge-m3 / 1024 par bane hain, Gemini par nahi.
+#
+# Kisi ne pakda nahi kyunki ye do field kahin PADHE hi nahi jaate —
+# engine.js inhe getKnowledgeStats() me aage bhej deta hai, aur use koi
+# view nahi bulata. Yaani ek jhooth jo chup-chaap baitha rehta hai aur
+# tab kaatta hai jab koi is file ko sach maan kar dobara build kare.
+STORE_EMBED_MODEL = "@cf/baai/bge-m3"
+STORE_EMBED_DIM   = 1024
 
 # Rate limits (free tier)
 RPM_LIMIT       = 100   # requests per minute
@@ -47,13 +77,13 @@ def embed_text(text: str) -> list[float] | None:
     """
     if not GEMINI_API_KEY:
         # Demo mode: return zero vector (browser search falls back to keyword)
-        return [0.0] * EMBED_DIM
+        return [0.0] * GEMINI_DIM
 
     # Gemini embedding max: 2048 tokens ≈ 8000 chars
     truncated = text[:8000]
 
     payload = json.dumps({
-        "model": EMBED_MODEL,
+        "model": GEMINI_MODEL,
         "content": {"parts": [{"text": truncated}]},
         "taskType": "SEMANTIC_SIMILARITY",
     }).encode()
@@ -151,8 +181,8 @@ def build_knowledge_store(chunks: list[dict]) -> dict:
     store = {
         "version":       "2.0.0",
         "schema":        "saarthi-knowledge-v2",
-        "embed_model":   EMBED_MODEL,
-        "embed_dim":     EMBED_DIM,
+        "embed_model":   STORE_EMBED_MODEL,
+        "embed_dim":     STORE_EMBED_DIM,
         "total_chunks":  len(chunks),
         "chunks":        [],
     }

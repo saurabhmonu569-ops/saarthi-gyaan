@@ -1,8 +1,8 @@
 {
  "version": "2.0.0",
  "schema": "saarthi-knowledge-v2",
- "embed_model": "models/text-embedding-004",
- "embed_dim": 768,
+ "embed_model": "@cf/baai/bge-m3",
+ "embed_dim": 1024,
  "total_chunks": 57432,
  "books": [
   "agni_purana",
