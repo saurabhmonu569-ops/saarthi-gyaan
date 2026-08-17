@@ -38,7 +38,7 @@ import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
-const EMB  = join(ROOT, "public", "knowledge", "embeddings");
+const EMB  = join(ROOT, "data", "embeddings");
 const BIN  = join(EMB, "vectors_int8.bin");
 const IDX  = join(EMB, "chunk_index.json");
 const EVAL = join(ROOT, "eval-perbook.json");
@@ -105,10 +105,16 @@ const onlyNoHint = process.argv.includes("--nohint");
 let all = JSON.parse(readFileSync(EVAL, "utf8"));
 
 // ⚠️ Jin granthon ke vector is file me hain HI NAHI, unke sawaal hatao.
-// vectors_int8.bin abhi 57,339 ansh / 24 granth ki hai — Yogasutra baad
-// me juda aur uski apni alag file bani (vectors_int8.yoga_sutra.bin).
-// Unhe rakhne par wo hamesha "miss" ginte aur ank jhootha girta —
-// jabki galti tareeke ki nahi, file purani hone ki hoti.
+//
+// 17 Aug tak ye zaroori tha: baad me jude granth (Yogasutra) ki apni alag
+// file banti thi, aur ye script sirf main file padhti thi — to Yogasutra
+// ke sawaal hamesha "miss" ginte aur ank jhootha girta, jabki galti
+// tareeke ki nahi, file purani hone ki hoti.
+//
+// 28_index_jodo.mjs ne saari files ek kar di, aur folder data/embeddings
+// me aa gaya. Ab yahan sab 25 granth hain aur ye chhanni kuch hatati nahi.
+// Phir bhi rakhi hai — agli baar koi granth jude aur embed karna bhool
+// jayein, to ye chup-chaap jhootha ank dene ke bajay saaf bata degi.
 const naapne_layak = new Set(books);
 const chhoote = [...new Set(all.filter(r => !naapne_layak.has(r.book)).map(r => r.book))];
 if (chhoote.length) console.log(`  ⚠️  is jaanch se bahar (vector-file me nahi): ${chhoote.join(", ")}\n`);

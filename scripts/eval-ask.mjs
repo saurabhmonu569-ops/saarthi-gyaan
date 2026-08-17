@@ -73,7 +73,7 @@ const { loadKnowledge, hybridSearch, crossBookSearch, getChunk, getBookChunks }
   = await import("../src/knowledge/engine.js");
 
 const ROOT  = join(dirname(fileURLToPath(import.meta.url)), "..");
-const EMB   = join(ROOT, "public", "knowledge", "embeddings");
+const EMB   = join(ROOT, "data", "embeddings");
 const BOOKS = join(ROOT, "public", "knowledge", "books");
 const DIM = 1024, ROW = 1028;
 const MIN_RERANK = 0.30;         // ChatView.jsx ka MIN_RERANK_SCORE (2026-08-10: 0.5 se ghataya)

@@ -50,7 +50,7 @@ import { fileURLToPath } from "node:url";
 
 const ROOT  = join(dirname(fileURLToPath(import.meta.url)), "..");
 const BOOKS = join(ROOT, "public", "knowledge", "books");
-const EMB   = join(ROOT, "public", "knowledge", "embeddings");
+const EMB   = join(ROOT, "data", "embeddings");
 const INDEX = "saarthi-chunks";
 const DB    = "saarthi-knowledge";
 

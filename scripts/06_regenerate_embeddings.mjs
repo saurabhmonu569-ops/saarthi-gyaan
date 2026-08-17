@@ -46,7 +46,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
 const BOOKS_DIR = path.join(ROOT, "public", "knowledge", "books");
 const EMBED_MODEL_BASE = path.join(ROOT, "public", "embed-model") + path.sep;
-const OUT_DIR = path.join(ROOT, "public", "knowledge", "embeddings");
+const OUT_DIR = path.join(ROOT, "data", "embeddings");
 const VECTORS_OUT = path.join(OUT_DIR, "vectors.bin");
 const INDEX_OUT = path.join(OUT_DIR, "chunk_index.json");
 

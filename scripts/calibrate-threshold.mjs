@@ -31,7 +31,7 @@ import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
-const EMB  = join(ROOT, "public", "knowledge", "embeddings");
+const EMB  = join(ROOT, "data", "embeddings");
 const MODEL = "@cf/baai/bge-m3";
 const DIM = 1024, ROW = 1028;
 

@@ -72,10 +72,15 @@ book-check.json
 # Ye chalne ke dauran bante hain aur sirf ek machine ke liye matlab rakhte
 # hain — inhe git me rakhne se dobara chalane par bemani conflict aate hain.
 public/knowledge/.d1-progress*.json
-public/knowledge/embeddings/.embed-progress*.json
-public/knowledge/embeddings/.vectorize-progress*.json
-public/knowledge/embeddings/chunk_index.*.json
-public/knowledge/embeddings/vectors_int8.*.bin
+# 17 Aug: embeddings public/knowledge/ se data/ me aa gaye — wo 59 MB har
+# Netlify deploy me jaate the par app unhe kabhi maangti hi nahi thi
+# (semanticSearch.js hata diya gaya, retrieval Worker par hai). Purane
+# raaste bhi rakhe hain taaki kisi purane clone me kachra na dikhe.
+data/embeddings/.embed-progress*.json
+data/embeddings/.vectorize-progress*.json
+data/embeddings/chunk_index.*.json
+data/embeddings/vectors_int8.*.bin
+public/knowledge/embeddings/
 .eval-ckpt.*.json
 eval-perbook.json
 

@@ -36,7 +36,7 @@ import { fileURLToPath } from "node:url";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const BOOKS_DIR = join(ROOT, "public", "knowledge", "books");
-const OUT_DIR   = join(ROOT, "public", "knowledge", "embeddings");
+const OUT_DIR   = join(ROOT, "data", "embeddings");
 
 /**
  * --books <id,id>  — SIRF in granthon ke ansh embed karo.  (2026-08-11)

@@ -22,7 +22,7 @@ import { fileURLToPath } from "node:url";
 import { toDevanagari, devanagariRatio } from "../src/knowledge/translit.js";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
-const EMB  = join(ROOT, "public", "knowledge", "embeddings");
+const EMB  = join(ROOT, "data", "embeddings");
 const MODEL = "@cf/baai/bge-m3";
 const DIM = 1024, ROW = 1028;
 
