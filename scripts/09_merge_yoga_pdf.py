@@ -25,7 +25,7 @@ PARTS = [
     "yog part 3.pdf",
     "yog part 4.pdf",
 ]
-OUT = Path("public/books/yoga_vasishtha.pdf")
+OUT = Path("data/books-pdf/yoga_vasishtha.pdf")
 
 
 def main() -> int:

@@ -7,7 +7,7 @@ JPEG mein dobara bana kar (padhne ki quality lagbhag wahi rehti hai,
 purani 13 hosted books isi level par hain).
 
 USAGE:
-  python scripts\08_compress_pdf.py "SOURCE.pdf" "public\books\book_id.pdf"
+  python scripts\08_compress_pdf.py "SOURCE.pdf" "data\books-pdf\book_id.pdf"
 
   Quality/size badalna ho:
   python scripts\08_compress_pdf.py "SOURCE.pdf" "OUT.pdf" --dpi 100 --quality 55

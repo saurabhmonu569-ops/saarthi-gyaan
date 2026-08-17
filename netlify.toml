@@ -32,20 +32,25 @@
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
-# Knowledge data (books/, index/) ab sirf Read aur Search tab maangte
-# hain — Ask ko iski zaroorat nahi rahi (retrieval Worker par hai).
-# Phir bhi jo user Read tab kholta hai uske liye ye 258 MB hai, isliye
-# ek din ka cache aur ek hafte ka stale-while-revalidate.
+# Knowledge data (books/, index/) — ab SIRF Search tab ise maangta hai.
+# Ask ko iski zaroorat kabhi nahi thi (retrieval Worker par hai), aur Read
+# tab 14 Aug se chhupa hua hai. Search kholne wale user ke liye ye ~519 MB
+# hai, isliye ek din ka cache aur ek hafte ka stale-while-revalidate.
 [[headers]]
   for = "/knowledge/*"
   [headers.values]
     Cache-Control = "public, max-age=86400, stale-while-revalidate=604800"
 
-# PDF badalti nahi hain — ek hafta.
-[[headers]]
-  for = "/books/*"
-  [headers.values]
-    Cache-Control = "public, max-age=604800"
+# ⚠️ "/books/*" wala PDF cache-header HATA DIYA — 2026-08-17.
+# 23 PDF (586 MB) ab data/books-pdf/ me hain, build me jaati hi nahi.
+# Wajah kanooni hai aur poori tarah src/featureFlags.js ke PDF_PAROSO par
+# likhi hai. Header rakhne ka matlab hota "ye raasta abhi bhi hai" — hai
+# nahi. Anumati milne par PDF wapas public/books/ me aayengi, tab ye
+# header bhi wapas aayega:
+#     [[headers]]
+#       for = "/books/*"
+#       [headers.values]
+#         Cache-Control = "public, max-age=604800"
 
 # ── SERVICE WORKER ───────────────────────────────────────────────────
 # sw.js KABHI cache nahi hona chahiye. Agar browser purani sw.js pakde

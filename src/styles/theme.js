@@ -5,6 +5,8 @@
  * Pure data — no behavior change from the original inline definitions.
  */
 
+import { PDF_PAROSO } from "@/featureFlags";
+
 // ─── DESIGN TOKENS ────────────────────────────────────────────────────────────
 export const C = {
   cream:    "#FDFCF8",
@@ -27,9 +29,21 @@ export const C = {
   shadowLg: "0 4px 16px rgba(24,18,14,0.1), 0 16px 40px rgba(24,18,14,0.08)",
 };
 
-// Kin books ki ASLI PDF public/books/ mein maujood hai (in 13 ke alawa nayi
-// books sirf text-reader se khulti hain — unki PDFs host par nahi/nahi ho saktin)
-export const HAS_PDF = new Set([
+// Kin granthon ki ASLI PDF web par parosi jaati hai.
+//
+// ⚠️ 17 Aug 2026 se ye Set KHAALI hai. PDF `data/books-pdf/` me chali gayi
+// hain — repo me hain, mit-i nahi, par build me nahi jaati. Wajah kanooni
+// hai aur poori tarah `src/featureFlags.js` ke PDF_PAROSO par likhi hai.
+//
+// Neeche ki soochi jaan-boojhkar rakhi hai (hataayi nahi): ye batati hai
+// ki kis granth ki PDF hamare paas HAI. Anumati milne par PDF_PAROSO ko
+// `true` karna kaafi hai — soochi dobara banane ki zaroorat nahi.
+//
+// BooksView aur GlobalSearchView dono is Set se poochhte hain, isliye
+// khaali hote hi wo apne aap "sirf paath" wale raaste par chale jaate
+// hain — wahi raasta jo Mahabharat aur Yogasutra par pehle se chal raha
+// tha (unki PDF kabhi thi hi nahi).
+const PDF_HAMARE_PAAS = [
   "agni_purana", "atharvaveda_1", "bhagavad_gita_shankar", "bhavishya_purana",
   "garuda_purana_1", "narasimha_purana", "rigveda_1", "samaveda",
   "shiva_purana_1", "shiva_purana_2", "vishnu_purana_1", "yajurveda",
@@ -37,7 +51,9 @@ export const HAS_PDF = new Set([
   "rashi_muhurt_vigyan", "chanakya_neeti", "ekadashi_mahatmya", "ishadi_upanishad",
   "guru_granth_sahib", "kathopanishad", "ramcharitmanas", "lal_kitab",
   "mantra_maha_sagar", "yoga_vasishtha", "nitya_karm_pooja",
-]);
+];
+
+export const HAS_PDF = new Set(PDF_PAROSO ? PDF_HAMARE_PAAS : []);
 
 // ─── TYPOGRAPHY ───────────────────────────────────────────────────────────────
 // Tiro Devanagari Hindi: granth-jaisa serif jo DEVANAGARI + Latin dono mein

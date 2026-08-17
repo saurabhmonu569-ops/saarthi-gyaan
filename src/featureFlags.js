@@ -36,3 +36,37 @@
  *   PDF     — Upload tab, alag raasta
  */
 export const READ_TAB_DIKHAO = false;
+
+/**
+ * Asli PDF web par parosein ya nahi.                          (2026-08-17)
+ *
+ * `false` ke saath `public/books/` ki 23 PDF (586 MB) build me jaati hi
+ * nahi — wo `data/books-pdf/` me rehti hain, repo me rehti hain, aapke
+ * paas rehti hain. Bas Netlify par nahi jaati.
+ *
+ * ⚠️ YE SUVIDHA KA FAISLA NAHI, KANOON KA HAI
+ * --------------------------------------------
+ * copyright_findings.md me teen kitaabein HIGH RISK hain — Rigveda aur
+ * Atharvaveda (Sanskrit Sahitya Prakashan, 2015, ISBN + © chhapa hua) aur
+ * Mantra Maha Sagar (Chowkhamba Krishnadas Academy, ISBN 978-81-218-0352-6,
+ * 2nd edn. 2017, ₹525). Teenon AAJ BHI bik rahi hain.
+ *
+ * 17 Aug tak unki poori scan seedhe URL par khuli thi —
+ *     saarthi-gyaan.netlify.app/books/rigveda_1.pdf
+ * bina login, bina kisi rok ke. Read tab 14 Aug ko chhupa diya gaya tha,
+ * par wo PARDA tha, TAALA nahi — URL jaanne wala phir bhi utaar leta.
+ *
+ * KYA TOOTA (poora, ginti ke saath):
+ *   Search ke har nateeje ke aage jo chhota "📄 p.12" link tha — wo ek.
+ *   Bas. Read tab pehle se chhupa hai, isliye uske PDF-iframe kabhi
+ *   render hote hi nahi the.
+ *
+ * KYA NAHI TOOTA: Ask ka poora jawab aur Aadhaar, Search ka poora nateeja
+ * aur uska paath, adhyay ki soochi, granth ke naam, Amrit, Upload.
+ *
+ * ⚠️ Ise `true` karne se PEHLE: PDF wapas `public/books/` me laani hongi,
+ * AUR publisher ki likhit anumati chahiye. Bina uske ye sirf wahi khatra
+ * wapas laana hai. Anumati mile to use `src/data/bookRights.js` me darj
+ * karein — wahi jagah hai jahan har granth ka adhikaar likha hai.
+ */
+export const PDF_PAROSO = false;

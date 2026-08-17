@@ -9,7 +9,7 @@ import { explainSearchTerm, hasApiKey } from "@/services/gemini";
 import { useT, useUiLang } from "@/i18n";
 import { useAuth } from "@/context/AuthContext";
 import { featureQuotaLeft, featureQuotaUse, SEARCH_QUOTA_LIMIT, serverQuotaConsume, syncLocalQuotaFromServer } from "@/services/quota";
-import { C, F } from "@/styles/theme";
+import { C, F, HAS_PDF } from "@/styles/theme";
 import { Prose, cleanOcrText } from "@/components/ui/Primitives";
 import { QuotaPill } from "@/views/AuthWidgets";
 
@@ -274,10 +274,18 @@ function SearchResultCard({ result, query }) {
             </span>
           )}
           {chunk.verse && <span style={{ fontSize: F.xs, color: C.muted }}> · Verse {chunk.verse}</span>}
-          <a href={`/books/${chunk.book}.pdf#page=${(chunk.page || 0) + 1}`} target="_blank" rel="noopener noreferrer"
-             onClick={e => e.stopPropagation()}
-             style={{ fontSize: F.xs, color: C.saffron, fontWeight: 600, textDecoration: "none" }}
-             title="Asli kitab ka yeh page kholein"> · 📄 p.{chunk.page}</a>
+          {/* ⚠️ 17 Aug: ye PDF-link HAS_PDF ke peeche hai. PDF ab web par
+              parosi nahi jaati (kanooni wajah — featureFlags.js ka
+              PDF_PAROSO dekhein), aur us haal me HAS_PDF khaali hota hai.
+              Bina is pehre ke ye link 404 par le jaata — aur toota link
+              us bharose ko kaatta hai jo poori app kamane ki koshish
+              karti hai. */}
+          {HAS_PDF.has(chunk.book) && (
+            <a href={`/books/${chunk.book}.pdf#page=${(chunk.page || 0) + 1}`} target="_blank" rel="noopener noreferrer"
+               onClick={e => e.stopPropagation()}
+               style={{ fontSize: F.xs, color: C.saffron, fontWeight: 600, textDecoration: "none" }}
+               title="Asli kitab ka yeh page kholein"> · 📄 p.{chunk.page}</a>
+          )}
         </div>
         <div style={{ display: "flex", gap: 5, alignItems: "center", flexShrink: 0 }}>
         </div>
