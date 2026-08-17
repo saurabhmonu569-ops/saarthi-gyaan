@@ -151,3 +151,47 @@ describe("jawab ki safai — andar ke nirdesh aur adhoori bhoomika (2026-08-11)"
     expect(hataoBhoomika(t)).toBe(t);
   });
 });
+
+describe("(Passage N) — andar ka plumbing user tak nahi jaana chahiye (2026-08-17)", () => {
+  // Model ko ansh is roop me jaate hain:
+  //     [1] Narasimha Purana
+  //     <paath>
+  // Wo "[1]" HAMARE liye hai. Par 17 Aug ki asli jaanch me model ne use
+  // jawab me uddharan ki tarah likh diya. User ke liye us number ka koi
+  // matlab nahi — wo kahin dikhta hi nahi aur jaancha bhi nahi ja sakta.
+  // Wahi tark jo panne ke number par lagta hai.
+  //
+  // Ye galti lambe jawab ke saath aayi: lamba likhne par model zyada
+  // uddharan dene lagta hai.
+
+  const hatao = (t) => t
+    .replace(/\s*[（(\[]\s*(?:passages?|ansh|अंश|पैसेज)\s*[#:]?\s*[\d०-९]+(?:\s*[-–,]\s*[\d०-९]+)*\s*[）)\]]/gi, "")
+    .replace(/\s*[（(\[]\s*(?:passages?|ansh|अंश)\s*[\d०-९]+\s*(?:aur|and|,)\s*[\d०-९]+\s*[）)\]]/gi, "");
+
+  it("ASLI namoona — 17 Aug ke jawab se hi liya gaya", () => {
+    const t = "vah sabhi paapon se mukt ho jata hai aur Vishnu lok mein jaata hai. (Passage 4)";
+    expect(hatao(t)).toBe("vah sabhi paapon se mukt ho jata hai aur Vishnu lok mein jaata hai.");
+  });
+
+  it("alag-alag roop", () => {
+    expect(hatao("baat kahi gayi hai (passage 6)")).toBe("baat kahi gayi hai");
+    expect(hatao("baat kahi gayi hai [Passage 2]")).toBe("baat kahi gayi hai");
+    expect(hatao("baat kahi gayi hai (Passages 4, 6)")).toBe("baat kahi gayi hai");
+    expect(hatao("baat kahi gayi hai (Ansh 3)")).toBe("baat kahi gayi hai");
+    expect(hatao("यह बात कही गई है (अंश ४)")).toBe("यह बात कही गई है");
+  });
+
+  // ⚠️ YE SABSE ZAROORI JAANCH HAI — safai ka kaam sirf plumbing hatana
+  // hai. Akela "[4]" ya "(4)" asli paath me bhi ho sakta hai (shlok ki
+  // ginti, soochi ka number). Use hatana jawab ko bigadna hoga.
+  it("akela number ko HAATH NAHI lagata", () => {
+    expect(hatao("श्लोक (4) में यह कहा गया है")).toBe("श्लोक (4) में यह कहा गया है");
+    expect(hatao("teen prakar hain [1] karma [2] bhakti")).toBe("teen prakar hain [1] karma [2] bhakti");
+    expect(hatao("Gita 2.47 mein likha hai")).toBe("Gita 2.47 mein likha hai");
+  });
+
+  it("saaf jawab ko chhoota hi nahi", () => {
+    const t = "एकादशी व्रत से पुण्य मिलता है और उपवास श्रेष्ठ माना गया है।";
+    expect(hatao(t)).toBe(t);
+  });
+});

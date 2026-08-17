@@ -556,6 +556,34 @@ export function useChat({
         if (before !== responseText) console.log("[Aadhaar] jawab me se panna-number hataye");
       }
 
+      // "(Passage 4)" HATAO — hamara apna plumbing user tak pahunch raha tha
+      // ------------------------------------------------------------------
+      // 2026-08-17. Model ko ansh is roop me jaate hain:
+      //     [1] Narasimha Purana
+      //     <paath>
+      // Wo "[1]" hamare liye hai, user ke liye nahi. Par model use jawab me
+      // uddharan ki tarah likhne laga:
+      //     "...vah sabhi paapon se mukt ho jata hai. (Passage 4)"
+      //
+      // User ke liye ye number ka koi matlab nahi — wo kahin dikhta hi nahi,
+      // aur na hi jaancha ja sakta hai. Ye bilkul wahi kism hai jo panne ke
+      // number ki thi (upar dekhein): jo pramaan jaancha na ja sake, wo
+      // pramaan nahi — wo sirf bharosa todta hai.
+      //
+      // Ye 17 Aug ko tab dikha jab jawab lambe kiye gaye. Lamba jawab likhne
+      // par model zyada uddharan dene lagta hai, aur wahin ye bahar aaya.
+      //
+      // ⚠️ Akela "[4]" JAAN-BOOJHKAR nahi hata rahe — wo asli paath me bhi
+      //    ho sakta hai (shlok ki ginti, soochi). Sirf wo roop hata rahe hain
+      //    jinme "passage" ya "ansh" shabd saath likha ho.
+      if (responseText) {
+        const before = responseText;
+        responseText = responseText
+          .replace(/\s*[（(\[]\s*(?:passages?|ansh|अंश|पैसेज)\s*[#:]?\s*[\d०-९]+(?:\s*[-–,]\s*[\d०-९]+)*\s*[）)\]]/gi, "")
+          .replace(/\s*[（(\[]\s*(?:passages?|ansh|अंश)\s*[\d०-९]+\s*(?:aur|and|,)\s*[\d०-९]+\s*[）)\]]/gi, "");
+        if (before !== responseText) console.log("[Aadhaar] jawab me se (Passage N) hataye");
+      }
+
       if (responseText && groundedChunks.length > 0 && !responseText.includes("📚 Aadhaar") && !noGroundingDisclaimed) {
         // BUG FIX: pehle book+page se dedupe hota tha — "Agni Purana · Agni
         // Purana · Agni Purana" dikhta tha. Ab ek book EK baar, pages jud kar.
