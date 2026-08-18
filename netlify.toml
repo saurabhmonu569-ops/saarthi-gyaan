@@ -13,7 +13,19 @@
 # data har baar bina cache ke jaa raha tha. Ab wo headers yahan hain.
 
 [build]
-  command = "npm run build"
+  # ⚠️ `npm test &&` 18 AGAST 2026 KO JODA — aur ye is hafte ka sabse
+  # zaroori ek-line badlaav hai.
+  #
+  # Aaj tak yahan sirf `npm run build` tha. Yaani 122 test likhe gaye,
+  # roz chalaye gaye, aur unme se EK BHI deploy ke raaste me nahi tha.
+  # Koi bhi toota code push kar sakta tha aur Netlify use khushi se build
+  # karke live kar deta.
+  #
+  # Test tabhi kaam ke hain jab wo ROK sakein. Jo test sirf tab chalta hai
+  # jab koi use yaad rakh kar chalaye, wo test nahi — sujhav hai.
+  #
+  # Ab test fail = build fail = deploy nahi.
+  command = "npm test && npm run build"
   publish = "dist"
 
 [build.environment]
