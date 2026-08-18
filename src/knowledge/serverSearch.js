@@ -14,11 +14,25 @@
  * Ab wahi kaam Worker ke /search par hota hai (Vectorize + D1 + Workers
  * AI). Client par download: 0 MB.
  *
- * ⚠️ JO CLIENT PAR HI RAHTA HAI, AUR KYUN:
- *   translit / paryay / stripMetaFraming / isOutOfScope / detectHintedBook
- * Ye sab SIRF CODE hain — inka data kuch KB ka lexicon hai, MB ka corpus
- * nahi. Inhe client par rakhne se ek round-trip bachta hai, aur — zyada
- * zaroori — inke 200+ unit test bina kisi network ke chalte rehte hain.
+ * ⚠️ QUERY-PREP BHI AB SERVER PAR — 2026-08-18
+ *
+ * Upar ye likha tha: "translit / paryay / stripMetaFraming / isOutOfScope
+ * / detectHintedBook client par rahenge — inka data kuch KB ka lexicon
+ * hai, MB ka corpus nahi."
+ *
+ * WO GALAT THA. Naapa gaya:
+ *     poora bundle  :  1,104 kB   →  gzip  354 kB
+ *     lexicon akela :    813 kB   →  gzip  242 kB
+ *
+ * Bundle ka teen-chauthai wahi "kuch KB ka lexicon" tha. Aur uska poora
+ * istemaal EK jagah — `toDevanagari()` ke andar ek lookup.
+ *
+ * Ab client sirf KACCHA sawaal bhejta hai. `isOutOfScope` phir bhi client
+ * par hai (wo lexicon ko chhoota hi nahi, aur uska kaam hi server call se
+ * PEHLE rok dena hai).
+ *
+ * SEEKH: "ye to chhota hai" ek ANDAAZA hai. Andaaza comment mein likh dene
+ * se wo naap nahi ban jaata. Ye line 8 din tak yahan padi rahi.
  *
  * ⚠️ SANKHYAYEIN YAHAN NAHI HAIN. MIN_RERANK 0.30, per-book cap 3, keep 12,
  * quota 45/20/20 — sab Worker mein hain, ek hi jagah. Client unhe dohrata
@@ -45,7 +59,7 @@ function sessionHeader() {
 /**
  * Ek sawaal par poora retrieval — Worker se.
  *
- * @param {{findQ:string, rerankQ?:string, hintedBook?:string|null}} q
+ * @param {{q:string}} arg — user ka KACCHA sawaal. Bas itna.
  * @returns {Promise<{chunks:Array, stats:Object}>}
  *
  * FAIL-SOFT: network gira ya Worker ne 5xx diya to KHAALI lautata hai,
@@ -53,19 +67,22 @@ function sessionHeader() {
  * apna niyam yahi hai: "agar 1% bhi jawab nahi mila toh saada jawab dena,
  * source ke bina bhi chalega." Throw karne se poora chat toot jaata.
  */
-export async function serverRetrieve({ findQ, rerankQ, hintedBook = null }) {
+export async function serverRetrieve({ q }) {
   if (!AI_PROXY_URL) {
     console.warn("[ServerSearch] VITE_AI_PROXY_URL set nahi hai — bina granth ke jawab");
     return { chunks: [], stats: null };
   }
-  if (!findQ || !findQ.trim()) return { chunks: [], stats: null };
+  if (!q || !q.trim()) return { chunks: [], stats: null };
 
   const t0 = performance.now();
   try {
     const res = await fetch(`${AI_PROXY_URL}/search`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...sessionHeader() },
-      body: JSON.stringify({ findQ, rerankQ: rerankQ || findQ, hintedBook }),
+      // ⚠️ Sirf `q`. findQ/rerankQ/hintedBook worker banata hai.
+      // Worker purana dhaancha BHI leta hai — wo cache me padi purani
+      // client-file ke liye hai, naye code ke liye nahi.
+      body: JSON.stringify({ q: q.trim() }),
     });
     if (!res.ok) {
       const body = await res.text().catch(() => "");
@@ -117,5 +134,5 @@ export async function serverRetrieve({ findQ, rerankQ, hintedBook = null }) {
  */
 export function warmServerSearch() {
   if (!AI_PROXY_URL) return;
-  serverRetrieve({ findQ: "धर्म", rerankQ: "धर्म" }).catch(() => {});
+  serverRetrieve({ q: "धर्म" }).catch(() => {});
 }

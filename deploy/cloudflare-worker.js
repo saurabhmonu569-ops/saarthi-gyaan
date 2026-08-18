@@ -16,6 +16,21 @@ import {
   ftsQuery,
 } from "../src/shared/paath.js";
 
+// ⚠️ QUERY-PREP AB SERVER PAR — 2026-08-18
+//
+// Ye do import LEXICON (813 kB) ko worker me laate hain. Jaan-boojhkar.
+// Worker ka bundle 10 MB tak ja sakta hai aur wo ek baar CF ke edge par
+// baithta hai; client ka bundle HAR user ke mobile par utarta hai.
+// Wahi 813 kB idhar muft hai, udhar mehnga.
+//
+// Isse client se pura `knowledge/translit` + `knowledge/bookHints`
+// nikal jaata hai — bundle gzip 354 kB → ~136 kB (naapa hua).
+import {
+  normalizeQueryForSearch, stripMetaFraming,
+  expandQueryWithParyay, questionToTopic,
+} from "../src/knowledge/translit.js";
+import { detectHintedBook } from "../src/knowledge/bookHints.js";
+
 /**
  * SAARTHI AI Proxy v2 — "ROUTER-LITE" (Groq 70b → Gemini Flash backup)
  * =====================================================================
@@ -1041,10 +1056,52 @@ export default {
       let b;
       try { b = JSON.parse(await request.text()); } catch { return jsonResponse({ error: { message: "Bad JSON" } }, 400, origin); }
 
-      const findQ   = typeof b?.findQ   === "string" ? b.findQ.trim().slice(0, EMBED_MAX_CHARS)   : "";
-      const rerankQ = typeof b?.rerankQ === "string" ? b.rerankQ.trim().slice(0, EMBED_MAX_CHARS) : findQ;
-      const hinted  = typeof b?.hintedBook === "string" ? b.hintedBook.slice(0, 64) : null;
-      if (!findQ) return jsonResponse({ error: { message: "findQ required" } }, 400, origin);
+      // ── QUERY AB YAHAN BANTI HAI — 18 Agast 2026 ─────────────────────
+      //
+      // Client ab sirf KACCHA sawaal (`q`) bhejta hai. Query ka poora
+      // tark — translit, paryay, meta-dhaancha hatana, granth ka naam
+      // pehchanna — ab yahin chalta hai.
+      //
+      // DO WAJAH, DONO NAAPI HUI:
+      //
+      // 1. LEXICON 813 kB KA HAI AUR CLIENT PAR BEKAAR BOJH THA.
+      //    Naapa: bundle gzip 354 kB, usme akela lexicon 242 kB. Aur uska
+      //    poora istemaal EK jagah hai — toDevanagari() ke andar ek lookup.
+      //    Bharat me mobile par wo 242 kB har user utaarta tha, sirf apna
+      //    Roman sawaal Devanagari me badalne ke liye.
+      //
+      // 2. EK HI NIYAM DO JAGAH — YE JAAL IS PROJECT KO BAAR-BAAR KAAT
+      //    CHUKA HAI. Query banane ka tark ChatView me tha, aur uski
+      //    nakal 17/18/19/23/24/29 har eval-script me. 18 Agast ko pata
+      //    chala ki debug-query.mjs ki nakal DRIFT kar chuki hai — wo
+      //    `toDevanagari()` seedha bhej rahi thi jabki app teen kadam se
+      //    guzarti hai. Uske saare nidaan APP KE THE HI NAHI.
+      //    Ab tark EK jagah hai. Script sirf sawaal bhejegi.
+      //
+      // ⚠️ PURANA DHAANCHA ABHI BHI CHALTA HAI — ye jaan-boojhkar hai.
+      // Client aur worker alag-alag deploy hote hain. Jab tak kisi user ke
+      // browser me purani file cache me padi hai, wo `findQ` hi bhejega.
+      // Use todna wahi galti hogi jo aaj subah model ka naam badalte waqt
+      // ho sakti thi. Dono raaste tab tak rahenge jab tak Netlify ka naya
+      // build sab jagah na pahunch jaye.
+      let findQ, rerankQ, hinted;
+      const kaccha = typeof b?.q === "string" ? b.q.trim().slice(0, EMBED_MAX_CHARS) : "";
+
+      if (kaccha) {
+        const { query: nq } = normalizeQueryForSearch(kaccha);
+        const baseQ = stripMetaFraming(nq);
+        // ⚠️ .trim() ZAROORI — purana raasta `b.findQ.trim()` karta tha.
+        // Bina iske ek trailing space bhi alag embedding deta hai, aur do
+        // raaston ki tulna me wo "bug" jaisa dikhta.
+        findQ   = expandQueryWithParyay(baseQ).trim().slice(0, EMBED_MAX_CHARS);
+        rerankQ = questionToTopic(baseQ).trim().slice(0, EMBED_MAX_CHARS);
+        hinted  = detectHintedBook(kaccha) || null;   // ⚠️ MOOL sawaal par, nq par nahi
+      } else {
+        findQ   = typeof b?.findQ   === "string" ? b.findQ.trim().slice(0, EMBED_MAX_CHARS)   : "";
+        rerankQ = typeof b?.rerankQ === "string" ? b.rerankQ.trim().slice(0, EMBED_MAX_CHARS) : findQ;
+        hinted  = typeof b?.hintedBook === "string" ? b.hintedBook.slice(0, 64) : null;
+      }
+      if (!findQ) return jsonResponse({ error: { message: "q (ya findQ) required" } }, 400, origin);
 
       const t0 = Date.now();
       // KADAM-DAR-KADAM SAMAY (2026-08-10)
@@ -1173,7 +1230,11 @@ export default {
           ...[...byId.values()].filter(c => hintedSet.has(c.id)),
           ...[...byId.values()].filter(c => !hintedSet.has(c.id)),
         ].slice(0, SEARCH_MAX_RERANK);
-        if (!cand.length) return jsonResponse({ chunks: [], stats: { pool: 0, ms: Date.now() - t0 } }, 200, origin);
+        // ⚠️ `q` yahan BHI — khaali lautne par bhi. Khaali jawab ki do
+        // bilkul alag wajah hoti hain: query hi galat bani, ya query theek
+        // thi par corpus me kuch mila nahi. Bina `q` ke dono ek jaise
+        // dikhte hain aur galat bimari ka ilaaj shuru ho jaata hai.
+        if (!cand.length) return jsonResponse({ chunks: [], stats: { pool: 0, ms: Date.now() - t0, q: { findQ, rerankQ }, hinted: hinted || null } }, 200, origin);
 
         // ── 5. TEXT laao — D1 se, ek hi query mein ────────────────────
         // rowid bhi le rahe hain — padosi ansh usi se milte hain (neeche 6.5)
@@ -1187,7 +1248,7 @@ export default {
         const withText = cand
           .map(c => ({ ...c, ...(textById.get(c.id) || {}) }))
           .filter(c => (c.text || "").trim());
-        if (!withText.length) return jsonResponse({ chunks: [], stats: { pool: cand.length, ms: Date.now() - t0 } }, 200, origin);
+        if (!withText.length) return jsonResponse({ chunks: [], stats: { pool: cand.length, ms: Date.now() - t0, q: { findQ, rerankQ }, hinted: hinted || null } }, 200, origin);
 
         // ── 6. RERANK — asli sawaal par, paryay ke bina ───────────────
         const scores = await rerankAll(env, rerankQ, withText.map(c => c.text));
@@ -1504,6 +1565,28 @@ export default {
                 .sort((a, b) => b[1] - a[1]).slice(0, 8)
             ),
             hinted: hinted || null,
+
+            // ⚠️ QUERY JO ASAL ME CHALI — 18 Agast 2026
+            //
+            // Ab query client par BHI ban sakti hai (purana raasta) aur
+            // worker par BHI (naya). Do jagah ek tark ka matlab hai ki wo
+            // tark chupchaap alag ho jayega — is project me do baar ho
+            // chuka hai.
+            //
+            // Pehle maine ye jaanchne ki koshish ki thi ki dono raaston ke
+            // ANSH ek jaise aate hain ya nahi. Wo naap BEKAAR nikli: /search
+            // ka apna shor 29% naapa gaya (ek hi body do baar bhejne par,
+            // ek sawaal par to 100% alag ansh). Us shor ke saamne kisi bhi
+            // tulna ka koi matlab nahi tha.
+            //
+            // Isliye ab ASLI cheez lautayi jaati hai — wo string jo bani.
+            // String shuddh tark hai; usme ANN ka shor ghus hi nahi sakta.
+            // 30_query_prep_jaanch.mjs isi ko milaati hai.
+            //
+            // Chhoti hai (do query), aur sirf debug me kaam aati hai —
+            // par iske bina dono raaston ki tulna ka koi saaf tareeka nahi.
+            q: { findQ, rerankQ },
+
             hintedInPool: hinted ? withText.filter(c => c.book === hinted).length : null,
             hintedPassed: hinted ? passed.filter(c => c.book === hinted).length : null,
             // kitne ansh SIRF 'naam liya hua granth' ke naate aaye (score se nahi)

@@ -9,9 +9,9 @@ import { useBookProgress } from "@/context/AppContext";
 import { BOOKS } from "@/data";
 import { BOOK_META } from "@/data/bookMeta";
 import { useT } from "@/i18n";
-import { detectHintedBook } from "@/knowledge/bookHints";
 import { serverRetrieve, warmServerSearch } from "@/knowledge/serverSearch";
-import { normalizeQueryForSearch, expandQueryWithParyay, stripMetaFraming, questionToTopic, isOutOfScope } from "@/knowledge/translit";
+// ⚠️ SIRF `isOutOfScope` — aur ye jaan-boojhkar hai. Dekhein retrieveContext.
+import { isOutOfScope } from "@/knowledge/translit";
 
 // ── RELEVANCE GATE ───────────────────────────────────────────────────────
 //
@@ -309,21 +309,37 @@ export function ChatView() {
   // yaani 298 sawaalon par naapa hua 80% ka score kisi ASLI user tak
   // pahunchta hi nahi tha. Ab client par download 0 MB hai.
   //
-  // JO YAHAN BACHA HAI, WO JAAN-BOOJHKAR BACHA HAI:
-  //   translit / paryay / stripMetaFraming / isOutOfScope / detectHintedBook
-  // Ye sirf CODE hain — inka lexicon KB mein hai, MB mein nahi. Client par
-  // rehne se ek round-trip bachta hai aur inke unit test bina network ke
-  // chalte rehte hain.
+  // QUERY-PREP AB YAHAN NAHI HAI — 18 Agast 2026
+  // =====================================================================
+  // Upar likha tha: "inka lexicon KB mein hai, MB mein nahi." WO GALAT THA,
+  // aur naapne par saaf ho gaya:
+  //
+  //     poora bundle  :  1,104 kB   →  gzip  354 kB
+  //     lexicon akela :    813 kB   →  gzip  242 kB
+  //
+  // Yaani bundle ka teen-chauthai ek hi file thi. Aur uska poora istemaal
+  // EK jagah tha — `toDevanagari()` ke andar ek lookup, jise sirf
+  // `normalizeQueryForSearch` bulati thi, jise sirf ye function bulata tha.
+  // Bharat mein mobile par har user wo 242 kB isliye utaarta tha taaki uska
+  // Roman sawaal Devanagari mein badal sake.
+  //
+  // Ab client SIRF KACCHA SAWAAL bhejta hai. Worker khud translit, paryay,
+  // meta-safai aur granth-hint karta hai — wahi functions, wahi kram.
+  //
+  // DOOSRA (aur shayad bada) faayda: EK NIYAM AB EK HI JAGAH HAI.
+  // Query banane ka tark yahan tha, aur uski nakal har eval-script mein.
+  // 18 Agast ko pata chala ki debug-query.mjs ki nakal DRIFT kar chuki thi
+  // — wo `toDevanagari()` seedha bhej rahi thi jabki app teen kadam se
+  // guzarti hai. Uske saare nidaan APP KE THE HI NAHI.
+  //
+  // ⚠️ `isOutOfScope` JAAN-BOOJHKAR YAHIN HAI. Wo lexicon ko chhoota hi
+  // nahi (chand KB ka apna list hai), aur uska kaam hi hai server call se
+  // PEHLE rok dena — use server par le jaane se wo bachat khatm ho jaati.
+  //
+  // Jaancha: 30_query_prep_jaanch.mjs — 12 sawaal, dono taraf banne wali
+  // findQ/rerankQ/hint akshar-dar-akshar mili (12/12).
   const retrieveContext = useCallback(async (query) => {
     try {
-      // 0. QUERY NORMALIZATION (item #17, 2026-08-03)
-      // Poora corpus Devanagari mein hai. Roman/Hinglish sawaal
-      // ("gussa kaise shant karein") ko model na Hindi maanta hai na
-      // English — score girkar shor ke barabar aa jaata hai:
-      //     gussa kaise shant karein   0.4370
-      //     गुस्सा कैसे शांत करें         0.6595
-      const { query: searchQ } = normalizeQueryForSearch(query);
-
       // DAAYRE SE BAHAR? (2026-08-10) — "Quran ki shiksha", "Meditation app
       // kaunsa best" jaise sawaalon par reranker 0.9+ score deta hai kyunki
       // wo VISHAY milata hai, sawaal nahi. Koi bhi threshold ise nahi rok
@@ -338,35 +354,14 @@ export function ChatView() {
         setSacredChunks([]); return [];
       }
 
-      // Teen alag query, teen alag kaam (2026-08-07):
-      //   query   = user ka asli sawaal   → AI ke PROMPT mein (achhoota)
-      //   rerankQ = meta-dhaancha hataya  → RERANKER ko
-      //   findQ   = rerankQ + granth-paryay → DHOONDHNE ko
+      // KACCHA SAWAAL — worker khud isse teen query banata hai.
       //
-      // KYUN rerankQ se meta hataya: "क्रोध को नियंत्रित करने के लिए
-      // शास्त्र क्या कहते हैं?" par 0 ansh mile the — jabki corpus mein
-      // krodh-niyantran par 464 chunks hain. Reranker cross-encoder hai;
-      // "शास्त्र क्या कहते हैं" use KITAB ke baare mein sawaal lagta hai,
-      // vishay ke baare mein nahi.
-      //
-      // KYUN findQ alag: paryay sirf UMMEEDWAAR dhoondhne ke liye hain.
-      // Reranker ko paryay dene se sawaal anaad ho jaata hai aur wahi gate
-      // bigadta hai jo 32 control sawaalon par 0 jhoothi citation deta hai.
-      // PRASHN → VISHAY-VAAKYA, sirf aankne wali query par (2026-08-11).
-      // Naapa gaya: "चेतना क्या होती है?" → 0.0023, par
-      //             "चेतना का स्वरूप और उसका वर्णन" → 0.6831 (300 guna).
-      // Granth prashn-uttar ki shaili mein likhe hi nahi hain; wo vishay
-      // ka VARNAN karte hain. Isliye reranker ko prashn nahi, vishay do.
-      //
-      // findQ ko JAAN-BOOJHKAR nahi badla — wo FTS/Vectorize ko jaati hai
-      // jahan "क्या/कैसे" stopword hain aur asli sawaal ke shabd hi pool
-      // banate hain. Do query, do alag kaam.
-      const baseQ   = stripMetaFraming(searchQ);
-      const rerankQ = questionToTopic(baseQ);
-      const findQ   = expandQueryWithParyay(baseQ);
-      const hintedBook = detectHintedBook(query);
-
-      const { chunks } = await serverRetrieve({ findQ, rerankQ, hintedBook });
+      // (Wo teen kya hain aur kyun alag hain, ye ab worker ke /search mein
+      // likha hai — jahan wo tark asal mein chalta hai. Yahan dohrana ka
+      // matlab hi wahi nakal banana hai jise hatane ke liye ye badlaav
+      // kiya gaya. Chhota saar itna hi: query prompt ko jaati hai,
+      // rerankQ reranker ko, findQ dhoondhne ko.)
+      const { chunks } = await serverRetrieve({ q: query });
       if (!chunks.length) { setSacredChunks([]); return []; }
 
       // Server se aaye ansh ko wahi shakl do jo gemini.js aur useChat.js
