@@ -584,11 +584,26 @@ export function ChatView() {
           </div>
         )}
 
-        {messages.map(m => <ChatMessage key={m.id} msg={m} onRetry={m.error ? retryLast : null} />)}
+        {/* ⚠️ aria-live — SCREEN-READER KE LIYE  (2026-08-18)
+            18 Agast ke audit me mila: poore app me aria-live KAHIN NAHI tha.
+            Jawab DOM me chup-chaap aa jaata tha — screen-reader use padhta
+            hi nahi, aur nabina user ko pata hi nahi chalta ki jawab aa gaya.
+            Wo wahi baith kar intzaar karta rehta.
+
+            Ek aadhyatmik app ke liye, jise budhe aur kam-drishti wale log
+            istemaal karte hain, ye chhoti baat nahi hai.
+
+            "polite" isliye (assertive nahi) — jawab zaroori hai par turant
+            tokne layak nahi. User jo padh raha ho wo pehle poora ho.
+            aria-busy batata hai ki jawab abhi aa raha hai. */}
+        <div aria-live="polite" aria-atomic="false" aria-busy={isLoading}>
+          {messages.map(m => <ChatMessage key={m.id} msg={m} onRetry={m.error ? retryLast : null} />)}
+        </div>
 
         {/* Thinking indicator */}
         {isLoading && (
-          <div style={{ display: "flex", gap: 11, marginBottom: 22, animation: "fadeUp 0.2s ease" }}>
+          <div role="status" aria-label="Saarthi soch rahe hain"
+               style={{ display: "flex", gap: 11, marginBottom: 22, animation: "fadeUp 0.2s ease" }}>
             <SaarthiOrb size={33} />
             <div style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: "5px 20px 20px 20px", padding: "14px 18px", boxShadow: C.shadow }}>
               <ThinkingBubble label={loadPhase} />

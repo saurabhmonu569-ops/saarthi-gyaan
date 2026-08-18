@@ -6,6 +6,7 @@
  */
 import { useState } from "react";
 import { C, F, serif } from "@/styles/theme";
+import { inlineMarkup } from "@/shared/markdown";
 
 export function SaarthiOrb({ size = 36 }) {
   return (
@@ -160,24 +161,17 @@ export function Prose({ text = "", size = F.base, scripture = false }) {
     list = [];
   }
 
-  // escapeHtml: neutralise any HTML in AI output before we inject our own markup.
-  // This prevents XSS from a malicious model response containing <script> or event attrs.
-  function escapeHtml(str) {
-    return str
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#39;");
-  }
+  // ⚠️ escapeHtml aur inlineMarkup AB src/shared/markdown.js ME HAIN.
+  //
+  // Wo yahan Prose ke ANDAR the — yaani function ke andar chhupe hue, aur
+  // isliye unka koi test likha hi nahi ja sakta tha. 18 Agast ke audit me
+  // ye paaya gaya ki kram sahi hai (escape pehle, markup baad me) aur
+  // paanch hamle chala kar jaancha bhi gaya — par bina test ke wo suraksha
+  // ek refactor door thi.
+  //
+  // Ab wahi paanch hamle markdown.test.js me likhe hain.
+  const inl = (raw) => inlineMarkup(raw, C);
 
-  function inl(raw) {
-    const safe = escapeHtml(raw); // sanitize first, then add our controlled markup
-    return safe
-      .replace(/\*\*(.*?)\*\*/g, `<strong style="color:${C.ink};font-weight:700">$1</strong>`)
-      .replace(/\*(.*?)\*/g,     `<em style="color:${C.body}">$1</em>`)
-      .replace(/`(.*?)`/g,       `<code style="background:${C.goldBg};padding:1px 6px;border-radius:4px;font-size:13px;color:${C.saffron}">$1</code>`);
-  }
 
   lines.forEach((raw, i) => {
     if (raw.startsWith("- ") || raw.startsWith("• ")) { list.push(inl(raw.slice(2))); return; }
