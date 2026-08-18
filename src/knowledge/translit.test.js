@@ -367,3 +367,113 @@ describe("Ramayan ke naam — 2026-08-10 (user ne live app par pakda)", () => {
     }
   });
 });
+
+/**
+ * ROZ-MARRA KE SHABD vs SHASTRA KE HUMSHAKL           (2026-08-18)
+ * =====================================================================
+ * lexicon.js corpus SE BANA hai. Granthon me "कल", "शाम", "पापा" aate hi
+ * nahi, par "काल", "शम", "पाप" bhare pade hain — isliye har roz-marra ka
+ * shabd apne shastriya humshakl se takra jaata tha.
+ *
+ * ASLI GHATNA: control-naap me "kal ka mausam kaisa rahega" par jhoothi
+ * citation aa rahi thi. Do baar gate badla gaya (dono baar fail) — jabki
+ * gate ka masla tha hi nahi. Query ban rahi thi:
+ *
+ *     "काल का मौसम कैसा रहेगा"
+ *
+ * काल = Samay/Mrityu/Yama — Mahabharata ka sabse bhara vishay. Reranker
+ * ne theek hi 0.9387 diya; us panne me sach me काल tha. Query galat thi.
+ *
+ * ⚠️ Ye test isliye hai ki lexicon dobara banaya jaye (build-lexicon.mjs)
+ * to ye jodi chup-chaap wapas na aa jaye.
+ */
+describe("roz-marra ke shabd shastra ke humshakl na ban jaayein", () => {
+  it("kal ≠ काल, par kaal = काल (dono chahiye)", () => {
+    expect(toDevanagari("kal")).toBe("कल");     // aane wala din
+    expect(toDevanagari("kaal")).toBe("काल");   // samay / mrityu
+  });
+
+  it("papa = पापा, पाप nahi", () => {
+    // Sabse khatarnak wala: "papa ki tabiyat kharab hai" ki query me
+    // "पाप" chala jaata tha aur jawab paap-punya ke panno se aata.
+    expect(toDevanagari("papa")).toBe("पापा");
+  });
+
+  it("shaam = शाम, शम (shanti/daman) nahi", () => {
+    expect(toDevanagari("shaam")).toBe("शाम");
+    expect(toDevanagari("sham")).toBe("शाम");
+  });
+
+  it("net = नेट, नेता nahi", () => {
+    expect(toDevanagari("net")).toBe("नेट");
+  });
+
+  it("aur bhi jo galat ya adhoore the", () => {
+    expect(toDevanagari("mahina")).toBe("महीना");    // "महीं" tha
+    expect(toDevanagari("gaadi")).toBe("गाड़ी");     // "गदी" tha
+    expect(toDevanagari("chhutti")).toBe("छुट्टी");  // "छूटी" tha
+  });
+
+  it("jo shabd Latin me hi reh jaate the", () => {
+    for (const w of ["parso", "hafta", "padosi", "umeed", "baarish", "safar", "karza"]) {
+      const got = toDevanagari(w);
+      expect(/[a-z]/i.test(got), `"${w}" abhi bhi Latin mein hai: "${got}"`).toBe(false);
+    }
+  });
+
+  it("poora sawaal — jaisa control-naap me aaya tha", () => {
+    expect(toDevanagari("kal ka mausam kaisa rahega")).toBe("कल का मौसम कैसा रहेगा");
+  });
+});
+
+/**
+ * DUNIYAVI SAWAAL NAAM SE ROKE JAAYEIN                (2026-08-18)
+ * =====================================================================
+ * "kal ka mausam kaisa rahega" par Mahabharata ke YUGANTKAAL wale panne
+ * 0.9748 par aa rahe the — "युगान्तकालमे संसारकी यही दशा होगी". Sawaal
+ * bhavishya ka tha, panna bhi bhavishya ka. Cross-encoder ne vaakya ka
+ * ROOP milaya, vishay nahi. Koi threshold ise nahi rok sakta.
+ *
+ * ⚠️ Doosra test pehle se zyada zaroori hai: SAHI sawaal block na ho.
+ * Ye niyam jodne se pehle 1,012 in-corpus sawaalon par jaancha gaya tha
+ * (0 galat). Neeche unme se namoone hain — inme se koi bhi `true` de to
+ * niyam bahut chaude ho gaye hain.
+ */
+describe("isOutOfScope — duniyavi sawaal", () => {
+  it("mausam, bhaav, gadget, safar — sab bahar", () => {
+    for (const q of [
+      "kal ka mausam kaisa rahega",
+      "petrol ka aaj ka rate",
+      "डॉलर का भाव क्या चल रहा है",
+      "आज बिटकॉइन का भाव क्या है",
+      "iPhone 15 ka price kya hai",
+      "मेरा वाई-फाई राउटर काम नहीं कर रहा",
+      "मेरे फोन की बैटरी जल्दी खत्म होती है",
+      "Python mein for loop kaise likhte hain",
+      "train ka time table batao",
+      "मुंबई से दिल्ली की फ्लाइट कितने की है",
+      "nearest hospital kahan hai",
+      "sabse acchi car kaunsi hai",
+      "IPL 2026 kaun jeeta",
+      "GST return kaise file karein",
+    ]) expect(isOutOfScope(q), q).toBe(true);
+  });
+
+  // ⚠️ YE JAANCH ZYADA ZAROORI HAI. Ek sahi sawaal block hona us jhoothi
+  // citation se bura hai jise hum rok rahe hain — user ko bina kaaran
+  // "iska jawab granthon me nahi hai" milega.
+  it("granth ke sawaal andar hi rahein", () => {
+    for (const q of [
+      "गीता में कर्म योग क्या है?",
+      "जीवन का मूल्य क्या है",
+      "भक्ति भाव कैसे जागृत होता है",
+      "मकर राशि वालों के लिए उपाय",
+      "सप्तम भाव विवाह के लिए क्यों महत्वपूर्ण है",
+      "वर्षा ऋतु में कौन सा व्रत करना चाहिए",
+      "रथ की उपमा में इन्द्रियाँ क्या हैं",
+      "मुझे डर लगता है क्या करूं",
+      "पति पत्नी में झगड़ा हो तो क्या करें",
+      "कलियुग के अंत में क्या होगा",
+    ]) expect(isOutOfScope(q), q).toBe(false);
+  });
+});

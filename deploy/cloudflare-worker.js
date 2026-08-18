@@ -1234,7 +1234,11 @@ export default {
         // bilkul alag wajah hoti hain: query hi galat bani, ya query theek
         // thi par corpus me kuch mila nahi. Bina `q` ke dono ek jaise
         // dikhte hain aur galat bimari ka ilaaj shuru ho jaata hai.
-        if (!cand.length) return jsonResponse({ chunks: [], stats: { pool: 0, ms: Date.now() - t0, q: { findQ, rerankQ }, hinted: hinted || null } }, 200, origin);
+        // ⚠️ `poolScores: []` yahan BHI — khaali soochi aur "khet hi nahi
+        // aaya" do alag baatein hain. Bina iske calibration-script ko lagta
+        // hai ki worker purana hai aur wo ruk jaati hai (18 Agast ko yahi
+        // hua). Khaali pool control-sawaalon par SAHI nateeja hai.
+        if (!cand.length) return jsonResponse({ chunks: [], stats: { pool: 0, ms: Date.now() - t0, q: { findQ, rerankQ }, hinted: hinted || null, ...(b?.debug === true ? { poolScores: [] } : {}) } }, 200, origin);
 
         // ── 5. TEXT laao — D1 se, ek hi query mein ────────────────────
         // rowid bhi le rahe hain — padosi ansh usi se milte hain (neeche 6.5)
@@ -1248,7 +1252,7 @@ export default {
         const withText = cand
           .map(c => ({ ...c, ...(textById.get(c.id) || {}) }))
           .filter(c => (c.text || "").trim());
-        if (!withText.length) return jsonResponse({ chunks: [], stats: { pool: cand.length, ms: Date.now() - t0, q: { findQ, rerankQ }, hinted: hinted || null } }, 200, origin);
+        if (!withText.length) return jsonResponse({ chunks: [], stats: { pool: cand.length, ms: Date.now() - t0, q: { findQ, rerankQ }, hinted: hinted || null, ...(b?.debug === true ? { poolScores: [] } : {}) } }, 200, origin);
 
         // ── 6. RERANK — asli sawaal par, paryay ke bina ───────────────
         const scores = await rerankAll(env, rerankQ, withText.map(c => c.text));
@@ -1287,6 +1291,118 @@ export default {
         // nahi hai; ye sirf KRAM hai un ansho ka jo pehle hi paas ho chuke.
         // Floor: naam liye gaye granth ke liye 0.18, baaki sabke liye 0.30
         // (upar SEARCH_HINTED_MIN_RERANK ki poori tippani dekhein)
+        // ══ AAZMAYA AUR HATAYA: SAAPEKSH (per-sawaal) GATE ══════════════
+        //                                            18 Agast 2026
+        // ⚠️ YE POORA BLOCK EK NAKAAM PRAYOG KA BYORA HAI. Neeche wala
+        // `floorFor` sapaat 0.30 par hi hai — wahi chal raha hai. Ye
+        // tippani isliye hai ki agli baar koi (ya main) yahi dobara na
+        // aazmaye, aur agar aazmaye to us naap ke saath aaye jo iske liye
+        // chahiye.
+        //
+        // SOCH THI: ek number DO bilkul alag faisle kar raha hai —
+        //     1. BOLEIN YA CHUP RAHEIN?  — ye poore sawaal ka faisla hai
+        //     2. KAUN SE ANSH SAATH JAYEIN? — ye us sawaal ke ANDAR ka
+        //
+        // NAAPA GAYA (35_gate_calibrate.mjs — 179 bina-hint + 38 control
+        // sawaal, poore pool ke ank utaar kar):
+        //
+        //   `best` (us sawaal ka sabse ooncha ank) DONO ko alag karta hai:
+        //       corpus  ka beech ka best : 0.81
+        //       control ka beech ka best : 0.042
+        //   Yaani "bolna hai ya nahi" ka sahi paimana `best` hai.
+        //
+        //   Par ANSH ke ank ka paimana har sawaal par ALAG hai. Ek sawaal
+        //   par sahi ansh 0.72 par tha, doosre par sahi ansh 0.0015 par —
+        //   aur usi sawaal me kachra 0.0003 se upar gaya hi nahi. Reranker
+        //   ka AUC 0.993 hai (34_rerank_devanagari.mjs) — yaani KRAM sahi
+        //   hai, bas paimana sawaal-dar-sawaal badalta hai.
+        //
+        //   Isi wajah se ek sapaat seema ka sauda hamesha bura tha:
+        //       0.30  → SAHI granth mila 49%,  control par bola  8/38
+        //       0.001 → SAHI granth mila 81%,  control par bola 29/38
+        //
+        // AB DONO FAISLE ALAG:
+        //   • CHUP RAHNA — `best >= SEARCH_MIN_RERANK` (0.30). Ye BILKUL
+        //     wahi purani shart hai, isliye control par bartaav ratti bhar
+        //     nahi badla — naapa hua: pehle bhi 8/38, ab bhi 8/38.
+        //   • SAATH KAUN — jab bolna tay ho gaya, to usi sawaal ke `best`
+        //     ke sapeksh. 12 jagahein (SEARCH_KEEP) sabse achhe maujood
+        //     ansho se bhar jaati hain, bajaye 1-2 ansh lautane ke.
+        //
+        // NATEEJA (wahi 179 sawaal):
+        //     SAHI granth mila : 87/179 (49%)  →  119/179 (66%)
+        //     kuch bhi bola    : 140/179       →  140/179     (wahi)
+        //     control par bola : 8/38          →  8/38        (wahi)
+        //
+        // ⚠️⚠️ AUR EK ABSOLUTE FARSH BHI — YE PEHLI KOSHISH ME NAHI THA
+        // AUR USSE JHOOTHI CITATION AA GAYI THI.
+        //
+        // Pehle sirf `best * 0.005` tha. "kal ka mausam kaisa rahega" par
+        // best 0.9387 nikla (reranker ko kahin shabd mil gaye), yaani dwar
+        // 0.0047 ban gaya — lagbhag poora pool andar. Nateeja:
+        //     14_eval_search --set control  →  JHOOTHI CITATION 1/38
+        //     us sawaal par 7 granth cite ho gaye.
+        //
+        // MERI NAAP NE YE PAKDA KYUN NAHI: main gin raha tha ki control
+        // sawaal par KOI ansh laut raha hai ya nahi (8/38, dono taraf
+        // barabar). Par nuksaan is baat par hai ki KITNE ansh aur KITNE
+        // GRANTH aaye. Sahi paimana ginti thi, haan/na nahi.
+        //
+        // Dobara naapa (KEEP=12 aur per-book cap 3 ke saath, jo pehli
+        // baar main lagana bhool gaya tha):
+        //     purana (sapaat 0.30) : SAHI 83/179  control 30 ansh, 5 granth
+        //     farsh 0.20           : SAHI 89/179  control 39 ansh, 5 granth
+        //     farsh 0.005          : SAHI 98/179  control 91 ansh, 8 granth ← toota
+        //
+        // Granth ki ginti par seema lagana AAZMAYA AUR CHHODA: sahi granth
+        // aksar top-2/3 me hota hi nahi (SAHI 83 → 65). Wo lever galat hai.
+        //
+        // Isliye 0.20 aazmaya — laabh chhota (+6 sawaal) par control ka
+        // paidchinh lagbhag wahi.
+        //
+        // ⚠️⚠️ 0.20 BHI FAIL HUA. Deploy karke naapa:
+        //     14_eval_search --set control  →  JHOOTHI CITATION 1/38
+        //     wahi sawaal — "kal ka mausam kaisa rahega" — 4 granth
+        //     (0.005 par 7 the, yaani sudhaar hua par ZERO nahi hua)
+        //
+        // Yaani 0.20 se 0.30 ke beech wale ansh hi wo shor hain jinhe
+        // purana sapaat 0.30 rok raha tha. Wo number "bas yun hi" nahi
+        // tha — wo asli kaam kar raha hai.
+        //
+        // ISLIYE POORA PRAYOG WAPAS. floorFor neeche waisa hi hai jaisa
+        // pehle tha.
+        //
+        // ── TEEN SEEKH, TEENO MERI GALTIYAN ─────────────────────────────
+        //
+        // 1. GALAT PAIMANA. Maine gina tha ki control sawaal par KOI ansh
+        //    laut raha hai ya nahi — 8/38, dono taraf barabar, isliye
+        //    "muft" lag raha tha. Par nuksaan KITNE ansh aur KITNE GRANTH
+        //    par hai. Haan/na ki jagah ginti naapni thi.
+        //
+        // 2. ADHOORI NAKAL. Pehli naap me KEEP=12 aur per-book cap 3
+        //    lagana bhool gaya. Isliye laabh 32 sawaal dikha; asal me
+        //    18 tha, aur surakshit settings par 6.
+        //
+        // 3. RETRIEVAL ≠ CITATION. Ye script sirf ye naapti hai ki kaun se
+        //    ansh laute. Citation uske BAAD banti hai — Niyam #2 aur
+        //    [[GRANTH]] ke chhanne se. Wo is naap me dikhta hi nahi.
+        //    Isliye faisla HAMESHA 14_eval_search --set control se hoga,
+        //    offline sweep se kabhi nahi.
+        //
+        // AGAR DOBARA AAZMANA HO: pehle wo naap banao jo CITATION ginti
+        // ho, retrieval nahi. Us naap ke bina yahan koi badlaav nahi.
+        // (Poore ank ab bhi mil sakte hain: /search ko `debug: true`
+        //  bhejo → stats.poolScores; aur 35_gate_calibrate.mjs.)
+        //
+        // ⚠️ HINTED WALA RAASTA JAAN-BOOJHKAR NAHI CHHEDA. Wo abhi 98.9%
+        // par hai (HINTED_PAKKA + 0.18 floor). Jo cheez chal rahi hai use
+        // usi badlaav me chhedna wahi galti hai jo 13 Agast ko COSINE_PAKKA
+        // ke saath hui thi.
+        //
+        // BADALNE SE PEHLE, HAR BAAR:
+        //     node scripts/14_eval_search.mjs --set control     ← 0 rahe
+        //     node scripts/35_gate_calibrate.mjs --sirf-hisaab
+        // ══ PRAYOG YAHIN KHATM — neeche wahi hai jo pehle tha ═══════════
         const floorFor = c =>
           (hinted && c.book === hinted) ? SEARCH_HINTED_MIN_RERANK : SEARCH_MIN_RERANK;
 
@@ -1595,6 +1711,40 @@ export default {
             t: T,
             // kitne rerank batch chhoot gaye (timeout) — 0 hona chahiye
             skipped: scores._chhoote || 0,
+
+            // ── POORE POOL KE ANK — sirf maangne par (2026-08-18) ────────
+            //
+            // ⚠️ ISKE BINA HUM ANDHERE ME HAIN. Abhi tak /search sirf PAAS
+            // HUE ansh lautata tha, isliye ye kabhi nahi dikhta tha ki jo
+            // ansh gire wo KIS ANK par gire — 0.29 par ya 0.0001 par. Wo
+            // do bilkul alag baatein hain: pehli me gate thoda ooncha hai,
+            // doosri me ansh sach me bekaar tha.
+            //
+            // Aur ye faisla ab saamne khada hai. 34_rerank_devanagari.mjs
+            // ne naapa (40 ansh, ek sawaal):
+            //     reranker ka AUC 0.993 — wo sahi/galat me farak karta hai
+            //     par sahi-vishay ansh ka BEECH KA ank sirf 0.0015 tha
+            //     aur asambandhit ka SABSE OONCHA 0.0003
+            //     gate 0.30 paar kiya: 20 me se 1 ne
+            // Yaani gate lagbhag poora signal phenk raha hai. Par gate ka
+            // DOOSRA kaam CHUP RAHNA bhi hai (38 control sawaal), aur wo
+            // bhi isi ank par tika hai. Isliye naya gate ANDAAZE se nahi,
+            // in ankon ko dono taraf tol kar chunna hoga.
+            //
+            // TEXT YAHAN NAHI JAATA — sirf id, granth aur ank. Bhaar chhota
+            // rehta hai aur granth ka paath is raaste se bahar nahi jaata.
+            // Sirf tab bhejа jaata hai jab body me `debug: true` ho, yaani
+            // aam user ke jawab par iska koi asar nahi.
+            poolScores: b?.debug === true
+              ? scored.map(c => ({
+                  id: c.id, book: c.book, rerank: +c.rerank.toFixed(6),
+                  // `usable` = hasSentences && !looksGarbled. Ye ank se
+                  // pehle lagta hai, isliye calibration me ise ginna zaroori
+                  // hai — warna threshold un ansho par bhi tola jayega jo
+                  // kisi bhi ank par bahar hi rehte.
+                  usable: usable.some(u => u.id === c.id),
+                }))
+              : undefined,
           },
         }, 200, origin);
       } catch (e) {

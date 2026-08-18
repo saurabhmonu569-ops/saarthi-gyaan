@@ -441,6 +441,49 @@ const WORDS = {
   ilaj: "चिकित्सा", ilaaj: "चिकित्सा",                       // इलाज 34 → चिकित्सा 308
   karobar: "व्यापार", business: "व्यापार", vyapar: "व्यापार",// कारोबार 27 → व्यापार 833
   bharosa: "विश्वास", vishwas: "विश्वास",                    // भरोसा 43 → विश्वास 572
+
+  // ══ ROZ-MARRA KE SHABD JO SHASTRA KE SHABDON SE TAKRA RAHE THE ══════
+  //                                                    18 Agast 2026
+  // ⚠️ UPAR WALA BLOCK AUR YE BLOCK ALAG BAATEIN HAIN.
+  //     upar : jaan-boojhkar PARYAY — "khushi" ko "सुख" isliye bheja
+  //            jaata hai ki corpus me खुशी 23 baar hai aur सुख 9,221.
+  //            Wo SAHI matlab hai, bas granth ki bhasha me.
+  //     yahan: GALAT MATLAB. Ye paryay nahi, gadbad hai.
+  //
+  // KAISE PAKDA GAYA: control-naap me "kal ka mausam kaisa rahega" par
+  // jhoothi citation aa rahi thi (mahabharata, best 0.9387). Pehle laga
+  // gate ka masla hai — do baar gate badla, dono baar fail. Phir us ek
+  // sawaal ka chittha khola (36_ek_sawaal.mjs):
+  //
+  //     findQ bana : "काल का मौसम कैसा रहेगा"
+  //
+  // "kal" → "काल". कल = aane wala din. काल = Samay, Mrityu, Yama —
+  // Mahabharata ka sabse bhara hua vishay. Reranker galat nahi tha, usne
+  // theek hi 0.9387 diya — us panne me sach me काल hai. QUERY GALAT THI.
+  //
+  // JAD: lexicon.js corpus se banaya gaya (build-lexicon.mjs). Granthon
+  // me "कल", "शाम", "पापा" aate hi nahi, par "काल", "शम", "पाप" bhare
+  // pade hain. Isliye har roz-marra ka shabd apne shastriya humshakl se
+  // takra jaata hai. Ye ek SHRENI ka bug hai, ek shabd ka nahi.
+  //
+  // WORDS, LEXICON se PEHLE dekha jaata hai (toDevanagari me kadam 1 aur
+  // 2), isliye yahan likhna hi kaafi hai — 25,000 wali generated file ko
+  // haath lagane ki zarurat nahi.
+  //
+  // ⚠️ SABSE KHATARNAK: papa → पाप. Koi likhe "papa ki tabiyat kharab
+  // hai" aur uski query me "पाप" chala jaye. Wo galti chup-chaap hoti —
+  // jawab aa jaata, bas paap-punya ke panno se.
+  kal: "कल", kaal: "काल",          // कल = din · काल = samay/mrityu — dono chahiye
+  parso: "परसों", hafta: "सप्ताह",
+  shaam: "शाम", sham: "शाम",       // शम = shanti/daman, bilkul alag shabd
+  mahina: "महीना", mahine: "महीने",
+  papa: "पापा", pita: "पिता",      // पाप se bachao
+  gaadi: "गाड़ी", gadi: "गाड़ी",
+  chhutti: "छुट्टी", chutti: "छुट्टी",
+  net: "नेट", internet: "इंटरनेट", // नेता = neta, alag shabd
+  // ye bas LEXICON me the hi nahi — Latin me ja rahe the
+  padosi: "पड़ोसी", umeed: "उम्मीद", baarish: "बारिश",
+  safar: "सफ़र", karza: "कर्ज़", karz: "कर्ज़",
 };
 
 // ── 1b. Corpus se bana lexicon (scripts/build-lexicon.mjs) ────────────
@@ -1103,6 +1146,52 @@ const OUT_OF_SCOPE = [
   /\b(?:saarthi|सारथी)\b/i,
   /\b(?:ye|yeh|is|this)\s*(?:ai|app|chatbot|bot|tool|platform)\b/i,
   /\b(?:chatgpt|gemini|claude|openai|artificial\s*intelligence)\b/i,
+
+  // ── DUNIYAVI SAWAAL — MAUSAM, BHAAV, GADGET, SAFAR (2026-08-18) ──────
+  //
+  // ASLI GHATNA: control-naap me "kal ka mausam kaisa rahega" par jhoothi
+  // citation aa rahi thi. Do baar gate badla gaya — dono baar fail, kyunki
+  // gate ka masla tha hi nahi. Phir chittha khola (36_ek_sawaal.mjs) aur
+  // do alag-alag bug nikle, ek ke peeche doosra:
+  //
+  //   1. "kal" → "काल" ban raha tha (upar WORDS me theek kiya). कल = din,
+  //      काल = Samay/Mrityu — Mahabharata ka sabse bhara vishay.
+  //
+  //   2. Theek karne par BHI 0.9748 aaya. Jo panne aaye wo YUGANTKAAL ke
+  //      the — pralaya, Kali-yug ka ant, Kalki avatar:
+  //          "युगान्तकालमे संसारकी यही दशा होगी"
+  //          "एक महान्‌ शक्तिशाली बालक प्रकट होगा"
+  //      Sawaal tha "kal ka mausam KAISA RAHEGA" — bhavishya ke baare me.
+  //      Wo panne bhi bhavishya ka varnan hain. Cross-encoder ne VAAKYA KA
+  //      ROOP milaya, vishay nahi.
+  //
+  // ⚠️ ISE KOI THRESHOLD NAHI ROK SAKTA — 0.97 asli lagta hai. Yahi baat
+  // upar (line ~1144) SAARTHI wale niyam me pehle se likhi hai:
+  //     "score kam hai" suraksha nahi hai. Jo sawaal daayre se bahar hai,
+  //     use NAAM SE rokna chahiye — score ke bharose nahi chhodna.
+  // Wahan wo sabak SAARTHI par laga tha; ye usi sabak ka agla hissa hai.
+  //
+  // ⚠️ ASLI KHATRA IN NIYAMON ME ULTA HAI — koi SAHI sawaal galti se block
+  // ho jaye. Isliye jodne se pehle naapa gaya: hindi_100 + hinglish_100 +
+  // hinglish_300 + naye_granth + yogasutra_11 + hint_hataye + naye_design
+  // = 1,012 in-corpus sawaal. Inme se GALTI SE BAHAR gine gaye: 0.
+  // Control ke 13 aur sawaal pakde gaye.
+  //
+  // ⚠️ JO JAAN-BOOJHKAR NAHI LIKHA: "भाव" (bhakti-bhaav, aur jyotish ka
+  // bhaav), "मूल्य" (jeevan ka mulya), "सोना" (nींद), "gate" (Vastu wala
+  // sawaal Agni Purana me sach me hai). Ye shabd dono taraf chalte hain,
+  // isliye inhe naam se rokna sahi sawaal maar dega.
+  /\b(?:mausam|weather|temperature|forecast)\b|मौसम/i,
+  /\b(?:petrol|diesel|bitcoin|dollar|rupee\s*rate|gst|emi|ipl|cricket)\b/i,
+  /बिटकॉइन|डॉलर|पेट्रोल|डीज़ल|डीजल/i,
+  /\b(?:iphone|android|laptop|router|wifi|wi-fi|battery|charger|smartphone)\b/i,
+  /वाई-?फ़?ाई|राउटर|बैटरी|मोबाइल\s*फ़?ोन/i,
+  /\b(?:python|javascript|java|sql|for\s*loop|code|coding|api)\b/i,
+  /\b(?:flight|train|bus|ticket|time\s*table|timetable|booking)\b/i,
+  /फ्लाइट|ट्रेन|टिकट|बुकिंग/i,
+  /\b(?:price|rate|kitne\s*ka|kitne\s*ki|kimat|cost)\b/i,
+  /\b(?:nearest|nearby|hospital)\b/i,
+  /\b(?:car|bike|scooter)\b/i,
 ];
 
 /**
