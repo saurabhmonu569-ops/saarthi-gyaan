@@ -507,6 +507,32 @@ export function useChat({
         if (pehle !== responseText) console.log("[Aadhaar] andar ka [REPLY LANGUAGE] tag hataya");
       }
 
+      // ── [[GRANTH: …]] — PEHLE PAKDO, PHIR TURANT HATAO ────────────────
+      //
+      // Model ko prompt kehta hai ki ant me `[[GRANTH: A | B]]` likhe —
+      // sirf wo granth jinke ansh usne sach me istemaal kiye. Wo pankti
+      // HAMARE liye hai, user ke liye nahi.
+      //
+      // ⚠️ HATANA YAHAN HOTA HAI, Aadhaar wale block me NAHI — kyunki wo
+      // block sirf tab chalta hai jab grounded ansh hon. Agar hatana wahan
+      // hota, to bina-ansh wale jawab me ye pankti USER KO DIKH JAATI.
+      // Isi kism ki galti [REPLY LANGUAGE] tag ke saath ho chuki hai (upar
+      // dekhein) — wo bhi ek raaste par hat-ta tha aur doosre par nahi.
+      //
+      // Pakdi hui soochi neeche Aadhaar banane me kaam aati hai, par uspar
+      // bharosa nahi — wahan use bheje gaye granthon se MILAYA jaata hai.
+      let granthKahe = null;
+      if (responseText) {
+        const g = responseText.match(/\[\[\s*GRANTH\s*:([^\]]*)\]\]/i);
+        if (g) {
+          granthKahe = g[1].split("|").map(s => s.trim()).filter(Boolean);
+          responseText = responseText
+            .replace(/\n*\s*\[\[\s*GRANTH\s*:[^\]]*\]\]\s*/gi, "\n")
+            .replace(/\n{3,}/g, "\n\n")
+            .trim();
+        }
+      }
+
       // ── ADHOORI BHOOMIKA HATAO ───────────────────────────────────────
       //
       // verifyAnswer() gadha hua UDDHARAN hata deta hai — ye sahi kaam hai.
@@ -639,13 +665,58 @@ export function useChat({
         // bas AKELA kaafi nahi. Sahi raasta shayad ye hai ki model se hi
         // poochha jaye ki usne kaun se granth istemaal kiye (prompt me),
         // par wo alag kaam hai aur uski apni jaanch chahiye.
-        const books = [];
+        // ── NIYAM #2 — TEESRI KOSHISH: MODEL SE POOCHHO, PAR MILAAO ─────
+        //
+        // 18 Agast 2026 ko naapa (24_aadhaar_check, 15 asli jawab):
+        //     Aadhaar me naam jaate the  : ~3.5 granth prati jawab
+        //     jawab me naam LIYE jaate   : ~1.7 granth
+        // Yaani lagbhag AADHE naam bina kamaye ja rahe the. Namoona 7 me
+        // 5 granth cite hue aur jawab me sirf Vishnu Puran ka naam aaya.
+        //
+        // ⚠️ PICHHLI DO KOSHISHEN YAHI KAAM SHABD-MEL SE KARTI THI, AUR
+        //    DONO FAIL HUI (src/knowledge/aadhaar.js dekhein):
+        //      14 Aug — 5 me se 4 ulte
+        //      17 Aug — saaf prompt ke saath bhi 5 me se 4 ulte
+        //    Jad: model purani Hindi ko aaj ki bhasha me likhta hai, isliye
+        //    jawab aur ansh ke shabd milte hi nahi. Wo raasta band hai.
+        //
+        // AB: MODEL SE HI POOCHHTE HAIN. Prompt use kehta hai ki ant me
+        // `[[GRANTH: A | B]]` likhe — sirf wo granth jinke ansh usne sach
+        // me istemaal kiye.
+        //
+        // ⚠️ PAR US SOOCHI PAR AANKH MOONDKAR BHAROSA NAHI.
+        // Model gadh sakta hai. Isliye uski soochi ko un granthon se
+        // MILATE hain jo humne use SACH ME BHEJE the. Jo naam bheja hi
+        // nahi gaya tha, wo Aadhaar me nahi jaayega — chahe model kuch
+        // bhi likhe. Ye wahi asool hai jo `verifyAnswer` shloka par
+        // lagata hai: model ki baat maano nahi, MILAO.
+        //
+        // ⚠️ AUR AADHAAR KABHI KHAALI NAHI HOGA.
+        // Agar model ne pankti chhod di, ya galat naam likhe, ya mel
+        // shoonya nikla — to purana vyavhaar (saare grounded granth) hi
+        // chalta hai. Khaali Aadhaar "ye jawab kahin se nahi aaya" dikhata
+        // hai, jo zyada naam dikhane se bhi bura hai.
+        const sabGrounded = [];
         for (const r of groundedChunks) {
           const bt = (r.chunk && (r.chunk.book_title || r.chunk.book)) || "";
-          if (!bt || books.includes(bt)) continue;
-          books.push(bt);
-          if (books.length >= 5) break;
+          if (bt && !sabGrounded.includes(bt)) sabGrounded.push(bt);
         }
+
+        let books = [];
+        if (granthKahe && granthKahe.length) {
+          // MILAAN — sirf wahi naam jo humne bheje the (bade-chhote akshar
+          // aur aage-peeche ki jagah chhod kar)
+          const saaf = s => s.toLowerCase().replace(/\s+/g, " ").trim();
+          books = sabGrounded.filter(bt => granthKahe.some(k => saaf(k) === saaf(bt)));
+          const gadhe = granthKahe.filter(k => !sabGrounded.some(bt => saaf(k) === saaf(bt)));
+          if (gadhe.length) console.log(`[Aadhaar] model ne ${gadhe.length} aisa naam likha jo bheja hi nahi tha:`, gadhe);
+          if (books.length) console.log(`[Aadhaar] model ke hisaab se ${books.length}/${sabGrounded.length} granth istemaal hue`);
+        }
+        if (!books.length) {
+          if (granthKahe) console.log("[Aadhaar] model ki soochi se kuch mila nahi — saare grounded granth dikha raha hoon");
+          books = sabGrounded;
+        }
+        books = books.slice(0, 5);
         if (books.length) responseText += `\n\n---\n📚 *Aadhaar: ${books.join(" · ")}*`;
       }
       // SWASTHYA CHETAVANI (2026-08-04) — CODE se, model ke bharose NAHI.

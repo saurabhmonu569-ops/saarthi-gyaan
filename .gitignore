@@ -83,6 +83,9 @@ data/embeddings/vectors_int8.*.bin
 public/knowledge/embeddings/
 .eval-ckpt.*.json
 eval-perbook.json
+# 29_vishay_jaanch.mjs ka nateeja — ek RUN ka haal hai, project ka nahi
+vishay-jaanch.json
+aadhaar-check.json
 
 # 26_anaath_safai.mjs ka kachra (2026-08-14) — anaath id ki soochi aur
 # unhe mitane wali SQL. Dono ek hi chalne ke liye bante hain; agli baar

@@ -152,6 +152,88 @@ describe("jawab ki safai — andar ke nirdesh aur adhoori bhoomika (2026-08-11)"
   });
 });
 
+describe("[[GRANTH: …]] — model se poochho, par MILAO (2026-08-18)", () => {
+  // NIYAM #2 ki TEESRI koshish. Pehli do shabd-mel se thi aur dono fail —
+  // 14 aur 17 Agast, dono baar asli jawab par 5 me se 4 ULTE (poori kahani
+  // src/knowledge/aadhaar.js me).
+  //
+  // Ab model se hi poochhte hain ki usne kaunse granth istemaal kiye. Par
+  // uspar bharosa NAHI — uski soochi ko un granthon se MILATE hain jo
+  // humne use sach me bheje the.
+  //
+  // ⚠️ TEEN CHEEZEIN IS BADLAAV KO TOD SAKTI HAIN, teenon yahan jaanchi hain:
+  //   1. model naam GADH de              → mel me nahi aana chahiye
+  //   2. model pankti CHHOD de           → purana vyavhaar chalna chahiye
+  //   3. pankti USER KO DIKH jaye        → hamesha hatni chahiye
+
+  const saaf = s => s.toLowerCase().replace(/\s+/g, " ").trim();
+
+  /** useChat ka wahi tark — pakdo, milao, na mile to sab dikhao */
+  function aadhaarBanao(jawab, bhejeGaye) {
+    const g = jawab.match(/\[\[\s*GRANTH\s*:([^\]]*)\]\]/i);
+    const kahe = g ? g[1].split("|").map(s => s.trim()).filter(Boolean) : null;
+    const dikhao = jawab.replace(/\n*\s*\[\[\s*GRANTH\s*:[^\]]*\]\]\s*/gi, "\n")
+                        .replace(/\n{3,}/g, "\n\n").trim();
+    let books = [];
+    if (kahe && kahe.length) books = bhejeGaye.filter(b => kahe.some(k => saaf(k) === saaf(b)));
+    if (!books.length) books = bhejeGaye;
+    return { books: books.slice(0, 5), dikhao };
+  }
+
+  const BHEJE = ["Agni Purana", "Rigveda", "Mahabharata", "Vishnu Purana", "Shri Yoga Vasishtha"];
+
+  it("model ne 2 naam liye → Aadhaar me wahi 2, paanchon nahi", () => {
+    const { books } = aadhaarBanao("jawab…\n\n[[GRANTH: Agni Purana | Mahabharata]]", BHEJE);
+    expect(books).toEqual(["Agni Purana", "Mahabharata"]);
+  });
+
+  // ⚠️ SABSE ZAROORI JAANCH — model jhooth bol sakta hai
+  it("model ne GADHA hua naam liya → wo Aadhaar me NAHI jaayega", () => {
+    const { books } = aadhaarBanao("jawab…\n\n[[GRANTH: Bhagavad Gita | Agni Purana]]", BHEJE);
+    expect(books).toEqual(["Agni Purana"]);       // "Bhagavad Gita" bheji hi nahi thi
+    expect(books).not.toContain("Bhagavad Gita");
+  });
+
+  it("model ne SAB gadhe → purana vyavhaar, Aadhaar khaali NAHI", () => {
+    const { books } = aadhaarBanao("jawab…\n\n[[GRANTH: Quran | Bible]]", BHEJE);
+    expect(books).toEqual(BHEJE);
+  });
+
+  it("model pankti CHHOD gaya → purana vyavhaar", () => {
+    const { books } = aadhaarBanao("jawab bina kisi tag ke", BHEJE);
+    expect(books).toEqual(BHEJE);
+  });
+
+  it("model ne khaali soochi di → purana vyavhaar (Aadhaar kabhi khaali nahi)", () => {
+    const { books } = aadhaarBanao("jawab…\n\n[[GRANTH: ]]", BHEJE);
+    expect(books).toEqual(BHEJE);
+  });
+
+  it("bade-chhote akshar aur zyada space se farq nahi padta", () => {
+    const { books } = aadhaarBanao("jawab…\n\n[[granth:  AGNI   PURANA ]]", BHEJE);
+    expect(books).toEqual(["Agni Purana"]);
+  });
+
+  // ⚠️ ULTA KHATRA — hamara plumbing user tak
+  it("pankti jawab se HAMESHA hat jaati hai", () => {
+    const { dikhao } = aadhaarBanao("मोक्ष के चार मार्ग हैं।\n\n[[GRANTH: Agni Purana]]", BHEJE);
+    expect(dikhao).toBe("मोक्ष के चार मार्ग हैं।");
+    expect(dikhao).not.toMatch(/GRANTH/);
+  });
+
+  it("beech me aa jaye to bhi hatti hai", () => {
+    const { dikhao } = aadhaarBanao("pehla hissa\n[[GRANTH: Rigveda]]\ndusra hissa", BHEJE);
+    expect(dikhao).not.toMatch(/GRANTH/);
+    expect(dikhao).toMatch(/pehla hissa/);
+    expect(dikhao).toMatch(/dusra hissa/);
+  });
+
+  it("saaf jawab ko chhoota hi nahi", () => {
+    const t = "एकादशी व्रत से पुण्य मिलता है।";
+    expect(aadhaarBanao(t, BHEJE).dikhao).toBe(t);
+  });
+});
+
 describe("(Passage N) — andar ka plumbing user tak nahi jaana chahiye (2026-08-17)", () => {
   // Model ko ansh is roop me jaate hain:
   //     [1] Narasimha Purana
