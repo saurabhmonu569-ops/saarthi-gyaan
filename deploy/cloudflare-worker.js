@@ -137,28 +137,133 @@ const RERANK_TIMEOUT_MS = 4000;
 const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent";
 
 // Sirf yeh models manegi (koi mehenga model nahi maang sakta)
+// ⚠️⚠️ 18 AGAST 2026 — ASK SECTION LIVE BAND HO GAYA THA. YE PADHIYE. ⚠️⚠️
+//
+// Groq ne 17 June ko EK email me DO model band karne ka ailaan kiya tha:
+//     llama-3.1-8b-instant     → openai/gpt-oss-20b
+//     llama-3.3-70b-versatile  → openai/gpt-oss-120b
+// Dono ki aakhri tareekh 16 Agast 2026 thi.
+//
+// 13 Agast ko humne sirf PEHLA badla. DOOSRA usi email me tha aur hum use
+// PADH NAHI PAYE — jabki wahi MUKHYA model tha. 16 Agast ko wo band hua
+// aur 18 Agast ki subah user ko sirf "Saarthi abhi dhyan-magn hain" wala
+// offline jawab mil raha tha. Worker ke log me:
+//     [SAARTHI] ENGINE 1 (Groq, key #1) FAIL — HTTP 404
+//     "The model `llama-3.3-70b-versatile` does not exist"
+//
+// SEEKH: deprecation ka email PORA padho. Ek naam theek karke maan lena ki
+// kaam ho gaya — yahi galti hui. Ab dono naam saath likhe hain, isi jagah,
+// taaki agli baar dono ek saath dikhein.
+//
+// Groq ke dastavez: https://console.groq.com/docs/deprecations
 const ALLOWED_MODELS = new Set([
-  "llama-3.3-70b-versatile",
-  // 2026-08-13: "llama-3.1-8b-instant" 16 Aug ko band ho raha hai (Groq ka
-  // email). Uski jagah unka sujhaya hua "openai/gpt-oss-20b".
-  //
-  // ⚠️ Purana naam JAAN-BOOJHKAR ABHI RAKHA HAI. Client aur worker alag-alag
-  // deploy hote hain (Netlify aur Cloudflare). Agar yahan se purana naam
-  // abhi hata dein aur kisi user ke browser me purani client-file cache me
-  // padi ho, to uski request "model allowed nahi" hokar chupchaap 70b par
-  // chali jaayegi — jo theek hai — par 70b ke band hone wale din wo suraksha
-  // -jaal kaam nahi karega. 16 Aug ke baad ye pankti hata dena surakshit hai.
-  "llama-3.1-8b-instant",
-  "openai/gpt-oss-20b",
+  "openai/gpt-oss-120b",   // MUKHYA  (llama-3.3-70b-versatile ki jagah)
+  "openai/gpt-oss-20b",    // FALLBACK (llama-3.1-8b-instant ki jagah)
+  // Purane dono naam HATA DIYE — 16 Agast ko Groq ne band kar diya, unhe
+  // rakhne se sirf ye hota ki request "allowed" ho kar 404 laati.
 ]);
 
 const MAX_BODY_BYTES = 100_000;
+
+// ── TOKEN-BUDGET — 18 Agast 2026 ko joda, ASK BAND HONE KE BAAD ──────────
+//
+// KYA HUA: model badalne par Groq ka free-tier budget CHHOTA ho gaya —
+//     llama-3.3-70b-versatile   12,000 TPM
+//     openai/gpt-oss-120b        8,000 TPM   ← ek tihaai kam
+// Hamari ek request lagbhag 9-10 hazaar token ki hai (SYSTEM_PROMPT ~11,600
+// akshar + 12 ansh ~7,000 akshar). 12K me wo aa jaati thi, 8K me nahi.
+//
+// ⚠️ AUR JAB EK HI REQUEST POORE MINUTE KE BUDGET SE BADI HO, Groq use
+// rate-limit (429) NAHI kehta — wo 413 "Request Entity Too Large" kehta hai.
+// Isi ne 18 Agast ko Ask band kiya, aur 404 theek karne ke BAAD bhi band
+// rakha. Do alag kharabiyan ek ke peeche ek chhupi thi.
+//
+// ⚠️ DEVANAGARI KA JAAL — yahi is naap ka dil hai.
+// Token ginti akshar se nahi hoti. Roman me lagbhag 3.5 akshar ka ek token
+// banta hai, par DEVANAGARI me lagbhag EK AKSHAR = EK TOKEN. Yaani granth
+// ka 7,000-akshar ka ansh ~7,000 token hai, jabki utna hi angrezi paath
+// ~2,000. Sirf akshar ginne wali koi bhi seema is corpus par jhooth bolegi.
+
+// ⚠️ DEVANAGARI KA BHAAR 2 HAI, 1 NAHI — 18 Agast ko naap kar badla.
+// Pehli koshish me 1 rakha tha ("ek akshar = ek token"). Us hisaab se
+// request 5,500 token ki thi aur budget me aa jaani chahiye thi — par Groq
+// ne PHIR BHI 413 diya. Yaani asli tokenizer Devanagari par ~2 token prati
+// akshar kharch karta hai (matra aur halant apne alag token bante hain).
+// Ye ank abhi bhi andaza hai, isliye neeche GROQ_TPM_SURAKSHIT me achha
+// khaasa bachav rakha hai.
+const DEV_BHAAR = 2;
+
+/** Mota-mota token andaza — Devanagari mehnga, Latin sasta. */
+function tokenAndaza(s) {
+  const t = String(s || "");
+  const dev = (t.match(/[ऀ-ॿ]/g) || []).length;
+  return Math.ceil(dev * DEV_BHAAR + (t.length - dev) / 3.5);
+}
+
+// Groq ka asli TPM 8,000 hai. 6,000 par kaam karte hain — 25% bachav,
+// kyunki upar wala token-andaza mota hai aur galti mehngi (413 = user ko
+// "dhyan-magn"). Ise badhane se pehle asli 413 ki ginti dekhni hogi.
+const GROQ_TPM_SURAKSHIT = 6_000;
+
+/**
+ * Messages ko budget me laao — SYSTEM ko haath NAHI lagate.
+ *
+ * Kram jaan-boojhkar ye hai:
+ *   1. system rehta hai (usme saare niyam hain — gadhne ke khilaf pehre
+ *      bhi. Use kaatna jawab ko galat bana dega, chhota nahi.)
+ *   2. purana itihaas pehle jaata hai (sabse kam kaam ka)
+ *   3. aakhir me aaj ka sawaal+ansh kaata jaata hai, aur wo bhi ANT se —
+ *      shuru ke ansh sabse achhe rerank wale hote hain.
+ */
+function tokenBudgetMeKaato(messages) {
+  const sys   = messages.filter(m => m.role === "system");
+  let  baaki  = messages.filter(m => m.role !== "system");
+  const sysT  = sys.reduce((n, m) => n + tokenAndaza(m.content), 0);
+  let bacha   = TOKEN_BUDGET - sysT;
+
+  if (bacha <= 0) return [...sys, ...baaki.slice(-1)];   // asambhav, par surakshit
+
+  // peeche se aage — naya pehle
+  const rakhe = [];
+  for (let i = baaki.length - 1; i >= 0; i--) {
+    const m = baaki[i];
+    const t = tokenAndaza(m.content);
+    if (t <= bacha) { rakhe.unshift(m); bacha -= t; continue; }
+    // Sabse naya sandesh (aaj ka sawaal + ansh) — ise chhodna nahi,
+    // kaat kar rakhna hai. Baaki purane sandesh poore gira dete hain.
+    if (rakhe.length === 0) {
+      // ⚠️ Yahan bhi DEV_BHAAR laga — warna hisaab ulta ho jaata hai.
+      // Pehle yahan "1 akshar = 1 token" maan kar kaata tha jabki upar
+      // tokenAndaza() 2 gin raha tha. Nateeja: kaat-chhaant apni hi seema
+      // 4,400 ki jagah 5,598 par chhod deti thi — yaani jo pehra seema me
+      // laane ke liye tha, wo khud seema paar kar raha tha.
+      const dev = (String(m.content).match(/[ऀ-ॿ]/g) || []).length;
+      const devAnupaat = dev / Math.max(String(m.content).length, 1);
+      const aksharPerToken = devAnupaat > 0.4 ? (1 / DEV_BHAAR) : 3.5;
+      const kitne = Math.max(400, Math.floor(bacha * aksharPerToken));
+      rakhe.unshift({ ...m, content: String(m.content).slice(0, kitne) });
+      console.log(`[SAARTHI] token-budget: sandesh ${tokenAndaza(m.content)} se ~${bacha} token par kaata`);
+    }
+    break;
+  }
+  if (rakhe.length !== baaki.length) {
+    console.log(`[SAARTHI] token-budget: ${baaki.length} me se ${rakhe.length} sandesh bheje (budget ${TOKEN_BUDGET})`);
+  }
+  return [...sys, ...rakhe];
+}
 // FIX (2026-07-24, tuned 2026-07-25): 2000→2200 kiya tha truncation fix
 // karne ke liye, par uske baad Groq (429) + Gemini (429 "quota exceeded" +
 // 503 "high demand") dono baar-baar fail hone lage — bade max_tokens =
 // zyada TPM (tokens/minute) kharch per-request, jo free-tier ki asli
 // seema hai (RPM nahi). 1600 par settle — truncation-safe, kam TPM-bhaari.
 const MAX_TOKENS_CAP = 1600;
+
+// ⚠️ YE ANK ALAG-ALAG MAT LIKHNA — GHATA KAR NIKALO.
+// Pehli koshish me maine TOKEN_BUDGET (5,500) aur GROQ_TPM_SURAKSHIT
+// (6,000) alag-alag likh diye the. 5,500 input + 1,600 output = 7,100,
+// jo 6,000 ki apni hi seema paar kar raha tha. Do ank jo ek doosre par
+// nirbhar hain, unhe haath se do jagah likhna hi galti ki jad hai.
+const TOKEN_BUDGET = GROQ_TPM_SURAKSHIT - MAX_TOKENS_CAP;   // = 4,400
 
 // ── KAVACH 2: per-IP raftaar-seema ──
 // FIX (2026-07-25 audit): purana limiter sirf in-memory Map tha — Cloudflare
@@ -402,7 +507,14 @@ async function tryGemini(safeBody, env) {
     .filter(m => m.role !== "system" && (m.content || "").trim())
     .map(m => ({ role: m.role === "assistant" ? "model" : "user",
                  parts: [{ text: m.content }] }));
-  if (!contents.length) return null;
+  if (!contents.length) {
+    // ⚠️ Ye pehle CHUP-CHAAP null lauta deta tha — Gemini ka ekmatra aisa
+    // raasta. 18 Agast ko jab Groq 413 de raha tha, log me Gemini ki koi
+    // line hi nahi aayi, aur ye pata karne me waqt gaya ki wo bulaya bhi
+    // gaya ya nahi. Ab har raasta bolta hai.
+    console.log("[SAARTHI] ENGINE 2 (Gemini) SKIP — koi user-sandesh bacha hi nahi (sirf system tha?)");
+    return null;
+  }
 
   // BUG FOUND (2026-07-23, confirmed via live Observability logs): gemini-3.5-flash
   // "thinking" (reasoning) DEFAULT ON rakhta hai — chhote max_tokens (jaise app ke
@@ -410,12 +522,33 @@ async function tryGemini(safeBody, env) {
   // asli jawab ke liye ek token bhi nahi bachta tha (finishReason: MAX_TOKENS,
   // content khaali). Fix: thinkingLevel "low" (yeh model ke liye "off" ke sabse
   // kareeb hai) + thoda zyada maxOutputTokens taaki jawab ke liye jagah bache.
+  //
+  // ⚠️ 18 AGAST 2026 — WAHI BUG WAPAS AAYA, PAR HALKE ROOP ME.
+  // Jawab ab KHAALI nahi aa raha tha, par BEECH ME KAT raha tha:
+  //     "...विवेकपूर्वक विचार करना शुरू करता है, तभी"        ← yahin ruk gaya
+  //     "...और मानव जीवन की नश्वरता"                          ← yahin ruk gaya
+  // Naapa: dikhne wala jawab sirf ~335 token ka tha, jabki budget 1,400 ka.
+  // Baaki ~1,000 "thinking" me gaya. thinkingLevel "low" use kam karta hai,
+  // khatam nahi.
+  //
+  // DO WAJAH ISE AAJ SE PEHLE CHHUPAYE RAKHA:
+  //   1. Gemini shaayad hi kabhi chalta tha — wo sirf 429/5xx par bulaya
+  //      jaata tha. Aaj se badi har request usi ke paas jaati hai.
+  //   2. DEVANAGARI OUTPUT MEHNGA HAI — lagbhag 2 token prati akshar. Yaani
+  //      1,200 akshar ka ek theek-thaak Hindi jawab hi ~2,400 token le leta
+  //      hai. Angrezi me wahi jawab ~350 token ka hota. Groq ke liye tuned
+  //      1,400 ka cap is bhasha me kabhi kaafi tha hi nahi.
+  //
+  // GEMINI KO GROQ KI TANGI MAT DO. `MAX_TOKENS_CAP` (1600) Groq ke TPM ke
+  // liye 25 July ko tuned hua tha. Gemini ki seema us se kai guna oonchi hai;
+  // wahi cap yahan lagana apne hi paer par kulhadi hai.
+  const GEMINI_OUT_TOKENS = 4_000;   // ~2,000 Devanagari akshar + thinking
   const payload = {
     contents,
     ...(sys ? { systemInstruction: { parts: [{ text: sys.content }] } } : {}),
     generationConfig: {
       temperature:      safeBody.temperature,
-      maxOutputTokens:  Math.max(safeBody.max_tokens, 1300),
+      maxOutputTokens:  Math.max(safeBody.max_tokens, GEMINI_OUT_TOKENS),
       thinkingConfig:   { thinkingLevel: "low" },
     },
   };
@@ -438,6 +571,17 @@ async function tryGemini(safeBody, env) {
       const reason = data?.candidates?.[0]?.finishReason || data?.promptFeedback?.blockReason || "unknown";
       console.log(`[SAARTHI] ENGINE 2 (Gemini) FAIL — khaali jawab, reason=${reason}, raw=${JSON.stringify(data).slice(0, 300)}`);
       return null;
+    }
+    // ⚠️ ADHOORA JAWAB CHUP-CHAAP MAT JAANE DO — 18 Agast 2026.
+    // Aaj Gemini ne "OK ✅" chhapa aur jawab BEECH VAAKYA ME kat gaya
+    // ("...करना शुरू करता है, तभी"). Log me sab theek dikh raha tha, aur
+    // kharabi sirf user ki aankh se pakdi gayi. finishReason ye baat pehle
+    // hi bata deta hai — bas use kabhi padha nahi ja raha tha.
+    const kyunRuka = data?.candidates?.[0]?.finishReason;
+    if (kyunRuka && kyunRuka !== "STOP") {
+      console.log(`[SAARTHI] ⚠️ ENGINE 2 (Gemini) ka jawab ADHOORA — finishReason=${kyunRuka}, `
+        + `${text.length} akshar. MAX_TOKENS ho to maxOutputTokens badhaiye `
+        + `(Devanagari ~2 token prati akshar leta hai).`);
     }
     console.log("[SAARTHI] ENGINE 2 (Gemini) OK ✅ — is jawab ko yehi de raha hai");
     // OpenAI-shape mein lapet ke wapas — frontend ko kuch nahi badalna padta
@@ -1471,7 +1615,17 @@ export default {
       return jsonResponse({ error: { message: "Bad JSON" } }, 400, origin);
     }
 
-    const model = ALLOWED_MODELS.has(body.model) ? body.model : "llama-3.3-70b-versatile";
+    // ⚠️ YE DEFAULT SABSE KHATARNAK JAGAH HAI.
+    // Jab client koi anjaan model maange, request CHUP-CHAAP is naam par
+    // chali jaati hai. 18 Agast tak yahan "llama-3.3-70b-versatile" likha
+    // tha — jo 16 Agast ko band ho chuka tha. Yaani jis suraksha-jaal ka
+    // kaam bachana tha, wahi har request ko mare hue model par bhej raha
+    // tha. Ise badalna ALLOWED_MODELS badalne se zyada zaroori hai.
+    const model = ALLOWED_MODELS.has(body.model) ? body.model : "openai/gpt-oss-120b";
+    // ⚠️ safeBody me messages POORE rehte hain — KAATE HUE NAHI.
+    // Kaat-chhaant sirf Groq ke liye hoti hai (neeche groqBody), kyunki
+    // seema Groq ki hai. Gemini ka context us se kai guna bada hai, aur
+    // use aadha-adhoora sandarbh bhejna apne hi paer par kulhadi hai.
     const safeBody = {
       model,
       messages:    Array.isArray(body.messages) ? body.messages : [],
@@ -1519,13 +1673,47 @@ export default {
     // hai, Gemini par girne se PEHLE. Agar sirf GROQ_API_KEY hi set hai
     // (jaisa pehle tha), yeh bilkul pehle jaisa hi behave karta hai — kuch
     // tootega nahi.
-    const groqKeys = [env.GROQ_API_KEY, env.GROQ_API_KEY_2, env.GROQ_API_KEY_3, env.GROQ_API_KEY_4].filter(Boolean);
+    // ── BADI REQUEST SEEDHE GEMINI KO — 18 Agast 2026 ────────────────────
+    //
+    // Groq gpt-oss ka free-tier budget 8,000 TPM hai. Hamari poori request
+    // (SYSTEM_PROMPT ~3,200 token + 12 ansh, jinme Devanagari token me bahut
+    // mehnga padta hai) us se badi ho jaati hai — aur Groq tab 429 nahi,
+    // 413 "too large" kehta hai.
+    //
+    // PEHLA ILAAJ GALAT THA: maine request ko KAAT kar Groq ko bhejna shuru
+    // kiya. Wo chalta to hai, par 12 ansh ki jagah 1-2 bachte hain — yaani
+    // jawab ki jamin hi kat jaati hai. Ye us cheez ko maar deta hai jiske
+    // liye poora RAG banaya gaya.
+    //
+    // AB YE: request Groq ke budget me aati hai to Groq (tez, sasta). Nahi
+    // aati to SEEDHE Gemini — POORE ansh ke saath, bina kaate. Gemini ka
+    // context is se kai guna bada hai; uske liye ye request badi hai hi nahi.
+    //
+    // Yaani seema ke hisaab se engine chunte hain, sandarbh kaat kar seema
+    // me nahi ghusaate.
+    const kulToken = safeBody.messages.reduce((n, m) => n + tokenAndaza(m.content), 0);
+    const groqMeAayegi = (kulToken + safeBody.max_tokens) <= GROQ_TPM_SURAKSHIT;
+
     let groqRes, groqText;
+    if (!groqMeAayegi) {
+      console.log(`[SAARTHI] request ~${kulToken.toLocaleString()} token — Groq ke budget (${GROQ_TPM_SURAKSHIT}) se badi. SEEDHE Gemini, poore ansh ke saath.`);
+      const g = await tryGemini(safeBody, env);
+      if (g) {
+        console.log(`[SAARTHI] ENGINE 2 (Gemini) OK ✅ — badi request, poora sandarbh mila`);
+        return jsonResponse(g, 200, origin);
+      }
+      console.log(`[SAARTHI] Gemini bhi nahi de paya — ab Groq ko KAAT kar aazma raha hoon (aakhri koshish)`);
+    }
+
+    const groqKeys = [env.GROQ_API_KEY, env.GROQ_API_KEY_2, env.GROQ_API_KEY_3, env.GROQ_API_KEY_4].filter(Boolean);
+    // Groq ko hamesha budget me kaat kar bhejo. Chhoti request par
+    // tokenBudgetMeKaato kuch badalta hi nahi (jaancha gaya).
+    const groqBody = { ...safeBody, messages: tokenBudgetMeKaato(safeBody.messages) };
     for (let i = 0; i < groqKeys.length; i++) {
       groqRes = await fetch(GROQ_URL, {
         method:  "POST",
         headers: { "Content-Type": "application/json", "Authorization": `Bearer ${groqKeys[i]}` },
-        body:    JSON.stringify(safeBody),
+        body:    JSON.stringify(groqBody),
       });
       if (groqRes.ok) {
         groqText = await groqRes.text();
@@ -1553,9 +1741,41 @@ export default {
     // function aur upar wala _forceEngine debug-hook jaan-boojhkar rakha hai
     // — future mein zaroorat pade toh sirf ek line uncomment karke wapas
     // chalu ho sakta hai, function delete nahi karna pada.
-    if (groqRes.status === 429 || groqRes.status >= 500) {
+    // ⚠️ 18 AGAST 2026 — YAHAN SE `429 || >=500` WALI SHART HATAYI GAYI.
+    //
+    // Pehle Gemini SIRF tab bulaya jaata tha jab Groq "vyast" (429) ya "gira"
+    // (5xx) ho. Baaki har fail par worker Groq ka error SEEDHA app ko lauta
+    // deta tha, aur user ko "Saarthi abhi dhyan-magn hain" dikhta tha.
+    //
+    // Us shart ke peeche ek maanyata thi: "404/413 client ki galti hai,
+    // dobara koshish bekaar hai." Aaj wo maanyata TOOT GAYI, do baar:
+    //
+    //   404 — Groq ne model hi retire kar diya. Groq ke liye ye "hamesha ke
+    //         liye fail" hai, par GEMINI ka isse koi lena-dena nahi tha.
+    //   413 — request Groq ke 8,000 TPM budget se badi. Gemini ka context
+    //         is se kai guna bada hai; wo aaram se jawab de deta.
+    //
+    // Yaani DONO baar Engine 2 poori tarah taiyaar khada tha, aur router ne
+    // use bulaya hi nahi. Jo doosra engine THEEK IS DIN ke liye banaya gaya
+    // tha, wo chup baitha raha aur Ask poora din band raha.
+    //
+    // Ab niyam saral hai: GROQ KISI BHI WAJAH SE FAIL HO → GEMINI AAZMAO.
+    // Fallback ka matlab yahi hai. Agar Gemini bhi fail hua to neeche Groq
+    // ka asli error waise hi laut jaata hai, isliye kuch chhupta nahi.
+    {
+      // ⚠️ Log DONO taraf — safal aur asafal.
+      // 18 Agast: pehli baar yahan sirf SAFALTA par log likha tha. Groq 413
+      // de raha tha, Gemini bhi jawab nahi de paya, aur log me uske baad
+      // KUCH NAHI aaya — yaani asafalta chup-chaap nikal gayi aur pata hi
+      // nahi chala ki Gemini ko bulaya bhi gaya ya nahi. Yahi galti poore
+      // hafte pakad rahe the, aur wo isi fix me dobara ho gayi.
+      console.log(`[SAARTHI] Groq FAIL (HTTP ${groqRes.status}) → ENGINE 2 (Gemini) ko bula raha hoon…`);
       const g = await tryGemini(safeBody, env);
-      if (g) return jsonResponse(g, 200, origin);
+      if (g) {
+        console.log(`[SAARTHI] ENGINE 2 (Gemini) ne bacha liya ✅ — user ko farq nahi padega`);
+        return jsonResponse(g, 200, origin);
+      }
+      console.log(`[SAARTHI] ⚠️ DONO ENGINE FAIL — user ko "dhyan-magn" dikhega`);
     }
 
     // Dono engines fail → Groq ka asli jawab (429 etc.) — app dhyan-magn dikhayegi
@@ -1572,8 +1792,12 @@ export default {
   // Observability logs mein SAAF OK/FAIL likh deta hai — taaki koi chaabi
   // chupke se hafton tak toothi na rahe (jaisa Gemini ke saath hua tha).
   async scheduled(event, env, ctx) {
+    // ⚠️ Ye roz ka health-check bhi 18 Agast tak mare hue model par ja raha
+    // tha — yaani jis cheez ka kaam "chaabi chupke se toothi na rahe" batana
+    // tha, wo khud mari hui thi aur teen din tak kuch nahi bola.
+    // Model ka naam ALLOWED_MODELS ke saath badalna HAMESHA yaad rakhein.
     const testBody = {
-      model:       "llama-3.3-70b-versatile",
+      model:       "openai/gpt-oss-120b",
       messages:    [{ role: "user", content: "Reply with exactly one word: OK" }],
       temperature: 0.1,
       max_tokens:  10,

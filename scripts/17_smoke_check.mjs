@@ -165,5 +165,60 @@ der.sort((a, b) => a - b);
 console.log(`\n  ${pass}/${JAANCH.length} theek`
   + `   |  der: madhya ${der[Math.floor(der.length / 2)]}ms, sabse zyada ${der[der.length - 1]}ms`);
 if (fail) console.log(`\n  ⚠️  ${fail} fail — poori naap chalane se pehle ye dekhna zaroori hai.`);
-else      console.log(`\n  Pipeline zinda hai. Ab poori naap chala sakte hain.`);
+else      console.log(`\n  /search zinda hai.`);
+
+// ── /chat BHI JAANCHO — 18 AGAST 2026 KO JODA ────────────────────────────
+//
+// KYUN: 17 Agast ko release se pehle yehi script chalayi thi. 10/10 pass.
+// Agle din subah Ask POORA BAND tha — Groq ne model retire kar diya tha.
+//
+// Wajah ye nahi ki jaanch kamzor thi. Wajah ye hai ki ye script SIRF
+// /search dekhti thi, aur toota /chat tha. Yaani jaancha wo gaya jo tha,
+// dekha wo nahi gaya jo badla tha.
+//
+// Ab ek asli sawaal /chat par bhi jaata hai. Ye do cheezein pakadta hai
+// jo 18 Agast ko ek ke peeche ek aayi thi:
+//     404 — model ka naam mar chuka hai
+//     413 — request Groq ke token-budget se badi hai
+//
+// ⚠️ Ye AI kota kharch karta hai — isliye SIRF EK sawaal, aur `--nochat`
+//    se band bhi kiya ja sakta hai (jab sirf retrieval jaanchni ho).
+if (!process.argv.includes("--nochat")) {
+  console.log(`\n  ── /chat ki jaanch (1 sawaal, AI kota kharch hoga) ──`);
+  const t0 = Date.now();
+  try {
+    const r = await fetch(API + "/chat", {
+      method: "POST", headers: { "Content-Type": "application/json", Origin: ORIGIN },
+      body: JSON.stringify({
+        messages: [
+          { role: "system", content: "Reply in one short line." },
+          { role: "user", content: "Dharm ka ek line me arth batao." },
+        ],
+        temperature: 0.3, max_tokens: 80,
+      }),
+    });
+    const txt = await r.text();
+    if (!r.ok) {
+      console.log(`  ❌ /chat HTTP ${r.status} — ${txt.slice(0, 160)}`);
+      if (r.status === 404) console.log(`     → model ka naam mar chuka hai. https://console.groq.com/docs/deprecations dekhein.`);
+      if (r.status === 413) console.log(`     → request Groq ke token-budget se badi hai. worker me TOKEN_BUDGET dekhein.`);
+      if (r.status === 429) console.log(`     → kota ya raftaar-seema. Ye zaroori nahi ki kharabi ho.`);
+      console.log(`\n  ⚠️  /search theek hai par /chat NAHI. Ask section user ke liye BAND hai.\n`);
+      process.exit(1);
+    }
+    const j = JSON.parse(txt);
+    const jawab = j?.choices?.[0]?.message?.content || j?.text || "";
+    console.log(`  ✅ /chat theek — ${Date.now() - t0}ms`);
+    console.log(`     → ${jawab.replace(/\s+/g, " ").slice(0, 100)}`);
+    if (!jawab.trim()) {
+      console.log(`\n  ⚠️  jawab KHAALI aaya. Model ne token "sochne" me kharch kar diye`);
+      console.log(`      hon to aisa hota hai — max_tokens ya reasoning-setting dekhein.\n`);
+      process.exit(1);
+    }
+  } catch (e) {
+    console.log(`  ❌ /chat: ${e.message}\n`);
+    process.exit(1);
+  }
+  console.log(`\n  Dono zinda hain — /search aur /chat.`);
+}
 console.log();

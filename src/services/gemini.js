@@ -54,7 +54,10 @@ function getProvider(key) {
 
 // Groq config (OpenAI-compatible)
 const GROQ_BASE    = "https://api.groq.com/openai/v1";
-const GROQ_MODEL   = "llama-3.3-70b-versatile"; // best free Groq model
+// ⚠️ 18 Agast 2026 ko badla — "llama-3.3-70b-versatile" Groq ne 16 Agast ko
+// band kar diya tha aur Ask section poora ruk gaya tha. Poori kahani
+// deploy/cloudflare-worker.js me ALLOWED_MODELS ke oopar likhi hai.
+const GROQ_MODEL   = "openai/gpt-oss-120b"; // Groq ka sujhaya replacement
 
 // Sawaal ki bhasha pehchanne ke liye (2026-08-03) — jawab ki bhasha ab
 // script se tay hoti hai jab script saaf ho, warna app ke toggle se.
