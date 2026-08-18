@@ -596,6 +596,38 @@ export function toDevanagari(text) {
     const hit = LEXICON[fuzzyKey(core)];
     if (hit) return pre + hit + post;
 
+    // ── AAZMAYA AUR HATAYA: kriya ka "-ne" roop niyam se banana ─────────
+    //    (2026-08-18 — ye teesri cheez hai jo aaj aazma kar hatayi gayi)
+    //
+    // Dikha tha ki "-na" chalta hai par "-ne" nahi:
+    //     kehna → कहना ✓      kehne → kehne ✗
+    //     dekhna → देखना ✓    dekhne → dekhne ✗
+    // par karne/hone/lene/dene chalte the. Lagta tha ek gayab NIYAM hai,
+    // 25,000 alag galtiyan nahi: "agar X-na jaana-pehchana hai to X-ne
+    // wahi shabd hai." Vyakaran ke hisaab se ye sahi bhi hai.
+    //
+    // NAAP NE MANA KAR DIYA:
+    //   sirf "X+na" ki shart  → 6 kriya theek, PAR 3 angrezi shabd toote
+    //                           (tone→टोने, wine→विने, vine→विने), kyunki
+    //                           fuzzy match "tona/wina" jaisa kuch dhoondh
+    //                           leta hai jo "ना" par khatam hota hai.
+    //   "X+na" AUR "X+ta"     → sirf 2 theek (kehne, rehne), 1 abhi bhi
+    //   dono ki shart           toota. dekhne/samajhne/sochne chhoot gaye
+    //                           kyunki unka "-ta" roop list me hai hi nahi.
+    //
+    // ASLI SEEKH: kami koi gayab niyam nahi thi — LIST KHUD jagah-jagah se
+    // adhoori hai (kisne kaunsa roop yaad se daala, bas utna hi chalta
+    // hai). Adhoori list ke upar niyam lagane par niyam bhi utna hi adhoora
+    // rehta hai, aur uske saath naya kachra bhi aata hai.
+    //
+    // Aur ginti bhi yahan nahi thi: 29 khaali sawaalon me "-ne" wale shabd
+    // sirf ~5 baar aaye. Bache hue Roman shabd me sabse zyada ye the —
+    //     house(9)  relate(5)  context(4)  explain(3)
+    // — yaani ilaaj EN_CONCEPT me hai, toDevanagari ke niyam me nahi.
+    //
+    // Agar kabhi dobara karna ho: pehle LEXICON hi theek se banao (uski
+    // apni script build-lexicon.mjs hai), niyam se paiband mat lagao.
+
     // 3. NAHI PEHCHANA → Latin mein hi chhod do.
     //    Yahan pehle syllable-transliteration hoti thi. Usi ne kachre
     //    sawaalon ka score +0.13 tak badha diya tha. Ab nahi.
@@ -870,6 +902,25 @@ export function expandQueryWithParyay(text) {
 export function mapEnglishConcepts(text) {
   let s = String(text || "");
   if (!s) return s;
+
+  // ── JYOTISH: "<ginti> house" → "<ginti> भाव"  (2026-08-18) ──────────
+  //
+  // EN_CONCEPT me "second house" jaisi chaabi likhi thi, par wo KABHI
+  // match nahi karti thi — kyunki toDevanagari() ISSE PEHLE chalta hai
+  // aur "second" ko lexicon se "द्वितीय" bana chuka hota hai. Paath tab
+  // "द्वितीय house" hota hai, aur ASCII chaabi us par lagti hi nahi.
+  // ("fourth"–"twelfth" lexicon me nahi hain, isliye wo chaabiyan chal
+  // gayi — yaani aadha kaam chup-chaap ho raha tha, aadha nahi.)
+  //
+  // ⚠️ YAHAN \b MAT LAGANA — shuru me nahi. JS ka \b sirf [A-Za-z0-9_]
+  // ko shabd maanta hai; Devanagari uske liye shabd hai hi nahi, isliye
+  // /\bद्वितीय/ kabhi match nahi karta. Yahi jaal is file me teen aur
+  // jagah likha hua hai. Aakhir me "house" ASCII hai, wahan \b theek hai.
+  s = s.replace(
+    /(प्रथम|द्वितीय|तृतीय|चतुर्थ|पंचम|षष्ठ|सप्तम|अष्टम|नवम|दशम|एकादश|द्वादश)\s+house\b/gi,
+    "$1 भाव"
+  );
+
   for (const [en, hi] of Object.entries(EN_CONCEPT)) {
     s = s.replace(new RegExp(`\\b${en}\\b`, "gi"), hi);
   }
@@ -1221,6 +1272,42 @@ export function questionToTopic(text) {
  * paryay na paryay se bura hai.
  */
 export const EN_CONCEPT = {
+  // ⚠️⚠️ JODNE KA KRAM MAAYNE RAKHTA HAI — SABSE UPAR KYUN
+  //
+  // mapEnglishConcepts() Object.entries() ke KRAM me chalta hai aur har
+  // chaabi ko badal deta hai. Isliye BAHU-SHABD chaabi ("second house")
+  // apne tukdon ("second", "house") se PEHLE aani chahiye. Agar "second"
+  // pehle chal gaya to paath "द्वितीय house" ban jayega aur "second house"
+  // wali chaabi ka match hoga hi nahi — wo line chup-chaap bekaar ho
+  // jayegi. Isliye ye block file me sabse upar hai, aur naya bahu-shabd
+  // niyam bhi YAHIN aana chahiye, neeche nahi.
+
+  // ── JYOTISH KE BHAAV (2026-08-18) ───────────────────────────────────
+  // 29 khaali sawaalon ki naap me sabse zyada bacha hua Roman shabd yahi
+  // tha — "house", 9 baar. Saare Lal Kitab ke sawaal the:
+  //     "Second house ka sambandh family aur speech se…"
+  //     findQ bana: "द्वितीय house का सम्बन्ध कुटुम्ब और speech से…"
+  // aur us granth ke 18 ansh pool me hone ke baad bhi best score 0.0018
+  // aaya — yaani gate ne sab gira diya.
+  //
+  // ⚠️ AKELA "house" JAAN-BOOJHKAR NAHI JODA. Jyotish me "house" = भाव,
+  // par aam baat me "house" = घर. "ghar me shanti kaise laayein" jaisa
+  // sawaal "भाव me shanti" ban jaata — aur wo galti chup-chaap hoti,
+  // kyunki jawab phir bhi aa jaata, bas galat ansh se. Isliye sirf
+  // ginti-ke-saath wala roop, jahan matlab me koi shak nahi hai.
+  "first house": "प्रथम भाव",    "second house": "द्वितीय भाव",
+  "third house": "तृतीय भाव",    "fourth house": "चतुर्थ भाव",
+  "fifth house": "पंचम भाव",     "sixth house": "षष्ठ भाव",
+  "seventh house": "सप्तम भाव",  "eighth house": "अष्टम भाव",
+  "ninth house": "नवम भाव",      "tenth house": "दशम भाव",
+  "eleventh house": "एकादश भाव", "twelfth house": "द्वादश भाव",
+
+  // ── AATM- ke jode shabd (bahu-shabd, isliye upar) ───────────────────
+  // "self" akela nahi joda — "self" ka matlab bahut phaila hua hai. Ye
+  // do jode roop hi granth ki bhasha me seedhe milte hain.
+  "self-realization": "आत्म-साक्षात्कार", "self realization": "आत्म-साक्षात्कार",
+  "self-control": "आत्म-संयम",           "self control": "आत्म-संयम",
+
   // sawaal ka DHAANCHA — ye pehle "shor" maane the, par ye hi sawaal ka
   // matlab hain. Hatane se query thoonth ban jaati thi.
   meaning: "अर्थ", importance: "महत्व", significance: "माहात्म्य",
@@ -1388,6 +1475,52 @@ export const EN_CONCEPT = {
   chapters: "अध्याय", chapter: "अध्याय", desires: "काम",
   enemies: "शत्रु", root: "मूल", cause: "कारण", future: "भविष्य",
   eye: "नेत्र", important: "महत्व", overcome: "जीत",
+
+  // ── 2026-08-18: 29 KHAALI SAWAALON KI GINTI SE AAYE SHABD ───────────
+  //
+  // Ye andaaze se nahi chune gaye. 31_khaali_jaanch.mjs ne 29 aise sawaal
+  // nikale jo HAR BAAR khaali lautte the (shor nahi — teen baar jaancha),
+  // aur 32_khaali_kyun.mjs ne unme bache hue Roman shabd gine. Neeche
+  // wahi shabd hain, ginti ke saath.
+  //
+  // KYUN YE MAAYNE RAKHTA HAI — naapa hua:
+  //     Devanagari  0-50%  → best rerank score ka ausat 0.0106
+  //     Devanagari 50-60%  → 0.0348
+  //     Devanagari 60-70%  → 0.0730
+  //     Devanagari 70-100% → 0.1406        (13 guna, r = 0.55)
+  // Corpus poora Devanagari hai. Query me bacha hua Roman shabd sirf "ek
+  // shabd kam" nahi hai — wo poore vaakya ka score neeche kheenchta hai,
+  // aur gate (0.30) sab kuch gira deta hai. Un 29 me se EK BHI 0.30 tak
+  // nahi pahuncha (sabse ooncha 0.2913), jabki 19 me sahi granth ke ansh
+  // pool me maujood the.
+  //
+  // ⚠️ JO JAAN-BOOJHKAR NAHI JODE: near, far, higher, central, present,
+  // based, created, events, partnership, self, world. Inka matlab
+  // sandarbh se badalta hai, aur galat map hone par nuksaan CHUP-CHAAP
+  // hota hai — jawab phir bhi aata hai, bas galat ansh se. 6 Agast wali
+  // ghatna yahi thi: "the/say/is/me" Hindi lexicon me match kar rahe the
+  // aur har angrezi sawaal ki query aadhi bakwaas ban rahi thi.
+  relate: "सम्बन्ध",        // 5 baar
+  context: "सन्दर्भ",       // 4
+  explain: "वर्णन",         // 3
+  interpret: "अर्थ",        // 2
+  philosophical: "दार्शनिक", // 2
+  chariot: "रथ",            // 2 — Kathopanishad ki rath-upma
+  analogy: "उपमा",          // 2
+  cosmic: "ब्रह्माण्ड",      // 2
+  divine: "दिव्य", justice: "न्याय", karmic: "कर्म", actions: "कर्म",
+  translation: "अनुवाद", beings: "प्राणी", senses: "इन्द्रिय",
+  symbolism: "प्रतीक", hymns: "सूक्त", experience: "अनुभव",
+  naraka: "नरक", narakas: "नरक",
+  education: "विद्या", intelligence: "बुद्धि", children: "संतान",
+  courage: "साहस", siblings: "भाई", transformation: "परिवर्तन",
+  guidance: "मार्गदर्शन", comfort: "सुख", mother: "माता",
+  ruler: "राजा", conflict: "संघर्ष", preservation: "पालन",
+  rescue: "रक्षा",
+  // "depression" ko "विषाद" — granth ki apni bhasha yahi hai (Gita ka
+  // pehla adhyaay "अर्जुन विषाद योग" hai). "डिप्रेशन" likhne se corpus me
+  // kuch nahi milta.
+  depression: "विषाद",
 };
 
 export function normalizeQueryForSearch(text) {
