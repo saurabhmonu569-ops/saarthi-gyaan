@@ -49,7 +49,43 @@ const ORIGIN  = (env.EVAL_ORIGIN || "https://saarthi-gyaan.netlify.app").trim();
 const SESSION = (env.EVAL_SESSION || "").trim();
 if (!API) { console.error("❌ .env me VITE_AI_PROXY_URL chahiye"); process.exit(1); }
 
-const { chuneGayeGranth } = await import("../src/knowledge/aadhaar.js");
+// ⚠️ 18 AGAST 2026 — YE SCRIPT MARE HUE MODULE KO NAAP RAHI THI.
+//
+// Pehle yahan `chuneGayeGranth` (src/knowledge/aadhaar.js) aata tha — wo
+// SHABD-MEL wala tareeka hai jo 14 AUR 17 Agast, DONO baar fail hokar
+// hataya ja chuka hai. App use bulati hi nahi.
+//
+// Nateeja: aaj `[[GRANTH: …]]` wala naya tareeka deploy karne ke BAAD bhi
+// ye script "khatra 7" chhap rahi thi — kyunki wo naye tark ko chhoo hi
+// nahi rahi thi. Model ki soochi bilkul theek aa rahi thi (namoona 1 par
+// sirf "Agni Purana", namoona 8 par sirf "Vishnu Purana") aur script use
+// dekh hi nahi rahi thi.
+//
+// Ab yahan wahi tark hai jo useChat.js me hai: model se poochho, phir
+// bheje gaye granthon se MILAO, aur na mile to purana vyavhaar.
+// Ise badalte waqt useChat.js ke saath milana ZAROORI hai — do jagah ek
+// hi niyam rakhne ki keemat is project ne kai baar chukayi hai.
+const saafNaam = s => String(s || "").toLowerCase().replace(/\s+/g, " ").trim();
+
+function aadhaarBanao(jawab, grounded) {
+  const bheje = [];
+  for (const r of grounded) {
+    const bt = (r.chunk && (r.chunk.book_title || r.chunk.book)) || "";
+    if (bt && !bheje.includes(bt)) bheje.push(bt);
+  }
+  const m = String(jawab || "").match(/\[\[\s*GRANTH\s*:([^\]]*)\]\]/i);
+  const kahe = m ? m[1].split("|").map(s => s.trim()).filter(Boolean) : null;
+
+  let granth = [];
+  let gadhe  = [];
+  if (kahe && kahe.length) {
+    granth = bheje.filter(b => kahe.some(k => saafNaam(k) === saafNaam(b)));
+    gadhe  = kahe.filter(k => !bheje.some(b => saafNaam(k) === saafNaam(b)));
+  }
+  const soochiMili = !!m;
+  if (!granth.length) granth = bheje;          // Aadhaar kabhi khaali nahi
+  return { granth: granth.slice(0, 5), hataye: bheje.filter(b => !granth.includes(b)), gadhe, soochiMili };
+}
 const { detectHintedBook } = await import("../src/knowledge/bookHints.js");
 const { BOOK_META } = await import("../src/data/bookMeta.js");
 const { normalizeQueryForSearch, expandQueryWithParyay, questionToTopic, stripMetaFraming } =
@@ -176,7 +212,7 @@ console.log(`      "jo granth HATAYA gaya, kya wo sach me jawab me nahi tha?"\n`
 console.log(`  ${"═".repeat(72)}`);
 
 const byora = [];
-let kulRakhe = 0, kulHataye = 0, khatra = 0;
+let kulRakhe = 0, kulHataye = 0, khatra = 0, binaSoochi = 0, kulGadhe = 0;
 
 for (let i = 0; i < sawaal.length; i++) {
   const q = sawaal[i].q;
@@ -192,7 +228,9 @@ for (let i = 0; i < sawaal.length; i++) {
 
   const grounded = ch.filter(c => c.grounded);
   const purana = [...new Set(grounded.map(c => c.chunk.book_title))].slice(0, 5);   // pehle jo hota
-  const { granth, hataye } = chuneGayeGranth(jawab, grounded);
+  const { granth, hataye, gadhe, soochiMili } = aadhaarBanao(jawab, grounded);
+  if (!soochiMili) binaSoochi++;
+  if (gadhe.length) { kulGadhe += gadhe.length; console.log(`  ⚠️  model ne GADHA naam liya: ${gadhe.join(" · ")}  (mel me nahi gaya ✅)`); }
   kulRakhe += granth.length; kulHataye += hataye.length;
 
   console.log(`\n  ── ${i + 1}/${sawaal.length} ───────────────────────────────────────`);
@@ -211,6 +249,10 @@ for (let i = 0; i < sawaal.length; i++) {
       khatra++;
     }
   }
+  // ⚠️ App `[[GRANTH: …]]` ko hata deti hai (useChat.js). Ye script nahi
+  // hatati, isliye wo yahan dikhega — par uska JAWAB ME hona theek hai.
+  // Jaanchne layak baat ye hai ki wo MAUJOOD ho: na ho to model ne pankti
+  // chhod di aur Aadhaar purane (zyada) vyavhaar par gir gaya.
   if (process.argv.includes("--jawab")) {
     console.log(`\n  ── jawab ──\n${jawab.split("\n").map(l => "    " + l).join("\n")}`);
   }
@@ -225,6 +267,8 @@ console.log(`  ${byora.length} sawaal chale`);
 console.log(`  Aadhaar me rakhe : ${kulRakhe}   (aausat ${(kulRakhe / Math.max(byora.length, 1)).toFixed(1)} prati jawab)`);
 console.log(`  hataye           : ${kulHataye}   (aausat ${(kulHataye / Math.max(byora.length, 1)).toFixed(1)})`);
 console.log(`  ⚠️ khatre ke mamle: ${khatra}   ← jawab me naam tha, phir bhi hata`);
+console.log(`  model ne soochi hi nahi di: ${binaSoochi}   ← itne jawab purane (zyada) vyavhaar par gire`);
+console.log(`  model ne gadhe naam liye  : ${kulGadhe}   ← mel ne inhe roka`);
 console.log(`
   KAISE PADHEIN:
 
