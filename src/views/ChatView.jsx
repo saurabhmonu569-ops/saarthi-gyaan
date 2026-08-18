@@ -61,70 +61,22 @@ import { normalizeQueryForSearch, expandQueryWithParyay, stripMetaFraming, quest
 // Ye const yahan sirf itihaas ke liye chhoda hai — kahin istemal nahi hota.
 const MIN_RERANK_SCORE = 0.30;   // eslint-disable-line no-unused-vars
 
-/**
- * Kya is ansh mein asli VAAKYA hain, ya sirf table/suchi/mukhprishth hai?
- *
- * ASLI GHATNA (2026-08-04): "कृत्तिका नक्षत्र में जन्मे जातक" par
- * rashi_muhurt_vigyan p.74 aur p.75 mile. Reranker ne pass kar diya —
- * vishay to kritika hi tha. Par woh dono ansh TABLE hain:
- *     "कृतिका नक्षत्र जन्म-उत्पत्तिकर . कृतिका 0. उत्तरा फा. 9. उत्तराषाढ़
- *      संपत्तकर 2. रोहिणी ll. हस्त 20. श्रवण विपदकर 3. मृग…"
- * Nakshatron ke naam aur ank — koi vivaran nahi. Model ke paas kehne ko
- * kuch tha hi nahi, isliye usne apni taraf se bhar diya — aur jo likha
- * woh kitab ke BILKUL ULTA tha (kitab: कंजूसी, आक्रामक, झूठ; app: दयालु,
- * बुद्धिमान, सुख-समृद्धि). Aur footer ne unhi table-pannon ko cite kar
- * diya. Yeh sabse dhoka dene wala roop hai — sahi kitab, sahi panna,
- * ulta matlab.
- *
- * Naapne par saaf farak mila (prati 1000 akshar vaakya-chinh):
- *     table / copyright page   → 0
- *     asli Vedic richa         → 4.1 – 7.7
- *     asli Hindi gadya         → 17.9 – 46.6
- *
- * NOTE: aise ansh PHENKTE nahi — 2.8% chunks aise hain aur unme kuch
- * asli-par-kata-hua gadya bhi hai (agni_purana p.432 jaisa). Woh AI ko
- * context ki tarah ja sakte hain; bas CITATION ka aadhaar nahi ban
- * sakte. Content kabhi nahi khoyega, jhoothi citation nahi lagegi.
- */
-export function hasSentences(text) {
-  const t = (text || "").trim();
-  if (!t) return false;
-  return /।|॥|(?:है|हैं|था|थी|थे|हुआ|हुई|होता|होती|करते|करना|चाहिये|चाहिए|गया|गयी|रहता|रहती)(?=[\s।॥,.]|$)/.test(t);
-}
-
-/**
- * OCR-kachra pehchaan (2026-08-05 audit).
- *
- * KYUN ZAROORI: hasSentences() akela kaafi nahi hai. Bigda hua OCR bhi "॥"
- * aur "है" ugal deta hai, isliye woh gate paar kar jaata hai. valmiki_ramayana
- * (1927 sanskaran, kharab scan) ka asli text aisa nikla —
- *   "द | चस्ति निधाधत ॥ ३२ जी थी कहने लगे कि, से शुक्त दन बड़ी कणा धर ल्क तै"
- * — aur ye "grounded" bankar model ko jaa raha tha, yaani app apne hi kachre
- * ko Valmiki Ramayana ke naam se quote kar sakti thi. Wahi "jhootha aadhaar"
- * ki shikayat hai jo baar-baar aa rahi thi.
- *
- * KAISE: bigde OCR mein shabd TOOT jaate hain — "रामायण" → "रा मा यण". Toh
- * 1-2 akshar waale Devanagari token ka anupaat naapo.
- *
- * NAAPA GAYA (poora corpus, 32,032 chunks, per-book):
- *     madhya — 23 saaf kitaabein : 0.20 – 0.33
- *     madhya — valmiki_ramayana  : 0.50
- *   threshold 0.40 par:
- *     valmiki ke      97.8% chunks pakde gaye
- *     baaki 23 ke sirf 3.7% (jhootha alarm)
- *   0.45/0.50 par jhootha alarm to girta hai, par valmiki ka 16%/50% bach
- *   nikalta hai — isliye 0.40.
- *
- * hasSentences() ki tarah yeh bhi chunk PHENKTA nahi. Woh AI ko context ki
- * tarah mil sakta hai; bas CITATION ka aadhaar nahi ban sakta.
- */
-export const MAX_FRAGMENT_RATIO = 0.40;
-export function looksGarbled(text) {
-  const words = String(text || "").match(/[ऀ-ॿ]+/g);
-  // 12 se kam token par anupaat shor hai — chhote saaf ansh ko sazaa na mile
-  if (!words || words.length < 12) return false;
-  return words.filter(w => w.length <= 2).length / words.length > MAX_FRAGMENT_RATIO;
-}
+// ⚠️ hasSentences / looksGarbled / MAX_FRAGMENT_RATIO AB SHARED HAIN.
+//
+// 18 Agast 2026 tak ye teeno YAHAN aur deploy/cloudflare-worker.js me
+// HAATH SE do baar likhe the — bilkul ek jaisa regex, do file me.
+// Wo jaal is project me pehle bhi toota hai: 10 Agast ko yahan ka gate
+// 0.30 maang raha tha aur server 0.18 de raha tha, aur AADHAAR POORA
+// GAAYAB ho gaya (neeche line ~480 par poori kahani).
+//
+// Ab dono taraf ek hi file, aur uske apne test — src/shared/paath.test.js
+// me poora byora (kis asli galti se kaunsa test bana).
+// ⚠️ IMPORT AUR EXPORT DONO CHAHIYE — sirf `export {…} from` MAT likhna.
+// Wo naam ko sirf AAGE bhejta hai, is file ke andar laata NAHI. Ye galti
+// abhi hui thi aur build hi toot jaata, kyunki neeche line ~454 par
+// hasSentences/looksGarbled khud bulaye jaate hain.
+import { hasSentences, looksGarbled, MAX_FRAGMENT_RATIO } from "@/shared/paath";
+export { hasSentences, looksGarbled, MAX_FRAGMENT_RATIO };
 import { C, F } from "@/styles/theme";
 import { SaarthiOrb, StatusDot, Btn, ThinkingBubble, Prose, cleanOcrText } from "@/components/ui/Primitives";
 import { AudioEngine, HAS_EL } from "@/services/audioEngine";

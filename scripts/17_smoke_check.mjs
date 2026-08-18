@@ -34,6 +34,7 @@ if (existsSync(join(ROOT, ".env"))) {
 }
 
 const API = (env.VITE_AI_PROXY_URL || process.env.AI_PROXY_URL || "").trim().replace(/\/+$/, "");
+
 if (!API) {
   console.error("❌ .env me VITE_AI_PROXY_URL chahiye (Worker ka pata).");
   process.exit(1);
@@ -52,6 +53,24 @@ if (!API) {
  */
 const ORIGIN = (env.EVAL_ORIGIN || "https://saarthi-gyaan.netlify.app").trim();
 const SEARCH = API + "/search";
+
+/**
+ * ⚠️ SESSION HEADER DONO CALL PAR — 18 Agast 2026 ko yahi chhoot gaya tha.
+ *
+ * Us din `/chat` wali jaanch jodte waqt maine `H()` ki jagah plain object
+ * likh diya, aur usme `X-Saarthi-Session` reh hi nahi gaya. Nateeja: call
+ * anonymous jaati thi, din-bhar ke kote par 429 khaati thi, aur script
+ * "Ask section user ke liye BAND hai" chhaap deti thi — jo JHOOTH tha.
+ *
+ * Ye khatarnak isliye hai ki asli outage aur script ki apni galti bilkul
+ * ek jaise dikhte hain. Aur aaj subah asli outage hua bhi tha.
+ */
+const sirHeader = () => {
+  const h = { "Content-Type": "application/json", Origin: ORIGIN };
+  const t = (env.EVAL_SESSION || "").trim();
+  if (t) h["X-Saarthi-Session"] = t;
+  return h;
+};
 
 const { detectHintedBook } = await import("../src/knowledge/bookHints.js");
 const { normalizeQueryForSearch, expandQueryWithParyay, questionToTopic, stripMetaFraming } =
@@ -117,7 +136,7 @@ for (const [q, chahiye] of JAANCH) {
   try {
     const r = await fetch(SEARCH, {
       method: "POST",
-      headers: { "Content-Type": "application/json", Origin: ORIGIN },
+      headers: sirHeader(),
       body: JSON.stringify(body),
     });
     if (!r.ok) throw new Error(`HTTP ${r.status} — ${(await r.text()).slice(0, 120)}`);
@@ -188,7 +207,7 @@ if (!process.argv.includes("--nochat")) {
   const t0 = Date.now();
   try {
     const r = await fetch(API + "/chat", {
-      method: "POST", headers: { "Content-Type": "application/json", Origin: ORIGIN },
+      method: "POST", headers: sirHeader(),
       body: JSON.stringify({
         messages: [
           { role: "system", content: "Reply in one short line." },
@@ -202,7 +221,15 @@ if (!process.argv.includes("--nochat")) {
       console.log(`  ❌ /chat HTTP ${r.status} — ${txt.slice(0, 160)}`);
       if (r.status === 404) console.log(`     → model ka naam mar chuka hai. https://console.groq.com/docs/deprecations dekhein.`);
       if (r.status === 413) console.log(`     → request Groq ke token-budget se badi hai. worker me TOKEN_BUDGET dekhein.`);
-      if (r.status === 429) console.log(`     → kota ya raftaar-seema. Ye zaroori nahi ki kharabi ho.`);
+      // ⚠️ 429 KHARABI NAHI HAI — wo hamara apna din-bhar ka kota hai.
+      // Ise fail ginna matlab asli outage aur kote ke khatam hone me koi
+      // farq na rakhna. Owner token .env me ho to ye aata hi nahi.
+      if (r.status === 429) {
+        console.log(`     → Ye hamara apna kota hai, worker ki kharabi NAHI.`);
+        console.log(`     → .env me EVAL_SESSION (owner token) daalne par ye nahi aayega.\n`);
+        console.log(`  /search zinda hai. /chat jaancha nahi ja saka (kota).\n`);
+        process.exit(0);
+      }
       console.log(`\n  ⚠️  /search theek hai par /chat NAHI. Ask section user ke liye BAND hai.\n`);
       process.exit(1);
     }

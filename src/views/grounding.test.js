@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { looksGarbled, hasSentences, MAX_FRAGMENT_RATIO } from "./ChatView.jsx";
+import { looksGarbled, hasSentences, MAX_FRAGMENT_RATIO } from "@/shared/paath";
 
 /**
  * 2026-08-05 audit ka regression test.

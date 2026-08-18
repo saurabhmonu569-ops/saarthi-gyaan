@@ -1,3 +1,21 @@
+// ⚠️ SHUDDH NIYAM AB EK HI JAGAH — src/shared/paath.js  (2026-08-18)
+//
+// `hasSentences` aur `looksGarbled` yahan AUR ChatView.jsx me HAATH SE
+// do baar likhe the — bilkul ek jaisa regex, do file me. Wo jaal is
+// project me pehle bhi toota hai: 10 Agast ko client 0.30 maang raha tha
+// aur server 0.18 de raha tha, aur AADHAAR POORA GAAYAB ho gaya.
+//
+// Aur inka koi test nahi tha. 18 Agast ko is file (1,871 line) me chaar
+// bug mile aur unhe jaanchne ke liye source se `eval` karna pada.
+//
+// Ab dono taraf ek hi file, aur uske apne test (paath.test.js).
+import {
+  hasSentences, looksGarbled,
+  tokenAndaza, tokenBudgetMeKaato,
+  GROQ_TPM_SURAKSHIT, MAX_TOKENS_CAP,
+  ftsQuery,
+} from "../src/shared/paath.js";
+
 /**
  * SAARTHI AI Proxy v2 — "ROUTER-LITE" (Groq 70b → Gemini Flash backup)
  * =====================================================================
@@ -184,86 +202,15 @@ const MAX_BODY_BYTES = 100_000;
 // ka 7,000-akshar ka ansh ~7,000 token hai, jabki utna hi angrezi paath
 // ~2,000. Sirf akshar ginne wali koi bhi seema is corpus par jhooth bolegi.
 
-// ⚠️ DEVANAGARI KA BHAAR 2 HAI, 1 NAHI — 18 Agast ko naap kar badla.
-// Pehli koshish me 1 rakha tha ("ek akshar = ek token"). Us hisaab se
-// request 5,500 token ki thi aur budget me aa jaani chahiye thi — par Groq
-// ne PHIR BHI 413 diya. Yaani asli tokenizer Devanagari par ~2 token prati
-// akshar kharch karta hai (matra aur halant apne alag token bante hain).
-// Ye ank abhi bhi andaza hai, isliye neeche GROQ_TPM_SURAKSHIT me achha
-// khaasa bachav rakha hai.
-const DEV_BHAAR = 2;
 
-/** Mota-mota token andaza — Devanagari mehnga, Latin sasta. */
-function tokenAndaza(s) {
-  const t = String(s || "");
-  const dev = (t.match(/[ऀ-ॿ]/g) || []).length;
-  return Math.ceil(dev * DEV_BHAAR + (t.length - dev) / 3.5);
-}
 
-// Groq ka asli TPM 8,000 hai. 6,000 par kaam karte hain — 25% bachav,
-// kyunki upar wala token-andaza mota hai aur galti mehngi (413 = user ko
-// "dhyan-magn"). Ise badhane se pehle asli 413 ki ginti dekhni hogi.
-const GROQ_TPM_SURAKSHIT = 6_000;
 
-/**
- * Messages ko budget me laao — SYSTEM ko haath NAHI lagate.
- *
- * Kram jaan-boojhkar ye hai:
- *   1. system rehta hai (usme saare niyam hain — gadhne ke khilaf pehre
- *      bhi. Use kaatna jawab ko galat bana dega, chhota nahi.)
- *   2. purana itihaas pehle jaata hai (sabse kam kaam ka)
- *   3. aakhir me aaj ka sawaal+ansh kaata jaata hai, aur wo bhi ANT se —
- *      shuru ke ansh sabse achhe rerank wale hote hain.
- */
-function tokenBudgetMeKaato(messages) {
-  const sys   = messages.filter(m => m.role === "system");
-  let  baaki  = messages.filter(m => m.role !== "system");
-  const sysT  = sys.reduce((n, m) => n + tokenAndaza(m.content), 0);
-  let bacha   = TOKEN_BUDGET - sysT;
-
-  if (bacha <= 0) return [...sys, ...baaki.slice(-1)];   // asambhav, par surakshit
-
-  // peeche se aage — naya pehle
-  const rakhe = [];
-  for (let i = baaki.length - 1; i >= 0; i--) {
-    const m = baaki[i];
-    const t = tokenAndaza(m.content);
-    if (t <= bacha) { rakhe.unshift(m); bacha -= t; continue; }
-    // Sabse naya sandesh (aaj ka sawaal + ansh) — ise chhodna nahi,
-    // kaat kar rakhna hai. Baaki purane sandesh poore gira dete hain.
-    if (rakhe.length === 0) {
-      // ⚠️ Yahan bhi DEV_BHAAR laga — warna hisaab ulta ho jaata hai.
-      // Pehle yahan "1 akshar = 1 token" maan kar kaata tha jabki upar
-      // tokenAndaza() 2 gin raha tha. Nateeja: kaat-chhaant apni hi seema
-      // 4,400 ki jagah 5,598 par chhod deti thi — yaani jo pehra seema me
-      // laane ke liye tha, wo khud seema paar kar raha tha.
-      const dev = (String(m.content).match(/[ऀ-ॿ]/g) || []).length;
-      const devAnupaat = dev / Math.max(String(m.content).length, 1);
-      const aksharPerToken = devAnupaat > 0.4 ? (1 / DEV_BHAAR) : 3.5;
-      const kitne = Math.max(400, Math.floor(bacha * aksharPerToken));
-      rakhe.unshift({ ...m, content: String(m.content).slice(0, kitne) });
-      console.log(`[SAARTHI] token-budget: sandesh ${tokenAndaza(m.content)} se ~${bacha} token par kaata`);
-    }
-    break;
-  }
-  if (rakhe.length !== baaki.length) {
-    console.log(`[SAARTHI] token-budget: ${baaki.length} me se ${rakhe.length} sandesh bheje (budget ${TOKEN_BUDGET})`);
-  }
-  return [...sys, ...rakhe];
-}
 // FIX (2026-07-24, tuned 2026-07-25): 2000→2200 kiya tha truncation fix
 // karne ke liye, par uske baad Groq (429) + Gemini (429 "quota exceeded" +
 // 503 "high demand") dono baar-baar fail hone lage — bade max_tokens =
 // zyada TPM (tokens/minute) kharch per-request, jo free-tier ki asli
 // seema hai (RPM nahi). 1600 par settle — truncation-safe, kam TPM-bhaari.
-const MAX_TOKENS_CAP = 1600;
 
-// ⚠️ YE ANK ALAG-ALAG MAT LIKHNA — GHATA KAR NIKALO.
-// Pehli koshish me maine TOKEN_BUDGET (5,500) aur GROQ_TPM_SURAKSHIT
-// (6,000) alag-alag likh diye the. 5,500 input + 1,600 output = 7,100,
-// jo 6,000 ki apni hi seema paar kar raha tha. Do ank jo ek doosre par
-// nirbhar hain, unhe haath se do jagah likhna hi galti ki jad hai.
-const TOKEN_BUDGET = GROQ_TPM_SURAKSHIT - MAX_TOKENS_CAP;   // = 4,400
 
 // ── KAVACH 2: per-IP raftaar-seema ──
 // FIX (2026-07-25 audit): purana limiter sirf in-memory Map tha — Cloudflare
@@ -896,37 +843,8 @@ const SEARCH_QUOTA        = { semantic: 45, keyword: 20, cross: 20 };
  */
 const SEARCH_MAX_RERANK   = 100;
 
-/** ChatView.jsx ka hasSentences() — bilkul wahi regex */
-function hasSentences(text) {
-  const t = (text || "").trim();
-  if (!t) return false;
-  return /।|॥|(?:है|हैं|था|थी|थे|हुआ|हुई|होता|होती|करते|करना|चाहिये|चाहिए|गया|गयी|रहता|रहती)(?=[\s।॥,.]|$)/.test(t);
-}
 
-/** ChatView.jsx ka looksGarbled() — 32,032 chunks par naapa hua 0.40 */
-function looksGarbled(text) {
-  const w = String(text || "").match(/[ऀ-ॿ]+/g);
-  if (!w || w.length < 12) return false;
-  return w.filter(x => x.length <= 2).length / w.length > 0.40;
-}
 
-/**
- * Query se FTS5 ka MATCH banao.
- *
- * engine.js ki queryKeywords() jaisa hi: Devanagari 2+ akshar, Latin 3+,
- * stopwords bahar. Har shabd par PREFIX (`भय*`) isliye ki corpus mein
- * shabd jude hue roop mein hain — "भयसे", "भयके", "भयभीत". Bina prefix
- * ke "भय" akela kabhi match nahi karta.
- */
-function ftsQuery(q) {
-  const STOP = new Set("का के की को कि में से और पर यह जो है ने भी एक था the and for with".split(" "));
-  const words = [...String(q || "").toLowerCase().matchAll(/[ऀ-ॿ]{2,}|[a-z]{3,}/g)]
-    .map(m => m[0]).filter(w => !STOP.has(w));
-  const uniq = [...new Set(words)].slice(0, 12);
-  if (!uniq.length) return null;
-  // FTS5 mein " aur * khaas hain — shabd ko quote karke * bahar rakho
-  return uniq.map(w => `"${w.replace(/"/g, "")}"*`).join(" OR ");
-}
 
 /** 20-20 ke parallel batch — semanticSearch.js ke rerankPassages jaisa */
 async function rerankAll(env, query, texts) {
@@ -1816,7 +1734,7 @@ export default {
     const groqKeys = [env.GROQ_API_KEY, env.GROQ_API_KEY_2, env.GROQ_API_KEY_3, env.GROQ_API_KEY_4].filter(Boolean);
     // Groq ko hamesha budget me kaat kar bhejo. Chhoti request par
     // tokenBudgetMeKaato kuch badalta hi nahi (jaancha gaya).
-    const groqBody = { ...safeBody, messages: tokenBudgetMeKaato(safeBody.messages) };
+    const groqBody = { ...safeBody, messages: tokenBudgetMeKaato(safeBody.messages, console.log) };
     for (let i = 0; i < groqKeys.length; i++) {
       groqRes = await fetch(GROQ_URL, {
         method:  "POST",
