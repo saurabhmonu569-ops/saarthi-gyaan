@@ -7,7 +7,7 @@
  *   1. query kaise Devanagari mein badla
  *   2. cosine ne kaun se top-15 chunks nikale (book + score)
  *   3. reranker ne har ek ko kya score diya
- *   4. MIN_RERANK_SCORE (0.5) ke baad kaun bacha
+ *   4. server ka gate (0.30, naam liye granth par 0.18) ke baad kaun bacha
  *
  * CHALAO:
  *   node scripts/debug-query.mjs "मृत्यु के बाद आत्मा का क्या होता है"
@@ -17,13 +17,31 @@
 import { readFileSync, existsSync, readdirSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { toDevanagari } from "../src/knowledge/translit.js";
+import { normalizeQueryForSearch, stripMetaFraming, expandQueryWithParyay, questionToTopic } from "../src/knowledge/translit.js";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const EMB  = join(ROOT, "data", "embeddings");
 const BOOKS = join(ROOT, "public", "knowledge", "books");
 const DIM = 1024, ROW = 1028;
-const MIN_RERANK_SCORE = 0.5;      // ChatView.jsx ka wahi constant
+// ⚠️ 18 AGAST 2026 KO THEEK KIYA — YE ANK JHOOTHA HO CHUKA THA.
+// Yahan `0.5` likha tha aur uske aage tippani thi "ChatView.jsx ka wahi
+// constant". Dono baatein ab galat hain:
+//   1. ChatView ne 10 Agast ko apna gate HATA DIYA (line ~480 par poori
+//      wajah likhi hai — do jagah ek hi niyam rakhne se wo server se
+//      takra raha tha).
+//   2. Asli gate ab SERVER par hai: SEARCH_MIN_RERANK = 0.30, aur jis
+//      granth ka naam sawaal me liya gaya ho uske liye 0.18.
+//
+// Nateeja: ye script "gate ke baad bache" ki JHOOTHI ginti dikha rahi
+// thi — asli se sakht. Aaj Sati wale sawaal ki jaanch me yahi bhram
+// hua, aur kuch der ye lagta raha ki sahi ansh gate ne kaata jabki
+// asli gate usse alag hai.
+//
+// Seekh wahi purani: ek hi ank do jagah likha ho to wo ek din alag ho
+// hi jaata hai. Isliye ab dono yahan saath likhe hain, aur badalne par
+// worker ke saath milana ZAROORI hai.
+const MIN_RERANK_SCORE        = 0.30;   // worker: SEARCH_MIN_RERANK
+const MIN_RERANK_HINTED       = 0.18;   // worker: SEARCH_HINTED_MIN_RERANK
 const SHOW = 15;
 
 const query = process.argv.slice(2).join(" ").trim();
@@ -57,9 +75,38 @@ for (const f of readdirSync(BOOKS).filter(x => x.endsWith(".json"))) {
   for (const c of (b.chunks || [])) TEXT.set(c.id, (c.text || "").trim());
 }
 
-const dev = toDevanagari(query);
+// ⚠️ 18 AGAST 2026 — YE SCRIPT APP SE ALAG QUERY BHEJ RAHI THI.
+//
+// Pehle yahan sirf `toDevanagari(query)` tha, aur wahi dono jagah
+// (cosine aur reranker) chala jaata tha. Par app TEEN kadam se guzarti
+// hai, aur wo teeno alag-alag natija dete hain:
+//
+//   normalizeQueryForSearch → stripMetaFraming → expandQueryWithParyay  (cosine/FTS ko)
+//                                              → questionToTopic       (reranker ko)
+//
+// Farq chhota nahi tha:
+//     debug-query :  "सती के जन्म की story क्या है?"     ← "story" angrezi hi rahi
+//     APP         :  "सती के जन्म की कथा क्या है?"        ← "कथा" ban gaya
+//
+// Yaani jab bhi is script se "reranker ne galat score diya" ka nidaan
+// kiya jaata, wo APP KE SCORE THE HI NAHI. Aaj Sati aur Makar Rashi ki
+// jaanch me theek yahi hua — kuch der galat ank par bahas hoti rahi.
+//
+// Ye wahi kism ki galti hai jo isi file me gate ke ank (0.5 vs asli 0.30)
+// ke saath thi. Debug-auzaar agar app se alag chale to wo nidaan nahi,
+// bhram deta hai — aur uska bhram sabse mehnga hota hai, kyunki uspar
+// bharosa karke asli code badla jaata hai.
+const { query: nq } = normalizeQueryForSearch(query);
+const baseQ  = stripMetaFraming(nq);
+const findQ  = expandQueryWithParyay(baseQ);   // cosine + FTS ko yahi jaata hai
+const rerankQ = questionToTopic(baseQ);        // reranker ko yahi jaata hai
+const dev = findQ;
+
 console.log(`\nsawaal   : ${query}`);
-console.log(`translit : ${dev}${dev === query ? "   (pehle se Devanagari)" : ""}\n`);
+console.log(`findQ    : ${findQ}          (cosine/FTS ko)`);
+console.log(`rerankQ  : ${rerankQ}          (reranker ko)`);
+if (findQ !== rerankQ) console.log(`           ⚠️ dono alag hain — app me bhi aisa hi hai`);
+console.log();
 
 // 1. cosine
 const r1 = await fetch(api("@cf/baai/bge-m3"), {
@@ -85,7 +132,7 @@ const cands = order.map(i => ({ id: idx.chunks[i].id, book: idx.chunks[i].book, 
 const r2 = await fetch(api("@cf/baai/bge-reranker-base"), {
   method: "POST", headers: { Authorization: `Bearer ${TOK}`, "Content-Type": "application/json" },
   body: JSON.stringify({
-    query: dev,
+    query: rerankQ,   // ⚠️ reranker ko rerankQ, findQ NAHI — app bhi yahi karti hai
     contexts: cands.map(c => ({ text: (TEXT.get(c.id) || "").slice(0, 1200) })),
     top_k: cands.length,
   }),

@@ -1356,6 +1356,114 @@ export default {
           : [];
         const pakkaIds = new Set(hintedBest.map(c => c.id));
 
+        // ── COSINE KA SABSE ACHHA ANSH RERANKER MAAR NA SAKE ────────────
+        //
+        // ⚠️ 18 AGAST 2026 — DO ASLI MAMLON SE NIKLA, ANDAAZE SE NAHI.
+        //
+        // (1) "Makar Rashi ke practical traits kya bataye jate hain?"
+        //       cosine #1   "मकर (0) 2 राशियों में यह दसवीं राशि है"   rerank 0.1238  ✗ PHENKA
+        //       cosine #13  "मंगल पर सूर्य की दृष्टि हो तो जातक…"      rerank 0.9956  ✅ SABSE UPAR
+        //     Nau ansh gate paar kar gaye — कर्क, मिथुन, मीन raashi ke —
+        //     aur unme EK BHI मकर ka nahi tha. Sirf wahi phenka gaya.
+        //
+        // (2) "Sati ke janm ki story kya hai?"
+        //       cosine #3   "शोभामयी सती किस प्रकार उत्पन्न हुईं"      rerank 0.1220  ✗ PHENKA
+        //       cosine #6   "…फिर लक्ष्मीजी क्षीर-समुद्रसे"           rerank 0.9994  ✅ SABSE UPAR
+        //     Jawab me Lakshmi ki katha aayi, Sati ki nahi — aur model ne
+        //     jo shlok uddhrit kiya usme KHUD "लक्ष्मीजी" likha tha.
+        //
+        // DONO BAAR COSINE SAHI THA AUR RERANKER ULTA.
+        //
+        // ⚠️ PAR RERANKER HATANA GALAT HOGA — wo bina wajah nahi joda gaya.
+        // Upar RERANK_MODEL ki tippani me uski apni naap likhi hai:
+        //     cosine    sahi-min 0.4941  kachra-max 0.4882  gap +0.0059
+        //     reranker  sahi-min 0.9009  kachra-max 0.0131  gap +0.8878
+        // Yaani wo kachra chhaantne me 150 guna behtar hai — JAB kaam kare.
+        // Samasya "kaam nahi karta" nahi, "kabhi-kabhi ULTA karta hai" hai.
+        //
+        // ISLIYE: dono judge rakhte hain, par kisi EK ko doosre ko CHUP-CHAAP
+        // VETO karne nahi dete. Cosine ke sabse achhe 3 ansh hamesha jaate
+        // hain — reranker unhe kaat nahi sakta.
+        //
+        // Ye theek wahi tark hai jo upar HINTED_PAKKA ke saath likha hai:
+        // "threshold ka kaam hai jab kuch prasangik NA MILE tab chup rehna.
+        //  Par jab ansh saamne pade hon, tab 'mila ya nahi' ka sawaal hi
+        //  nahi banta."
+        //
+        // KYUN 3:
+        //   • Makar wala ansh cosine #1 par tha, Sati wala #3 par. 2 rakhne
+        //     par Sati ka mamla phir bhi tootta.
+        //   • Vectorize se 45 aate hain — 3 yaani upar ke 6.7%. Wo "cosine
+        //     ko pakka bharosa hai" wali patli katar hai, chaudi nahi.
+        //   • OCR-kachra aur table pehle hi bahar hain (`usable` me
+        //     hasSentences + !looksGarbled lag chuke hain).
+        //   • Per-book cap (3) iske BAAD bhi lagta hai, to ek granth poora
+        //     jawab nahi bhar sakta.
+        //
+        // ⚠️ KHATRA JO MAANNA CHAHIYE: ye ansh gate ke BINA jaate hain. Agar
+        // kisi sawaal par corpus me kuch prasangik hai hi nahi, to cosine ke
+        // top-3 phir bhi jayenge aur JHOOTHI CITATION ban sakti hai. Isliye
+        // badalne se PEHLE aur BAAD me ye chalana zaroori hai:
+        //     node scripts/14_eval_search.mjs --set control
+        // Dekhna sirf ek cheez — JHOOTHI CITATION 0 rahi ya nahi.
+        //
+        // NAAP: 19_eval_perbook ise pakad HI NAHI sakti — Makar wale sawaal
+        // me sahi GRANTH mila hi tha, galti granth ke ANDAR thi. Iski naap
+        // 29_vishay_jaanch.mjs hai. Aaj ka baseline: 40 me se 10 sandigdh
+        // (25%), usme 5 asli reranker ki galti (12.5%).
+        //
+        // ════════════════════════════════════════════════════════════════
+        // ⛔ AAZMAYA AUR WAPAS LIYA — 18 Agast 2026, usi din, ek naap me.
+        // ════════════════════════════════════════════════════════════════
+        // COSINE_PAKKA = 3 deploy kiya. Nateeja:
+        //
+        //     14_eval_search --set control :  JHOOTHI CITATION 0 → 21/38
+        //     29_vishay_jaanch             :  sandigdh 25% → 23%  (shor ke andar)
+        //
+        // Yaani nuksaan bada, fayda lagbhag shoonya. Do baatein main NAHI
+        // soch paya, aur dono peeche mudkar saaf dikhti hain:
+        //
+        // 1. GATE KA DOOSRA KAAM — CHUP REHNA.
+        //    Maine gate ko sirf "kachra rok" samjha. Uska asli kaam ye bhi
+        //    hai ki JAB KUCH PRASANGIK HAI HI NAHI, TAB KUCH NA DE. Par
+        //    cosine hamesha top-3 laut-ta hai — "iPhone 15 ka price" par bhi.
+        //    Un par best rerank 0.0001 tha, aur mera jaal unhe seedha andar
+        //    le aaya:
+        //        "Python mein for loop kaise likhte hain" → mantra_maha_sagar
+        //        "मेरा वाई-फाई राउटर काम नहीं कर रहा"      → atharvaveda, rigveda
+        //    Ye us bharose ko kaatta hai jo poori app kamane ki koshish
+        //    karti hai — aur wo galat jawab se bhi mehnga hai.
+        //
+        // 2. GATE PAAR KARNA ≠ SABSE UPAR AANA.
+        //    Makar wala ansh ab gate paar kar gaya, par kram abhi bhi
+        //    rerank se banta hai — to wo 0.1238 ke saath SABSE NEECHE raha
+        //    aur "मंगल" wala 0.9956 ke saath sabse upar. Model ne phir wahi
+        //    galat ansh uthaya. 29_vishay_jaanch me namoona 28 jyon ka tyon
+        //    hai.
+        //
+        // ➡️ ASLI SAMASYA GATE KI NAHI, KRAM KI HAI.
+        //    Aage jo bhi koshish ho, wo "kaun andar aaye" par nahi, "kaun
+        //    PEHLE dikhe" par honi chahiye — jaise cosine aur rerank ke
+        //    KRAM ko milana (score ko nahi, kyunki #21 ke mutabik rerank ke
+        //    score batch-sapeksh hain aur unhe jodna asangat hai).
+        //
+        // 0 = band. Ise dobara chalu karne se pehle upar wali dono baatein
+        // padh lijiye — warna wahi do din dobara jaayenge.
+        const COSINE_PAKKA = 0;
+        const cosineBest = usable
+          .filter(c => c.src === "semantic" && typeof c.score === "number")
+          .sort((a, b) => b.score - a.score)
+          .slice(0, COSINE_PAKKA);
+        let cosineBachaye = 0;
+        for (const c of cosineBest) {
+          if (!pakkaIds.has(c.id) && c.rerank < floorFor(c)) cosineBachaye++;
+          pakkaIds.add(c.id);
+        }
+        if (cosineBachaye) {
+          console.log(`[SAARTHI] cosine-pakka: ${cosineBachaye} ansh bachaye `
+            + `(reranker ne inhe gate se neeche rakha tha)`);
+        }
+
         const passed = usable
           .filter(c => pakkaIds.has(c.id) || c.rerank >= floorFor(c))
           .sort((a, b) => {
