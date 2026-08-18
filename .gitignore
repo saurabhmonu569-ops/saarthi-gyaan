@@ -53,6 +53,15 @@ public/knowledge/embeddings/.embed-progress.json
 # badalte hain aur inki tulna sirf ek hi machine par matlab rakhti hai.
 eval-*.json
 
+# 18 Agast 2026 ke naye naap-nateeje. gate-calibrate.json akela 1.5 MB ka
+# hai (217 sawaalon ke poore pool-ank). Ise dobara banane ki zarurat nahi
+# padti — 35_gate_calibrate.mjs --sirf-hisaab usi file par sab threshold
+# offline tol leta hai. Par wo EK din ki tasveer hai; repo me rakhne se
+# aage jaakar purani tasveer ko sach maan lene ka khatra hai.
+khaali-jaanch.json
+khaali-kyun.json
+gate-calibrate.json
+
 # Environment (NEVER commit your API key!)
 .env
 .env.local
