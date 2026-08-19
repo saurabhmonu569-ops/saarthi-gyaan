@@ -908,7 +908,60 @@ async function rerankAll(env, query, texts) {
       }
       return { at, s };
     } catch (e) {
-      console.log("[SAARTHI-SEARCH] rerank batch fail @" + at + " — " + (e?.message || e));
+      // ══ EK DOOSRA MAUKA — 19 Agast 2026 ═══════════════════════════════
+      //
+      // Pehle atka hua batch SEEDHE CHHOD diya jaata tha: uske 20 ansh ka
+      // ank 0 rehta aur wo gate par gir jaate. Wo "fail-soft" tha, par
+      // uski keemat naapi nahi gayi thi.
+      //
+      // NAAPA (38_sthirta.mjs — 5 sawaal, har ek 5 baar):
+      //     pool badla           : 0/5   ← Vectorize ka ANN bekasoor
+      //     ank badle            : 3/5
+      //     jawab badla          : 2/5
+      //     rerank batch chhoote : 3/5   ← THEEK WAHI 3
+      //
+      // Mel poora tha. "रामचरितमानस में भक्ति" par doosre daur me ek batch
+      // atka: best 0.9982 se girkar 0.7358 ho gaya aur 14 ki jagah 12 ansh
+      // laute. Yaani SABSE ACHHA ansh hi gaayab ho gaya — sirf isliye ki
+      // uska batch us baar dheema tha.
+      //
+      // ⚠️ YAHI #42 KA SROT HAI — "wahi sawaal, alag jawab" (29% shor, ek
+      // sawaal par 100%). Uske liye teen anumaan lagaye ja chuke the aur
+      // teeno galat nikle: batch-sapeksh score (#21, khaarij), Vectorize ka
+      // ANN (yahan khaarij), aur gate. Asli wajah ye chaar-second thi.
+      //
+      // AB: ek baar aur koshish. Baaki batch pehle hi parallel me poore ho
+      // chuke hote hain, isliye ye der SIRF tab lagti hai jab sach me kuch
+      // atka ho — aam mamle par raftaar par koi asar nahi. Rerank ka beech
+      // ka samay 722ms hai, yaani dobari koshish aksar turant lauti hai.
+      //
+      // Do baar fail ho to phir bhi 0 hi rahega (fail-soft wahi rahega),
+      // par ab wo neeche `_chhoote` me ginega — aur wo ginti ab naapi
+      // jaati hai (38_sthirta.mjs use dekhti hai).
+      console.log("[SAARTHI-SEARCH] rerank batch fail @" + at + " — " + (e?.message || e) + " · ek baar aur…");
+      try {
+        const out2 = await Promise.race([
+          env.AI.run(RERANK_MODEL, {
+            query,
+            contexts: t.map(x => ({ text: String(x).slice(0, RERANK_MAX_CHARS) })),
+            top_k: t.length,
+          }),
+          new Promise((_, rej) =>
+            setTimeout(() => rej(new Error(`batch @${at} dobara bhi ${RERANK_TIMEOUT_MS}ms me nahi laut`)), RERANK_TIMEOUT_MS)),
+        ]);
+        const list2 = out2?.response || out2?.result?.response || (Array.isArray(out2) ? out2 : null);
+        if (Array.isArray(list2)) {
+          const s2 = new Array(t.length).fill(0);
+          for (const it of list2) {
+            const i = it?.id ?? it?.index, v = it?.score ?? it?.relevance_score;
+            if (Number.isInteger(i) && i >= 0 && i < s2.length && typeof v === "number") s2[i] = v;
+          }
+          console.log("[SAARTHI-SEARCH] rerank batch @" + at + " doosri koshish me BACH GAYA ✅");
+          return { at, s: s2 };
+        }
+      } catch (e2) {
+        console.log("[SAARTHI-SEARCH] rerank batch @" + at + " doosri baar bhi fail — " + (e2?.message || e2));
+      }
       return { at, s: null };
     }
   }));
