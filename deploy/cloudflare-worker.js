@@ -462,7 +462,40 @@ async function verifySessionToken(token, env) {
 // ke liye — Cloudflare dashboard → Worker → Logs (ya "wrangler tail") mein
 // live dikhega ki har request ENGINE 1/2/3 mein se kis se hokar gayi.
 async function tryGemini(safeBody, env) {
-  if (!env.GEMINI_API_KEY) { console.log("[SAARTHI] ENGINE 2 (Gemini) SKIP — GEMINI_API_KEY set nahi hai"); return null; }
+  // ══ GEMINI KI BHI KAI CHAABI — 19 Agast 2026 ═══════════════════════════
+  //
+  // ⚠️ AAJ TAK YAHAN EK HI KEY THI, JABKI GROQ KE PAAS CHAAR KA LOOP HAI.
+  // Aur traffic bilkul ULTA chalta hai. Naapa gaya (10 sawaal, hindi_100):
+  //
+  //     gemini-3.5-flash   10 jawab   ← 100%
+  //     gpt-oss-120b        0 jawab
+  //
+  // Wajah ginti me hai, ittefaq me nahi:
+  //     Groq ka surakshit budget      6,000 token
+  //        SYSTEM PROMPT              3,669 token   (61%)
+  //        max_tokens (jawab)         1,400 token   (23%)
+  //        ────────────────────────────────────
+  //        sandarbh ke liye bacha       931 token   (16%)
+  //     par EK ansh (800 akshar Devanagari) = ~1,600 token
+  //
+  // Yaani Groq me EK BHI ANSH nahi samaata. Uski asli seema 8,000 par bhi
+  // sirf 1-2 ansh aayenge — aur 18 Agast ko yahi soch kar tay kiya gaya tha
+  // ki sandarbh KAAT kar Groq me ghusaane se achha hai poore ansh ke saath
+  // Gemini ko dena (us faisle ki tippani neeche router me hai).
+  //
+  // ⚠️ PAR US FAISLE KA EK NATIJA CHHOOT GAYA THA: ab Ask ka 100% bojh EK
+  // Gemini key par hai, jabki chaar Groq keys khaali baithi hain. Chaar
+  // keys RAFTAAR badhati hain, request ka AAKAR nahi — aur yahan masla
+  // aakar ka hai, isliye wo Ask me kabhi kaam nahi aayengi.
+  //
+  // Ab Gemini bhi wahi kram chalata hai jo Groq karta hai: pehli key,
+  // 429/5xx par agli. Naye key jodne ke liye sirf secret set karna hai:
+  //     npx wrangler secret put GEMINI_API_KEY_2
+  const geminiKeys = [
+    env.GEMINI_API_KEY, env.GEMINI_API_KEY_2,
+    env.GEMINI_API_KEY_3, env.GEMINI_API_KEY_4,
+  ].filter(Boolean);
+  if (!geminiKeys.length) { console.log("[SAARTHI] ENGINE 2 (Gemini) SKIP — GEMINI_API_KEY set nahi hai"); return null; }
 
   const sys      = safeBody.messages.find(m => m.role === "system");
   const contents = safeBody.messages
@@ -516,14 +549,26 @@ async function tryGemini(safeBody, env) {
   };
 
   try {
-    const res = await fetch(GEMINI_URL, {
-      method:  "POST",
-      headers: { "Content-Type": "application/json", "x-goog-api-key": env.GEMINI_API_KEY },
-      body:    JSON.stringify(payload),
-    });
-    if (!res.ok) {
-      const errBody = await res.text().catch(() => "");
-      console.log(`[SAARTHI] ENGINE 2 (Gemini) FAIL — HTTP ${res.status} — ${errBody.slice(0, 300)}`);
+    // ⚠️ KEY-DAR-KEY — bilkul wahi kram jo Groq ke loop me hai.
+    // 429 (kota) ya 5xx (gira) par hi agli key aazmao. 400/403 jaisi galti
+    // sab keys par ek jaisi hogi — waqt zaya karne ka koi matlab nahi.
+    let res = null, errBody = "";
+    for (let i = 0; i < geminiKeys.length; i++) {
+      res = await fetch(GEMINI_URL, {
+        method:  "POST",
+        headers: { "Content-Type": "application/json", "x-goog-api-key": geminiKeys[i] },
+        body:    JSON.stringify(payload),
+      });
+      if (res.ok) {
+        if (i > 0) console.log(`[SAARTHI] ENGINE 2 (Gemini) — key #${i + 1} ne bacha liya ✅`);
+        break;
+      }
+      errBody = await res.text().catch(() => "");
+      console.log(`[SAARTHI] ENGINE 2 (Gemini, key #${i + 1}) FAIL — HTTP ${res.status} — ${errBody.slice(0, 200)}`);
+      if (!(res.status === 429 || res.status >= 500)) break;
+    }
+    if (!res || !res.ok) {
+      console.log(`[SAARTHI] ENGINE 2 (Gemini) FAIL — ${geminiKeys.length} me se koi key kaam nahi aayi`);
       return null;                       // Gemini bhi vyast/fail → null
     }
     const data = await res.json();

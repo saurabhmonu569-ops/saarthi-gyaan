@@ -96,6 +96,7 @@ console.log(`${"═".repeat(74)}\n`);
 const byora = [];
 let chup = 0, aadhaarAaya = 0, kulGadhe = 0, girGaye = 0, binaSoochi = 0, gadbad = 0, khaali = 0;
 let sochneKulToken = 0, kateHue = 0;
+const enjGinti = {}, enjAkshar = {};
 
 for (let i = 0; i < sawaal.length; i++) {
   const q = sawaal[i];
@@ -153,10 +154,25 @@ for (let i = 0; i < sawaal.length; i++) {
   // ⚠️ Har jawab ke saath token ka hisaab — bina iske "khaali kyun aaya"
   // sirf andaaza rehta hai. `sochne` = reasoning token (gpt-oss ek
   // reasoning model hai aur wo USI budget se kharch hota hai).
+  // ⚠️ ENGINE KA NAAM SABSE PEHLE — iske bina jawab ki gunvatta ka koi
+  // bhi nidaan bemaani hai.
+  //
+  // 19 Agast: 8 jawab naape gaye aur wo Groq ke `reasoning_effort` ke
+  // asar jaise dikhe. Byora khola to SAARE 8 GEMINI SE AAYE THE — Groq
+  // ne 429 diya hoga aur router ne Engine 2 bula liya. Yaani jis setting
+  // ka asar naapa ja raha tha, wo laga hi nahi tha.
+  //
+  // Aur ye koi dur ki sambhavna nahi hai: Groq ki seema 8,000 TPM hai,
+  // isliye aam traffic ka bada hissa PEHLE SE Gemini par jaata hai.
   const t = meta.token || {};
-  const tokenLine = `ant=${meta.ant ?? "?"} · jawab-token ${t.jawab ?? "?"} (sochne me ${t.sochne ?? "?"})`;
+  const enj = (meta.model || "?").replace(/^openai\//, "");
+  const tokenLine = `[${enj}] ant=${meta.ant ?? "?"} · jawab ${String(text||"").length} akshar`
+    + (t.jawab != null ? ` · token ${t.jawab} (sochne me ${t.sochne ?? "?"})` : " · token: engine nahi batata");
   if (t.sochne != null && t.jawab != null && t.sochne > 0) sochneKulToken += t.sochne;
   if (meta.ant === "length") kateHue++;
+  { const e = (meta.model || "?").replace(/^openai\//, "");
+    enjGinti[e] = (enjGinti[e] || 0) + 1;
+    enjAkshar[e] = (enjAkshar[e] || 0) + String(text || "").length; }
 
   if (khaaliJawab) {
     khaali++;
@@ -202,6 +218,13 @@ console.log(`  purane vyavhaar par gire   : ${girGaye}   ← saare granth dikhe`
 // par Groq par kabhi dekha hi nahi gaya — aur Groq MUKHYA engine hai.
 console.log(`  budget khatam hone se KATE  : ${kateHue}/${kul}   ← finish_reason "length"`);
 console.log(`  "sochne" me gaye kul token  : ${sochneKulToken.toLocaleString()}`);
+
+// ⚠️ KAUN SA ENGINE — aur uske jawab kitne lambe. Router Groq ke fail hone
+// par Gemini bula leta hai, aur dono ka andaz alag hai. Iske bina "jawab
+// chhota ho gaya" jaisi shikayat ka nidaan ho hi nahi sakta.
+console.log(`  engine —`);
+for (const [e, n] of Object.entries(enjGinti).sort((a, b) => b[1] - a[1]))
+  console.log(`     ${e.padEnd(24)} ${n} jawab · ausat ${Math.round(enjAkshar[e] / n)} akshar`);
 
 // ⚠️ Ye tulna hi is script ka poora matlab hai.
 if (isControl) {
