@@ -155,5 +155,31 @@ export async function jawabLo(sawaal, dhale, prompt, koshish = 1) {
   }
   if (!r.ok) throw new Error(`/chat HTTP ${r.status} — ${(await r.text()).slice(0, 120)}`);
   const j = await r.json();
-  return j?.choices?.[0]?.message?.content || j?.text || "";
+
+  // ⚠️ SIRF `content` MAT LAUTAO — `finish_reason` aur `usage` BHI.
+  //
+  // 19 Agast: 12 me se 3 jawab BILKUL KHAALI aaye. Wajah dhoondhne ke liye
+  // worker me kuch jodne ki taiyari ho rahi thi — tabhi dikha ki worker
+  // Groq ka jawab JAISA HAI WAISA aage bhej deta hai. Yaani `finish_reason`
+  // aur reasoning-token ki ginti PEHLE SE yahan aa rahi thi, aur script
+  // unhe pheink rahi thi.
+  //
+  // KYUN YE ZAROORI HAI: `openai/gpt-oss-120b` ek REASONING model hai. Wo
+  // "sochne" me bhi token kharch karta hai, aur wo kharch usi max_tokens
+  // budget se nikalta hai. Budget khatam → content khaali, `finish_reason:
+  // "length"`. Bilkul yahi bug Gemini par pakda aur `thinkingLevel: "low"`
+  // se theek kiya gaya tha (worker line ~482) — par Groq par kabhi dekha
+  // hi nahi gaya, aur Groq hi MUKHYA engine hai.
+  const ch = j?.choices?.[0] || {};
+  const u  = j?.usage || {};
+  return {
+    text: ch?.message?.content || j?.text || "",
+    ant: ch?.finish_reason || null,          // "stop" = poora, "length" = kat gaya
+    token: {
+      jawab: u.completion_tokens ?? null,
+      sochne: u.completion_tokens_details?.reasoning_tokens ?? null,
+      sawaal: u.prompt_tokens ?? null,
+    },
+    model: j?.model || null,
+  };
 }

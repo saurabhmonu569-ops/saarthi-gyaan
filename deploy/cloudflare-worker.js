@@ -1967,7 +1967,44 @@ export default {
     const groqKeys = [env.GROQ_API_KEY, env.GROQ_API_KEY_2, env.GROQ_API_KEY_3, env.GROQ_API_KEY_4].filter(Boolean);
     // Groq ko hamesha budget me kaat kar bhejo. Chhoti request par
     // tokenBudgetMeKaato kuch badalta hi nahi (jaancha gaya).
-    const groqBody = { ...safeBody, messages: tokenBudgetMeKaato(safeBody.messages, console.log) };
+    // ══ REASONING KO KAM KARO — WARNA JAWAB KE LIYE TOKEN BACHTA HI NAHI ══
+    //                                                    19 Agast 2026
+    // `openai/gpt-oss-120b` ek REASONING model hai. Wo "sochne" me bhi
+    // token kharch karta hai, aur wo kharch USI `max_tokens` budget se
+    // nikalta hai jisme jawab aana hai.
+    //
+    // NAAPA GAYA (37_citation_naap.mjs, 12 sawaal, budget 900):
+    //     "sochne" me gaye token : 461 se 898 tak  (ausat ~741)
+    //     finish_reason "length" : 8/12
+    //     jawab BILKUL KHAALI    : 2/12  — dono me sochne me 898/900
+    //     [[GRANTH]] pankti gayab: 8/12  — theek wahi 8 jo kate the
+    //
+    // Yaani model apne budget ka 51% se 100% tak sirf sochne me kharch kar
+    // raha tha. TEEN alag shikayaton ki jad yahi ek cheez nikli:
+    //     • jawab bilkul khaali aana
+    //     • jawab beech-vaakya me kat jana
+    //     • Aadhaar me ZYADA granth aana — kyunki `[[GRANTH: …]]` pankti
+    //       jawab ke ANT me aati hai, aur kate hue jawab me wo pahunchti
+    //       hi nahi. Uske bina code purane (saare granth dikhao) vyavhaar
+    //       par gir jaata hai.
+    //
+    // ⚠️ YE BUG PEHLE BHI PAKDA JA CHUKA HAI — PAR DOOSRE ENGINE PAR.
+    // Gemini ke liye upar (line ~482) `thinkingLevel: "low"` isi wajah se
+    // lagaya gaya tha, poori tippani ke saath. Groq par kabhi dekha hi
+    // nahi gaya — aur GROQ MUKHYA ENGINE HAI. Ek hi bimari, do engine, aur
+    // hum ek hi taraf dawa lagaye baithe the.
+    //
+    // "low" hi kyun, "none" nahi: Gemini par bhi wahi chuna gaya tha, aur
+    // thoda sochna jawab ki gunvatta ke liye kaam ka hai. Ise badalne se
+    // pehle 37_citation_naap.mjs dobara chalao — wo teeno ank ek saath
+    // dikhata hai (khaali, kate, sochne ke token).
+    const GROQ_REASONING = "low";
+
+    const groqBody = {
+      ...safeBody,
+      reasoning_effort: GROQ_REASONING,
+      messages: tokenBudgetMeKaato(safeBody.messages, console.log),
+    };
     for (let i = 0; i < groqKeys.length; i++) {
       groqRes = await fetch(GROQ_URL, {
         method:  "POST",

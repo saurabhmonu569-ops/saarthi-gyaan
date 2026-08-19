@@ -95,6 +95,7 @@ console.log(`${"═".repeat(74)}\n`);
 
 const byora = [];
 let chup = 0, aadhaarAaya = 0, kulGadhe = 0, girGaye = 0, binaSoochi = 0, gadbad = 0, khaali = 0;
+let sochneKulToken = 0, kateHue = 0;
 
 for (let i = 0; i < sawaal.length; i++) {
   const q = sawaal[i];
@@ -124,8 +125,10 @@ for (let i = 0; i < sawaal.length; i++) {
   }
 
   const dhale = await dhaalo(ch);
+  let meta;
   try {
-    jawab = await jawabLo(q, dhale, prompt);
+    meta = await jawabLo(q, dhale, prompt);
+    jawab = meta.text;
   } catch (e) {
     gadbad++; console.log(`  ⚠️  ${n} /chat fail — ${e.message}`); continue;
   }
@@ -147,14 +150,24 @@ for (let i = 0; i < sawaal.length; i++) {
   if (!soochiMili) binaSoochi++;
   if (girGaya) girGaye++;
 
+  // ⚠️ Har jawab ke saath token ka hisaab — bina iske "khaali kyun aaya"
+  // sirf andaaza rehta hai. `sochne` = reasoning token (gpt-oss ek
+  // reasoning model hai aur wo USI budget se kharch hota hai).
+  const t = meta.token || {};
+  const tokenLine = `ant=${meta.ant ?? "?"} · jawab-token ${t.jawab ?? "?"} (sochne me ${t.sochne ?? "?"})`;
+  if (t.sochne != null && t.jawab != null && t.sochne > 0) sochneKulToken += t.sochne;
+  if (meta.ant === "length") kateHue++;
+
   if (khaaliJawab) {
     khaali++;
     console.log(`  ⬛ ${n} JAWAB KHAALI (${dhale.length} ansh bheje the) — ${q.slice(0, 46)}`);
+    console.log(`      ${tokenLine}`);
   } else if (granth.length) {
     aadhaarAaya++;
     const chinh = isControl ? "❌" : "📚";
     console.log(`  ${chinh} ${n} Aadhaar: ${granth.join(" · ")}`);
     console.log(`      ${q.slice(0, 62)}`);
+    console.log(`      ${tokenLine}`);
   } else {
     chup++;
     console.log(`  🔇 ${n} chup (Aadhaar khaali) — ${q.slice(0, 50)}`);
@@ -162,7 +175,9 @@ for (let i = 0; i < sawaal.length; i++) {
   if (gadhe.length) console.log(`      ⚠️ model ne gadha: ${gadhe.join(" · ")}`);
   if (DIKHAO) console.log(`\n${text.split("\n").map(l => "      " + l).join("\n")}\n`);
 
-  byora.push({ q, aadhaar: granth, gadhe, soochiMili, girGaya, khaaliJawab, bheje: dhale.length, jawab: text });
+  byora.push({ q, aadhaar: granth, gadhe, soochiMili, girGaya, khaaliJawab,
+               ant: meta.ant, token: meta.token, model: meta.model,
+               bheje: dhale.length, jawab: text });
   await so(400);
 }
 
@@ -179,6 +194,14 @@ console.log(`  AADHAAR AAYA     : ${aadhaarAaya}/${kul}` + (isControl ? (aadhaar
 console.log(`  model ne gadhe naam likhe : ${kulGadhe}   ← mel ne roka`);
 console.log(`  model ne soochi hi nahi di : ${binaSoochi}`);
 console.log(`  purane vyavhaar par gire   : ${girGaye}   ← saare granth dikhe`);
+// ⚠️ YE DO LINE HI "KHAALI JAWAB" KA NIDAAN HAIN.
+// gpt-oss ek REASONING model hai — wo "sochne" me bhi token kharch karta
+// hai, aur wo kharch USI max_tokens budget se nikalta hai. Budget khatam
+// → content khaali → finish_reason "length". Yahi bug Gemini par pakda
+// aur `thinkingLevel: "low"` se theek kiya gaya tha (worker line ~482),
+// par Groq par kabhi dekha hi nahi gaya — aur Groq MUKHYA engine hai.
+console.log(`  budget khatam hone se KATE  : ${kateHue}/${kul}   ← finish_reason "length"`);
+console.log(`  "sochne" me gaye kul token  : ${sochneKulToken.toLocaleString()}`);
 
 // ⚠️ Ye tulna hi is script ka poora matlab hai.
 if (isControl) {
