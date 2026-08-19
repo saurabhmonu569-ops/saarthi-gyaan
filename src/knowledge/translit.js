@@ -490,6 +490,10 @@ const WORDS = {
 // 24 granthon ke 6,000 sabse aam Devanagari shabd, Roman "fuzzy key" ke
 // saath. Yeh hamara "kya yeh shabd sach mein Hindi hai?" detector hai.
 import LEXICON from "./lexicon.js";
+// ⚠️ Ye list DO jagah chahiye — yahan (citation lagne hi na do) aur
+// bookHints.js me (galat granth ka hint na bane). Do nakal rakhna is
+// project ka sabse purana jaal hai, isliye ek hi file.
+import { ANUPASTHIT_GRANTH } from "./anupasthitGranth.js";
 
 /**
  * Hijje ke aam farak mita do — "kitab" aur "kitaab" ek hi key par aayein.
@@ -1192,6 +1196,22 @@ const OUT_OF_SCOPE = [
   /\b(?:price|rate|kitne\s*ka|kitne\s*ki|kimat|cost)\b/i,
   /\b(?:nearest|nearby|hospital)\b/i,
   /\b(?:car|bike|scooter)\b/i,
+
+  // ── JO GRANTH HAMARE PAAS HAIN HI NAHI (2026-08-19) ─────────────────
+  // Poori list aur uski wajah: anupasthitGranth.js
+  //
+  // ⚠️ YE UPAR WALI BAATON SE ALAG ROG HAI. Upar wale sawaal (mausam,
+  // petrol, iPhone) ka VISHAY hi hamare corpus me nahi hai. Yahan vishay
+  // hamare paas HAI, par granth nahi:
+  //     "अष्टावक्र गीता में विदेह मुक्ति क्या है"
+  //     → Yoga Vasishtha ka videha-mukti wala ansh, rerank 0.9965
+  // विदेह मुक्ति sach me hamare granthon me hai. Reranker galat nahi.
+  // Galti ATTRIBUTION ki hai — user ne poochha ki FALAN granth kya kehta
+  // hai, aur hum doosre granth ka naam laga rahe hain.
+  //
+  // Naapa (control_kathin, 20 sawaal): pehle 17/20 jhoothi citation,
+  // best 0.84 se 0.9992 tak. Koi bhi threshold ise nahi rok sakta tha.
+  ...ANUPASTHIT_GRANTH,
 ];
 
 /**

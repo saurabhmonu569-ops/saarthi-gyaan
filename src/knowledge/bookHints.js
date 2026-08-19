@@ -1,3 +1,5 @@
+import { anupasthitGranthHai } from "./anupasthitGranth.js";
+
 /**
  * SAARTHI — Book name → book_id hints (Roman + Devanagari)
  * ================================================================
@@ -326,6 +328,21 @@ export const BOOK_HINTS = {
  * @returns {string|null}
  */
 export function detectHintedBook(query) {
+  // ⚠️ PEHLE YE: kahin user ne kisi AISE granth ka naam to nahi liya jo
+  // hamare paas hai hi nahi?                              (2026-08-19)
+  //
+  // Neeche ka match SEEDHA SUBSTRING hai, isliye "अष्टावक्र गीता" ke andar
+  // "गीता" mil jaata tha aur hint `bhagavad_gita_shankar` ban jaata tha.
+  // Aur hint sirf ek sujhav nahi hai — HINTED_PAKKA=2 us granth ke do ansh
+  // SCORE DEKHE BINA jawab me daal deta hai. Yaani ye pakki jhoothi
+  // citation thi, gate use rok hi nahi sakta tha.
+  //
+  // Naapa (control_kathin, 20 sawaal): "अष्टावक्र गीता में विदेह मुक्ति"
+  // par 7 granth cite ho gaye the, best 0.9965.
+  //
+  // Wahi "देवी गीता", "अवधूत गीता", "उद्धव गीता", "गणेश गीता" ke saath.
+  if (anupasthitGranthHai(query)) return null;
+
   const ql = (query || "").toLowerCase();
   for (const [hint, bid] of Object.entries(BOOK_HINTS)) {
     if (ql.includes(hint.toLowerCase())) return bid;
