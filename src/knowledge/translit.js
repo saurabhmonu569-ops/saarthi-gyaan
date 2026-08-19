@@ -968,6 +968,41 @@ export function expandQueryWithParyay(text) {
     if (!s.includes(bol)) continue;
     for (const p of paryay) if (!s.includes(p) && !add.includes(p)) add.push(p);
   }
+
+  // ── 2. JYOTISH KE BHAAV — DO KITABEIN, DO BHASHAYEIN (2026-08-19) ────
+  //
+  // Hamare paas jyotish ki DO kitabein hain aur wo bhaav (house) ko ALAG
+  // NAAM se bulati hain. Naapa gaya (ansh me kitni baar):
+  //
+  //                       द्वितीय  तृतीय  भाव  खाना
+  //     rashi_muhurt_vigyan   229    230   189    0
+  //     lal_kitab               0      0    56*  141
+  //     (*aur wo 56 me se kai "समयाभाव" jaise shabd hain — house nahi)
+  //
+  // Yaani "द्वितीय भाव" poochhne par LAL KITAB KA CONTENT PAHUNCH SE
+  // BAAHAR HAI. Uske 211 me se sirf 1-4 ansh pool me aate the, aur wo bhi
+  // sanyog se — unka rerank ank 0.0005 se 0.0226 tak tha.
+  //
+  // ⚠️ "खाना" KO SEEDHA PARYAY BANANA BAHUT KHATARNAK HOTA. Uska doosra
+  // matlab BHOJAN hai, aur wo is corpus me bhara pada hai (vrat, prasad,
+  // annadaan). Har khaane-peene wale sawaal me "भाव" ghus jaata.
+  // Isliye sirf GINTI KE SAATH — jahan matlab me koi shak nahi.
+  //
+  // ⚠️ AUR YE SIRF findQ PAR LAGTA HAI, rerankQ PAR NAHI — wahi is
+  // function ka poora asool hai. Paryay UMMEEDWAAR dhoondhne ke liye hain;
+  // reranker ko dena sawaal ko anaad kar deta hai (poori wajah upar).
+  const BHAAV_KHAANA = {
+    "प्रथम": "पहला", "द्वितीय": "दूसरा", "तृतीय": "तीसरा", "चतुर्थ": "चौथा",
+    "पंचम": "पाँचवाँ", "षष्ठ": "छठा", "सप्तम": "सातवाँ", "अष्टम": "आठवाँ",
+    "नवम": "नौवाँ", "दशम": "दसवाँ", "एकादश": "ग्यारहवाँ", "द्वादश": "बारहवाँ",
+  };
+  if (s.includes("भाव")) {
+    for (const [sanskrit, aam] of Object.entries(BHAAV_KHAANA)) {
+      if (!s.includes(sanskrit)) continue;
+      for (const p of [`${aam} खाना`, `${aam} घर`]) if (!add.includes(p)) add.push(p);
+    }
+  }
+
   return add.length ? `${s} ${add.join(" ")}` : s;
 }
 
