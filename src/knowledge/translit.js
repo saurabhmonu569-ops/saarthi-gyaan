@@ -484,6 +484,45 @@ const WORDS = {
   // ye bas LEXICON me the hi nahi — Latin me ja rahe the
   padosi: "पड़ोसी", umeed: "उम्मीद", baarish: "बारिश",
   safar: "सफ़र", karza: "कर्ज़", karz: "कर्ज़",
+
+  // ══ GRANTH KE APNE SHABD JO ROMAN ME LIKHE JAATE HAIN ═══════════════
+  //                                                    19 Agast 2026
+  // 32_khaali_kyun.mjs ne 11 aise sawaal nikale jo HAR BAAR khaali
+  // lautte the. Unme bache hue Roman shabd ye the — aur ye koi angrezi
+  // shabd nahi hain, ye HAMARE APNE GRANTHON KE SHABD hain jo user Roman
+  // me likh deta hai:
+  //
+  //     "Tena tyaktena bhunjitha" ka practical meaning kya hai?
+  //          findQ bana : "तेना tyaktena bhunjitha ka …"
+  //     "Andham tamah" concept ko kaise samjhen?
+  //          findQ bana : "Andham तमाह …"
+  //
+  // Ye Ishavasya Upanishad ke prasiddh mantra hain. Devanagari roop
+  // corpus me maujood hai (381 ansh me in shabdon ka milna naapa gaya).
+  // Par Roman roop lexicon me nahi tha, isliye query aadhi Roman rehti
+  // thi aur reranker ka ank 0.0123 tak gir jaata tha.
+  //
+  // ⚠️ DO SHABD PEHLE SE GALAT MAP HO RAHE THE — aur wo shayad zyada bura
+  // tha "na milne" se:
+  //     tena → "तेना"   (sahi: तेन)
+  //     tamah → "तमाह"  (sahi: तमः)
+  // Ye fuzzy-match se bane the. Aadha-sahi Devanagari shabd corpus me
+  // milta hi nahi, par dikhta bilkul theek hai — isliye ye galti chup-chaap
+  // rehti hai.
+  tena: "तेन", tyaktena: "त्यक्तेन",
+  bhunjitha: "भुञ्जीथाः", bhunjithah: "भुञ्जीथाः",
+  andham: "अन्धं", tamah: "तमः", tamas: "तमस्",
+  sambhuti: "सम्भूति", asambhuti: "असम्भूति",
+  ashvin: "अश्विन", ashvins: "अश्विनौ", ashwini: "अश्विनी",
+  ishavasya: "ईशावास्य", isha: "ईश",
+
+  // Hinglish kriya ke wo roop jo LEXICON me the hi nahi. Inhe niyam se
+  // banane ki koshish 18 Agast ko AAZMAYI AUR HATAYI GAYI — 25,000 shabd
+  // ki list khud adhoori hai, isliye niyam bhi adhoora rehta tha (poori
+  // naap toDevanagari ke andar likhi hai). Ab sirf wahi jode ja rahe hain
+  // jo naap me sach me bache the.
+  kehne: "कहने", samjhen: "समझें", samajhne: "समझने", dekhne: "देखने",
+  sochne: "सोचने", milne: "मिलने", rakhne: "रखने", chalne: "चलने",
 };
 
 // ── 1b. Corpus se bana lexicon (scripts/build-lexicon.mjs) ────────────
@@ -1630,6 +1669,16 @@ export const EN_CONCEPT = {
   // pehla adhyaay "अर्जुन विषाद योग" hai). "डिप्रेशन" likhne se corpus me
   // kuch nahi milta.
   depression: "विषाद",
+
+  // ── 19 Agast: 11 bache hue khaali sawaalon ki ginti se ──────────────
+  // Wahi tareeka — andaaze se nahi, 32_khaali_kyun.mjs ki ginti se.
+  // ⚠️ near, far, created, based, partnership JAAN-BOOJHKAR CHHODE —
+  // inka matlab sandarbh se badalta hai aur galat map hone par nuksaan
+  // chup-chaap hota hai.
+  speech: "वाणी",      // "Second house … family aur speech se"
+  indicate: "संकेत",   // "Tenth house … kya indicate karta hai"
+  bind: "बाँध",        // "Desire mind ko kaise bind karti hai"
+  world: "संसार",      // "World ko mind-created … kehne ka arth"
 };
 
 export function normalizeQueryForSearch(text) {
