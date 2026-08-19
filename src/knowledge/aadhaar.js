@@ -99,51 +99,26 @@ export function vishishtShabd(text) {
 }
 
 /**
- * Kaun se granth Aadhaar me jaayein.
+ * ⚠️ `chuneGayeGranth` YAHAN SE HATA DIYA GAYA — 19 Agast 2026
  *
- * @param {string} jawab            — model ka poora jawab
- * @param {Array}  groundedChunks   — [{ chunk: { book, book_title }, rerank }]
- * @param {object} opts
- *   @param {number} opts.kamSeKam  — kitne vishisht shabd milne par granth
- *                                    "istemaal hua" maana jaye (default 2)
- *   @param {number} opts.adhikatam — footer me zyada se zyada kitne granth
- * @returns {{ granth: string[], hataye: string[] }}
- *   granth : jo Aadhaar me jaayenge (kram: sabse achhe pehle)
- *   hataye : jo hataye gaye (log ke liye — chup-chaap kuch mat karo)
+ * Wo SHABD-MEL wala tareeka tha: jawab aur ansh ke vishisht shabd milao,
+ * aur jis granth ke 2+ shabd na milein use Aadhaar se hata do.
+ *
+ * DO BAAR FAIL HUA (14 aur 17 Agast). Model apne shabdon me likhta hai,
+ * isliye SACHA granth bhi kat jaata tha — aur wo us galti se bura hai
+ * jise theek karne ke liye ye banaya gaya tha.
+ *
+ * KYUN HATANA ZAROORI THA, RAKHNA NAHI:
+ * Use koi bulata hi nahi tha — na app, na koi script. Par uske 7 test
+ * HARE the. Mara hua code jiske test pass hote hain, wo jhoothi tasalli
+ * hai: "aadhaar.js ke 12 test hare hain" sunkar lagta tha ki Aadhaar
+ * jaancha hua hai, jabki ASLI tark kahin aur tha aur ANJAANCHA tha.
+ *
+ * Aur wo bhram mehnga pada: 18 Agast ko 24_aadhaar_check.mjs isi mare
+ * hue module ko naap rahi thi aur "khatra 7" chhaap rahi thi, jabki app
+ * bilkul theek chal rahi thi.
+ *
+ * ASLI TARK AB: src/shared/aadhaar.js  (app aur naap dono wahi bulate)
+ *
+ * `vishishtShabd` yahin hai — use 29_vishay_jaanch.mjs sach me bulati hai.
  */
-export function chuneGayeGranth(jawab, groundedChunks, opts = {}) {
-  const kamSeKam  = opts.kamSeKam  ?? 2;
-  const adhikatam = opts.adhikatam ?? 5;
-
-  const list = Array.isArray(groundedChunks) ? groundedChunks : [];
-  if (!list.length) return { granth: [], hataye: [] };
-
-  const jawabShabd = vishishtShabd(jawab);
-
-  // granth-vaar jodo: uske saare ansh, uska sabse ooncha score
-  const perGranth = new Map();
-  for (const r of list) {
-    const naam = (r?.chunk?.book_title || r?.chunk?.book || "").trim();
-    if (!naam) continue;
-    const g = perGranth.get(naam) || { naam, mel: new Set(), best: -Infinity };
-    for (const w of vishishtShabd(r?.chunk?.text)) if (jawabShabd.has(w)) g.mel.add(w);
-    g.best = Math.max(g.best, Number(r?.rerank) || 0);
-    perGranth.set(naam, g);
-  }
-
-  const sab = [...perGranth.values()].sort((a, b) => b.best - a.best);
-  if (!sab.length) return { granth: [], hataye: [] };
-
-  // ⚠️ SABSE ACHHA GRANTH HAMESHA RAHEGA.
-  // Model paraphrase karta hai; ho sakta hai uske ek bhi shabd ka mel na
-  // ho. Par jawab usi se bana hai. Aadhaar khaali chhodna — yaani "ye
-  // jawab kahin se nahi aaya" dikhana — galat Aadhaar se bhi bura hai.
-  const rakhe  = [sab[0]];
-  const hataye = [];
-  for (const g of sab.slice(1)) {
-    if (g.mel.size >= kamSeKam && rakhe.length < adhikatam) rakhe.push(g);
-    else hataye.push(g.naam);
-  }
-
-  return { granth: rakhe.map(g => g.naam), hataye };
-}

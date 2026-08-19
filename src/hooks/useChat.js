@@ -17,6 +17,9 @@ import { stripCyrillic } from "@/knowledge/translit";
 // 2026-08-04 — gadhe hue uddharan aur jhoothi citation pakadne ke liye
 import { verifyAnswer } from "@/services/verifyAnswer";
 import { BOOK_META } from "@/data/bookMeta";
+// 2026-08-19 — Aadhaar ka tark ab EK jagah, taaki naap aur app ek hi
+// niyam par chalein (dekhein: src/shared/aadhaar.js ki poori tippani)
+import { granthPanktiNikaalo, aadhaarBanao } from "@/shared/aadhaar";
 
 // ── Chat history persistence ──────────────────────────────────────────────────
 const STORAGE_KEY = "saarthi_chat_history";
@@ -521,16 +524,15 @@ export function useChat({
       //
       // Pakdi hui soochi neeche Aadhaar banane me kaam aati hai, par uspar
       // bharosa nahi — wahan use bheje gaye granthon se MILAYA jaata hai.
+      // ⚠️ Ye tark ab src/shared/aadhaar.js me hai — NAKAL MAT BANANA.
+      // 18 Agast ko iski ek nakal 24_aadhaar_check.mjs me thi aur wo
+      // "khatra 7" chhaap rahi thi jabki app bilkul theek chal rahi thi.
+      // Nidaan asli tha, bimari nakli.
       let granthKahe = null;
       if (responseText) {
-        const g = responseText.match(/\[\[\s*GRANTH\s*:([^\]]*)\]\]/i);
-        if (g) {
-          granthKahe = g[1].split("|").map(s => s.trim()).filter(Boolean);
-          responseText = responseText
-            .replace(/\n*\s*\[\[\s*GRANTH\s*:[^\]]*\]\]\s*/gi, "\n")
-            .replace(/\n{3,}/g, "\n\n")
-            .trim();
-        }
+        const nikla = granthPanktiNikaalo(responseText);
+        responseText = nikla.text;
+        granthKahe = nikla.granthKahe;
       }
 
       // ── ADHOORI BHOOMIKA HATAO ───────────────────────────────────────
@@ -696,27 +698,20 @@ export function useChat({
         // shoonya nikla — to purana vyavhaar (saare grounded granth) hi
         // chalta hai. Khaali Aadhaar "ye jawab kahin se nahi aaya" dikhata
         // hai, jo zyada naam dikhane se bhi bura hai.
-        const sabGrounded = [];
-        for (const r of groundedChunks) {
-          const bt = (r.chunk && (r.chunk.book_title || r.chunk.book)) || "";
-          if (bt && !sabGrounded.includes(bt)) sabGrounded.push(bt);
-        }
+        // ⚠️ EK HI TARK, EK HI JAGAH — src/shared/aadhaar.js
+        // Pehle ye yahan haath se likha tha aur uski nakal
+        // 24_aadhaar_check.mjs me thi. Do jagah ek niyam rakhne ki keemat
+        // is project ne kai baar chukayi hai.
+        const { granth: books, gadhe, girGaya } =
+          aadhaarBanao(granthKahe, groundedChunks);
 
-        let books = [];
-        if (granthKahe && granthKahe.length) {
-          // MILAAN — sirf wahi naam jo humne bheje the (bade-chhote akshar
-          // aur aage-peeche ki jagah chhod kar)
-          const saaf = s => s.toLowerCase().replace(/\s+/g, " ").trim();
-          books = sabGrounded.filter(bt => granthKahe.some(k => saaf(k) === saaf(bt)));
-          const gadhe = granthKahe.filter(k => !sabGrounded.some(bt => saaf(k) === saaf(bt)));
-          if (gadhe.length) console.log(`[Aadhaar] model ne ${gadhe.length} aisa naam likha jo bheja hi nahi tha:`, gadhe);
-          if (books.length) console.log(`[Aadhaar] model ke hisaab se ${books.length}/${sabGrounded.length} granth istemaal hue`);
-        }
-        if (!books.length) {
-          if (granthKahe) console.log("[Aadhaar] model ki soochi se kuch mila nahi — saare grounded granth dikha raha hoon");
-          books = sabGrounded;
-        }
-        books = books.slice(0, 5);
+        if (gadhe.length)
+          console.log(`[Aadhaar] model ne ${gadhe.length} aisa naam likha jo bheja hi nahi tha:`, gadhe);
+        if (girGaya && granthKahe)
+          console.log("[Aadhaar] model ki soochi se kuch mila nahi — saare grounded granth dikha raha hoon");
+        else if (!girGaya)
+          console.log(`[Aadhaar] model ke hisaab se ${books.length} granth istemaal hue`);
+
         if (books.length) responseText += `\n\n---\n📚 *Aadhaar: ${books.join(" · ")}*`;
       }
       // SWASTHYA CHETAVANI (2026-08-04) — CODE se, model ke bharose NAHI.

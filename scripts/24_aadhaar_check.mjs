@@ -65,26 +65,21 @@ if (!API) { console.error("❌ .env me VITE_AI_PROXY_URL chahiye"); process.exit
 // bheje gaye granthon se MILAO, aur na mile to purana vyavhaar.
 // Ise badalte waqt useChat.js ke saath milana ZAROORI hai — do jagah ek
 // hi niyam rakhne ki keemat is project ne kai baar chukayi hai.
-const saafNaam = s => String(s || "").toLowerCase().replace(/\s+/g, " ").trim();
+// ⚠️ 19 AGAST 2026 — NAKAL KHATM.
+//
+// Kal yahan is tark ki HAATH SE LIKHI NAKAL thi, upar likhi chetavani ke
+// saath ki "do jagah ek niyam rakhne ki keemat is project ne kai baar
+// chukayi hai". Chetavani likh dene se nakal nakal hi rehti hai.
+//
+// Ab dono taraf ek hi module: src/shared/aadhaar.js
+// useChat.js bhi wahi bulata hai. Naap badle to app badlegi, aur ulta bhi.
+const { granthPanktiNikaalo, aadhaarBanao: aadhaarSeBanao } =
+  await import("../src/shared/aadhaar.js");
 
+/** Purani shakl bachaye rakhne ke liye ek patla aavaran. */
 function aadhaarBanao(jawab, grounded) {
-  const bheje = [];
-  for (const r of grounded) {
-    const bt = (r.chunk && (r.chunk.book_title || r.chunk.book)) || "";
-    if (bt && !bheje.includes(bt)) bheje.push(bt);
-  }
-  const m = String(jawab || "").match(/\[\[\s*GRANTH\s*:([^\]]*)\]\]/i);
-  const kahe = m ? m[1].split("|").map(s => s.trim()).filter(Boolean) : null;
-
-  let granth = [];
-  let gadhe  = [];
-  if (kahe && kahe.length) {
-    granth = bheje.filter(b => kahe.some(k => saafNaam(k) === saafNaam(b)));
-    gadhe  = kahe.filter(k => !bheje.some(b => saafNaam(k) === saafNaam(b)));
-  }
-  const soochiMili = !!m;
-  if (!granth.length) granth = bheje;          // Aadhaar kabhi khaali nahi
-  return { granth: granth.slice(0, 5), hataye: bheje.filter(b => !granth.includes(b)), gadhe, soochiMili };
+  const { granthKahe } = granthPanktiNikaalo(jawab);
+  return aadhaarSeBanao(granthKahe, grounded);
 }
 const { detectHintedBook } = await import("../src/knowledge/bookHints.js");
 const { BOOK_META } = await import("../src/data/bookMeta.js");
