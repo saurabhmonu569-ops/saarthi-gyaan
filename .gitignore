@@ -62,6 +62,13 @@ khaali-jaanch.json
 khaali-kyun.json
 gate-calibrate.json
 
+# 19 Agast — citation ki naap ke nateeje (37_citation_naap.mjs). Inme
+# model ke poore jawab hote hain, yaani ye ek RUN ki tasveer hain aur har
+# baar badalte hain (#42: wahi sawaal, alag jawab). Repo me rakhne se aage
+# jaakar purani tasveer ko sach maan lene ka khatra hai.
+citation-*.json
+aadhaar-check.json
+
 # Environment (NEVER commit your API key!)
 .env
 .env.local
